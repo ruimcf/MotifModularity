@@ -18,15 +18,17 @@ void CLI::start(int argc, char **argv)
   bool weight = true;
   GraphUtils::readFileTxt(g, fileName, dir, weight);
 
+  printf("A");
   int n = g->numNodes();
   partition = new int[n];
   for (int i = 0; i < n; i++)
   {
-    partition[i] = 0;
+    partition[i] = i;
   }
 
-  printf("Num nodes: %d", g->numNodes());
-  printf("kronecker (1, 2): %d", kronecker(1, 2));
+  printf("Num nodes: %d\n", g->numNodes());
+  printf("kronecker (1, 2): %d\n", kronecker(1, 2));
+  CLI::motifModularity();
 }
 
 int CLI::kronecker(int a, int b)
@@ -34,55 +36,54 @@ int CLI::kronecker(int a, int b)
   return partition[a - 1] == partition[b - 1] ? 1 : 0;
 }
 
-int CLI::motifModularity()
+float CLI::motifModularity()
 {
   int n = g->numNodes();
 
-  int numberMotifsInPartitions = 0;
+  float numberMotifsInPartitions = 0;
+  float numberMotifsGraph = 0;
+  float numberMotifsRandomGraphPartitions = 0;
+  float numberMotifsRandomGraph = 0;
   for (int i = 0; i < n; i++)
   {
-    for (int j = 0; i < n; j++)
+    for (int j = 0; j < n; j++)
     {
       for (int k = 0; k < n; k++)
       {
-        numberMotifsInPartitions += CLI::weightWithKronecker(i, j) * CLI::weightWithKronecker(j, k) * CLI::weightWithKronecker(i, k);
+        //printf("i %d; j %d; k %d\n", i, j, k);
+        numberMotifsInPartitions += CLI::maskedWeight(i, j) * CLI::maskedWeight(j, k) * CLI::maskedWeight(i, k);
+        numberMotifsGraph += CLI::weight(i, j) * CLI::weight(j, k) * CLI::weight(i, k);
+        numberMotifsRandomGraphPartitions += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
+        numberMotifsRandomGraph += CLI::nullcaseWeight(i, j) * CLI::nullcaseWeight(j, k) * CLI::nullcaseWeight(i, k);
+        //printf("done\n");
       }
     }
   }
 
-  int numberMotifsGraph = 0;
-  for (int i = 0; i < n; i++)
-  {
-    for (int j = 0; i < n; j++)
-    {
-      for (int k = 0; k < n; k++)
-      {
-        numberMotifsGraph += CLI::weight(i, j) * CLI::weight(j, k) * CLI::weight(i, k);
-      }
-    }
-  }
+  float _motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
+  printf("Motif modularity: %f", _motifModularity);
 
-  int numberMotifsRandomGraphPartitions = 0;
-  for (int i = 0; i < n; i++)
-  {
-    for (int j = 0; i < n; j++)
-    {
-      for (int k = 0; k < n; k++)
-      {
-        numberMotifsGraph += CLI::weight(i, j) * CLI::weight(j, k) * CLI::weight(i, k);
-      }
-    }
-  }
+  return _motifModularity;
 }
 
 int CLI::outWeight(int a)
 {
-  return (g->numOutEdges(a));
+  return (g->nodeOutEdges(a));
 }
 
 int CLI::inWeight(int a)
 {
-  return (g->numInEdges(a));
+  return (g->nodeInEdges(a));
+}
+
+int CLI::nullcaseWeight(int a, int b)
+{
+  return CLI::outWeight(a) * CLI::inWeight(b);
+}
+
+int CLI::maskedNullcaseWeight(int a, int b)
+{
+  return CLI::nullcaseWeight(a, b) * CLI::kronecker(a, b);
 }
 
 int CLI::weight(int a, int b)
@@ -90,7 +91,7 @@ int CLI::weight(int a, int b)
   return (int)(g->hasEdge(a, b));
 }
 
-int CLI::weightWithKronecker(int a, int b)
+int CLI::maskedWeight(int a, int b)
 {
   return CLI::weight(a, b) * CLI::kronecker(a, b);
 }
