@@ -12,6 +12,8 @@ private:
   static int outWeight(int a);
   static int nullcaseWeight(int a, int b);
   static int maskedNullcaseWeight(int a, int b);
+  static void readPartition(const char *s);
+  static void randomPartition(int maxCummunities);
 
   static float motifModularity();
   static int weight(int a, int b);

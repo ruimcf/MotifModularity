@@ -49,7 +49,6 @@ void GraphUtils::readFileTxt(Graph *g, const char *s, bool dir, bool weight)
       max = b;
     size++;
   }
-  printf("done");
   fclose(f);
 
   if (dir)

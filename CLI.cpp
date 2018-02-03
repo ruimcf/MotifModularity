@@ -1,11 +1,12 @@
 #include "CLI.h"
+#include "Error.h"
 
 Graph *CLI::g;
 int *CLI::partition;
 
 void CLI::start(int argc, char **argv)
 {
-  if (argc < 2)
+  if (argc < 3)
   {
     printf("Use with more arg");
     return;
@@ -18,13 +19,12 @@ void CLI::start(int argc, char **argv)
   bool weight = true;
   GraphUtils::readFileTxt(g, fileName, dir, weight);
 
-  printf("A");
   int n = g->numNodes();
   partition = new int[n];
-  for (int i = 0; i < n; i++)
-  {
-    partition[i] = i;
-  }
+  char partitionFile[MAX_BUF];
+  strcpy(partitionFile, argv[2]);
+  //CLI::readPartition(partitionFile);
+  CLI::randomPartition(2);
 
   printf("Num nodes: %d\n", g->numNodes());
   printf("kronecker (1, 2): %d\n", kronecker(1, 2));
@@ -50,12 +50,10 @@ float CLI::motifModularity()
     {
       for (int k = 0; k < n; k++)
       {
-        //printf("i %d; j %d; k %d\n", i, j, k);
         numberMotifsInPartitions += CLI::maskedWeight(i, j) * CLI::maskedWeight(j, k) * CLI::maskedWeight(i, k);
         numberMotifsGraph += CLI::weight(i, j) * CLI::weight(j, k) * CLI::weight(i, k);
         numberMotifsRandomGraphPartitions += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
         numberMotifsRandomGraph += CLI::nullcaseWeight(i, j) * CLI::nullcaseWeight(j, k) * CLI::nullcaseWeight(i, k);
-        //printf("done\n");
       }
     }
   }
@@ -94,4 +92,43 @@ int CLI::weight(int a, int b)
 int CLI::maskedWeight(int a, int b)
 {
   return CLI::weight(a, b) * CLI::kronecker(a, b);
+}
+
+void CLI::readPartition(const char *s)
+{
+  FILE *f = fopen(s, "r");
+  if (!f)
+    Error::msg(NULL);
+
+  int a, size = 0;
+
+  while (fscanf(f, "%d", &a) == 1)
+  {
+    partition[size] = a;
+    size++;
+  }
+  fclose(f);
+}
+
+void CLI::randomPartition(int maxCommunities)
+{
+  std::vector<int> v;
+  srand(time(NULL));
+  int n = g->numNodes();
+  int numberCommunities = 0;
+  for (int i = 0; i < n; i++)
+  {
+    int x = rand() % maxCommunities;
+    if (std::find(v.begin(), v.end(), x) != v.end())
+    {
+      /* v contains x */
+    }
+    else
+    {
+      numberCommunities++;
+      v.push_back(x);
+    }
+    partition[i] = x;
+  }
+  printf("Number of communities: %d\n", numberCommunities);
 }
