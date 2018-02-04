@@ -28,7 +28,8 @@ void CLI::start(int argc, char **argv)
 
   printf("Num nodes: %d\n", g->numNodes());
   printf("kronecker (1, 2): %d\n", kronecker(1, 2));
-  CLI::motifModularity();
+  //CLI::motifModularity();
+  CLI::createAllPartitions();
 }
 
 int CLI::kronecker(int a, int b)
@@ -59,7 +60,7 @@ float CLI::motifModularity()
   }
 
   float _motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
-  printf("Motif modularity: %f", _motifModularity);
+  printf("Motif modularity: %f\n", _motifModularity);
 
   return _motifModularity;
 }
@@ -131,4 +132,23 @@ void CLI::randomPartition(int maxCommunities)
     partition[i] = x;
   }
   printf("Number of communities: %d\n", numberCommunities);
+}
+
+void CLI::createAllPartitions()
+{
+  int numNodes = g->numNodes();
+  CLI::createAllPartitionsStep(0, numNodes);
+}
+
+void CLI::createAllPartitionsStep(int level, int numberNodes)
+{
+  if (level == numberNodes - 1)
+  {
+    CLI::motifModularity();
+    return;
+  }
+  partition[level] = 0;
+  CLI::createAllPartitionsStep(level + 1, numberNodes);
+  partition[level] = 1;
+  CLI::createAllPartitionsStep(level + 1, numberNodes);
 }
