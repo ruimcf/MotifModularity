@@ -1,8 +1,14 @@
 #include "CLI.h"
 #include "Error.h"
 
+using namespace std;
+
 Graph *CLI::g;
 int *CLI::partition;
+vector<int> CLI::nodes;
+vector<int> CLI::combination;
+int total = 0;
+float CLI::n1 = 0, CLI::n2 = 0, CLI::n3 = 0, CLI::n4 = 0;
 
 void CLI::start(int argc, char **argv)
 {
@@ -28,8 +34,15 @@ void CLI::start(int argc, char **argv)
 
   printf("Num nodes: %d\n", g->numNodes());
   printf("kronecker (1, 2): %d\n", kronecker(1, 2));
-  //CLI::motifModularity();
-  CLI::createAllPartitions();
+  CLI::motifModularity();
+  //CLI::createAllPartitions();
+  for (int i = 0; i < g->numNodes(); i++)
+  {
+    nodes.push_back(i + 1);
+  }
+  float _motifModularity = CLI::cicleModularity(3);
+  printf("Motif modularity: %f\n", _motifModularity);
+  //cout << "Total: " << total << endl;
 }
 
 int CLI::kronecker(int a, int b)
@@ -62,7 +75,66 @@ float CLI::motifModularity()
   float _motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
   printf("Motif modularity: %f\n", _motifModularity);
 
+  // if(_motifModularity > bestPartition){
+
+  // }
   return _motifModularity;
+}
+
+float CLI::cicleModularity(int size)
+{
+  CLI::combinationRecursive(0, size);
+  return n1 / n2 - n3 / n4;
+}
+
+void CLI::combinationRecursive(int offset, int k)
+{
+  if (k == 0)
+  {
+    //I have the combination
+    pretty_print(combination);
+    //CLI::computeCombinationCicleModularity();
+    total++;
+    return;
+  }
+  for (int i = offset; i < g->numNodes(); i++)
+  {
+    combination.push_back(nodes[i]);
+    CLI::combinationRecursive(i + 1, k - 1);
+    combination.pop_back();
+  }
+}
+
+void CLI::computeCombinationCicleModularity()
+{
+  int g1 = CLI::maskedWeight(combination.back(), combination.front());
+  int g2 = CLI::weight(combination.back(), combination.front());
+  int g3 = CLI::maskedNullcaseWeight(combination.back(), combination.front());
+  int g4 = CLI::nullcaseWeight(combination.back(), combination.front());
+
+  for (int i = 0; i < combination.size() - 2; i++)
+  {
+    g1 *= CLI::maskedWeight(combination[i], combination[i + 1]);
+    g2 *= CLI::weight(combination[i], combination[i + 1]);
+    g3 *= CLI::maskedNullcaseWeight(combination[i], combination[i + 1]);
+    g4 *= CLI::nullcaseWeight(combination[i], combination[i + 1]);
+  }
+
+  n1 += g1;
+  n2 += g2;
+  n3 += g3;
+  n4 += g4;
+}
+
+void pretty_print(const vector<int> &v)
+{
+  static int count = 0;
+  cout << "combination no " << (++count) << ": [ ";
+  for (int i = 0; i < v.size(); ++i)
+  {
+    cout << v[i] << " ";
+  }
+  cout << "] " << endl;
 }
 
 int CLI::outWeight(int a)
