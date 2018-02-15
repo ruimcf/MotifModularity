@@ -29,20 +29,19 @@ void CLI::start(int argc, char **argv)
   partition = new int[n];
   char partitionFile[MAX_BUF];
   strcpy(partitionFile, argv[2]);
-  //CLI::readPartition(partitionFile);
-  CLI::randomPartition(2);
+  CLI::readPartition(partitionFile);
+  //CLI::randomPartition(2);
 
   printf("Num nodes: %d\n", g->numNodes());
-  printf("kronecker (1, 2): %d\n", kronecker(1, 2));
   CLI::motifModularity();
+  total = 0;
   //CLI::createAllPartitions();
   for (int i = 0; i < g->numNodes(); i++)
   {
-    nodes.push_back(i + 1);
+    nodes.push_back(i);
   }
   float _motifModularity = CLI::cicleModularity(3);
   printf("Motif modularity: %f\n", _motifModularity);
-  //cout << "Total: " << total << endl;
 }
 
 int CLI::kronecker(int a, int b)
@@ -60,10 +59,11 @@ float CLI::motifModularity()
   float numberMotifsRandomGraph = 0;
   for (int i = 0; i < n; i++)
   {
-    for (int j = 0; j < n; j++)
+    for (int j = i + 1; j < n; j++)
     {
-      for (int k = 0; k < n; k++)
+      for (int k = j + 1; k < n; k++)
       {
+        total++;
         numberMotifsInPartitions += CLI::maskedWeight(i, j) * CLI::maskedWeight(j, k) * CLI::maskedWeight(i, k);
         numberMotifsGraph += CLI::weight(i, j) * CLI::weight(j, k) * CLI::weight(i, k);
         numberMotifsRandomGraphPartitions += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
@@ -75,15 +75,14 @@ float CLI::motifModularity()
   float _motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
   printf("Motif modularity: %f\n", _motifModularity);
 
-  // if(_motifModularity > bestPartition){
-
-  // }
   return _motifModularity;
 }
 
 float CLI::cicleModularity(int size)
 {
   CLI::combinationRecursive(0, size);
+  // cout << "Final values" << endl
+  //      << "n1: " << n1 << " n2: " << n2 << " n3: " << n3 << " n4: " << n4 << endl;
   return n1 / n2 - n3 / n4;
 }
 
@@ -92,9 +91,8 @@ void CLI::combinationRecursive(int offset, int k)
   if (k == 0)
   {
     //I have the combination
-    pretty_print(combination);
-    //CLI::computeCombinationCicleModularity();
-    total++;
+    //pretty_print(combination);
+    CLI::computeCombinationCicleModularity();
     return;
   }
   for (int i = offset; i < g->numNodes(); i++)
@@ -107,12 +105,12 @@ void CLI::combinationRecursive(int offset, int k)
 
 void CLI::computeCombinationCicleModularity()
 {
-  int g1 = CLI::maskedWeight(combination.back(), combination.front());
-  int g2 = CLI::weight(combination.back(), combination.front());
-  int g3 = CLI::maskedNullcaseWeight(combination.back(), combination.front());
-  int g4 = CLI::nullcaseWeight(combination.back(), combination.front());
+  int g1 = CLI::maskedWeight(combination.front(), combination.back());
+  int g2 = CLI::weight(combination.front(), combination.back());
+  int g3 = CLI::maskedNullcaseWeight(combination.front(), combination.back());
+  int g4 = CLI::nullcaseWeight(combination.front(), combination.back());
 
-  for (int i = 0; i < combination.size() - 2; i++)
+  for (int i = 0; i < combination.size() - 1; i++)
   {
     g1 *= CLI::maskedWeight(combination[i], combination[i + 1]);
     g2 *= CLI::weight(combination[i], combination[i + 1]);
