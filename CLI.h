@@ -20,19 +20,19 @@ private:
   static int maskedWeight(int a, int b);
   static int nullcaseWeight(int a, int b);
   static int maskedNullcaseWeight(int a, int b);
+
   static void readPartition(const char *s);
   static void randomPartition(int maxCummunities);
   static void createAllPartitions();
   static void createAllPartitionsStep(int level, int numNodes);
-  static float cicleModularity(int size);
-  static void combinationRecursive(int offset, int k);
-  static void computeCicleModularity();
-  static void computeCombinationCicleModularity();
 
-  static float motifModularity();
+  static float cicleModularity(int size);
+  static void iterateCombinations(int offset, int k);
+  static void computeCicleModularity();
+  static void combinationCicleModularity();
+  static float triangleModularity();
 
 public:
-  static int a;
   static void start(int argc, char **argv);
 };
 

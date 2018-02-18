@@ -28,11 +28,11 @@ void CLI::start(int argc, char **argv)
   partition = new int[n];
   char partitionFile[MAX_BUF];
   strcpy(partitionFile, argv[2]);
-  CLI::readPartition(partitionFile);
-  //CLI::randomPartition(2);
+  //CLI::readPartition(partitionFile);
+  CLI::randomPartition(2);
 
   printf("Num nodes: %d\n", g->numNodes());
-  CLI::motifModularity();
+  CLI::triangleModularity();
   total = 0;
   //CLI::createAllPartitions();
   for (int i = 0; i < g->numNodes(); i++)
@@ -48,7 +48,7 @@ int CLI::kronecker(int a, int b)
   return partition[a - 1] == partition[b - 1] ? 1 : 0;
 }
 
-float CLI::motifModularity()
+float CLI::triangleModularity()
 {
   int n = g->numNodes();
 
@@ -79,28 +79,26 @@ float CLI::motifModularity()
 
 float CLI::cicleModularity(int size)
 {
-  CLI::combinationRecursive(0, size);
+  CLI::iterateCombinations(0, size);
   return n1 / n2 - n3 / n4;
 }
 
-void CLI::combinationRecursive(int offset, int k)
+void CLI::iterateCombinations(int offset, int k)
 {
   if (k == 0)
   {
-    //I have the combination
-    //pretty_print(combination);
-    CLI::computeCombinationCicleModularity();
+    CLI::combinationCicleModularity();
     return;
   }
   for (int i = offset; i < g->numNodes(); i++)
   {
     combination.push_back(nodes[i]);
-    CLI::combinationRecursive(i + 1, k - 1);
+    CLI::iterateCombinations(i + 1, k - 1);
     combination.pop_back();
   }
 }
 
-void CLI::computeCombinationCicleModularity()
+void CLI::combinationCicleModularity()
 {
   int g1 = CLI::maskedWeight(combination.front(), combination.back());
   int g2 = g->hasEdge(combination.front(), combination.back());
@@ -165,24 +163,20 @@ void CLI::readPartition(const char *s)
 
 void CLI::randomPartition(int maxCommunities)
 {
-  std::vector<int> v;
+  std::vector<int> communities(maxCommunities, 0);
   srand(time(NULL));
   int n = g->numNodes();
   int numberCommunities = 0;
   for (int i = 0; i < n; i++)
   {
     int x = rand() % maxCommunities;
-    if (std::find(v.begin(), v.end(), x) != v.end())
-    {
-      /* v contains x */
-    }
-    else
-    {
-      numberCommunities++;
-      v.push_back(x);
-    }
+    communities[x] += 1;
     partition[i] = x;
   }
+  for (std::vector<int>::iterator it = communities.begin(); it != communities.end(); ++it)
+    if (*it > 0)
+      numberCommunities++;
+
   printf("Number of communities: %d\n", numberCommunities);
 }
 
@@ -196,7 +190,7 @@ void CLI::createAllPartitionsStep(int level, int numberNodes)
 {
   if (level == numberNodes - 1)
   {
-    CLI::motifModularity();
+    CLI::triangleModularity();
     return;
   }
   partition[level] = 0;
