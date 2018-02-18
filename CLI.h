@@ -1,5 +1,6 @@
-#include "GraphMatrix.h"
-#include "GraphUtils.h"
+#include "gtries/GraphMatrix.h"
+#include "gtries/GraphUtils.h"
+#include "gtries/Error.h"
 #include <string>
 
 class CLI

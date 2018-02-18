@@ -21,9 +21,9 @@ CLIBS=
 
 # Source files
 SRC =                   \
-	GraphMatrix.cpp	\
-	GraphUtils.cpp \
-	Error.cpp \
+	gtries/GraphMatrix.cpp	\
+	gtries/GraphUtils.cpp \
+	gtries/Error.cpp \
 	CLI.cpp	\
 	main.cpp 
 
@@ -40,4 +40,4 @@ ${EXEC_NAME}: ${OBJ}
 	${CC} ${CFLAGS} -c -o $@ $+
 
 clean:
-	rm ${EXEC_NAME} *.o *~ *# -rf
+	rm ${EXEC_NAME} *.o */*.o *~ *# -rf

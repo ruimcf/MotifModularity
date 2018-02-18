@@ -1,5 +1,4 @@
 #include "CLI.h"
-#include "Error.h"
 
 using namespace std;
 
