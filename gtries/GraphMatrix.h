@@ -79,6 +79,8 @@ public:
   int *arrayNumNeighbours() { return _num_neighbours; }
   vector<int> *outEdges(int a) { return &_adjOut[a]; }
   vector<int> *inEdges(int a) { return &_adjIn[a]; }
+
+  //Defined by ruimcf
 };
 
 #endif

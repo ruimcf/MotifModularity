@@ -64,7 +64,7 @@ float CLI::motifModularity()
       {
         total++;
         numberMotifsInPartitions += CLI::maskedWeight(i, j) * CLI::maskedWeight(j, k) * CLI::maskedWeight(i, k);
-        numberMotifsGraph += CLI::weight(i, j) * CLI::weight(j, k) * CLI::weight(i, k);
+        numberMotifsGraph += g->hasEdge(i, j) * g->hasEdge(j, k) * g->hasEdge(i, k);
         numberMotifsRandomGraphPartitions += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
         numberMotifsRandomGraph += CLI::nullcaseWeight(i, j) * CLI::nullcaseWeight(j, k) * CLI::nullcaseWeight(i, k);
       }
@@ -80,8 +80,6 @@ float CLI::motifModularity()
 float CLI::cicleModularity(int size)
 {
   CLI::combinationRecursive(0, size);
-  // cout << "Final values" << endl
-  //      << "n1: " << n1 << " n2: " << n2 << " n3: " << n3 << " n4: " << n4 << endl;
   return n1 / n2 - n3 / n4;
 }
 
@@ -105,14 +103,14 @@ void CLI::combinationRecursive(int offset, int k)
 void CLI::computeCombinationCicleModularity()
 {
   int g1 = CLI::maskedWeight(combination.front(), combination.back());
-  int g2 = CLI::weight(combination.front(), combination.back());
+  int g2 = g->hasEdge(combination.front(), combination.back());
   int g3 = CLI::maskedNullcaseWeight(combination.front(), combination.back());
   int g4 = CLI::nullcaseWeight(combination.front(), combination.back());
 
   for (int i = 0; i < combination.size() - 1; i++)
   {
     g1 *= CLI::maskedWeight(combination[i], combination[i + 1]);
-    g2 *= CLI::weight(combination[i], combination[i + 1]);
+    g2 *= g->hasEdge(combination[i], combination[i + 1]);
     g3 *= CLI::maskedNullcaseWeight(combination[i], combination[i + 1]);
     g4 *= CLI::nullcaseWeight(combination[i], combination[i + 1]);
   }
@@ -134,19 +132,9 @@ void pretty_print(const vector<int> &v)
   cout << "] " << endl;
 }
 
-int CLI::outWeight(int a)
-{
-  return (g->nodeOutEdges(a));
-}
-
-int CLI::inWeight(int a)
-{
-  return (g->nodeInEdges(a));
-}
-
 int CLI::nullcaseWeight(int a, int b)
 {
-  return CLI::outWeight(a) * CLI::inWeight(b);
+  return g->nodeOutEdges(a) * g->nodeInEdges(b);
 }
 
 int CLI::maskedNullcaseWeight(int a, int b)
@@ -154,14 +142,9 @@ int CLI::maskedNullcaseWeight(int a, int b)
   return CLI::nullcaseWeight(a, b) * CLI::kronecker(a, b);
 }
 
-int CLI::weight(int a, int b)
-{
-  return (int)(g->hasEdge(a, b));
-}
-
 int CLI::maskedWeight(int a, int b)
 {
-  return CLI::weight(a, b) * CLI::kronecker(a, b);
+  return g->hasEdge(a, b) * CLI::kronecker(a, b);
 }
 
 void CLI::readPartition(const char *s)
