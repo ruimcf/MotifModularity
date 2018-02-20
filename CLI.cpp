@@ -8,6 +8,8 @@ vector<int> CLI::nodes;
 vector<int> CLI::combination;
 int total = 0;
 float CLI::n1 = 0, CLI::n2 = 0, CLI::n3 = 0, CLI::n4 = 0;
+float bestModularity;
+int *bestPartition;
 
 void CLI::start(int argc, char **argv)
 {
@@ -28,24 +30,30 @@ void CLI::start(int argc, char **argv)
   partition = new int[n];
   char partitionFile[MAX_BUF];
   strcpy(partitionFile, argv[2]);
-  //CLI::readPartition(partitionFile);
-  CLI::randomPartition(2);
+  CLI::readPartition(partitionFile);
+  cout << "Parition read: " << int_array_to_string(partition, n) << endl;
+  //CLI::randomPartition(2);
 
   printf("Num nodes: %d\n", g->numNodes());
-  CLI::triangleModularity();
+  float _triangleModularity = CLI::triangleModularity();
+  printf("Triangle modularity: %f\nTotal: %d\n", _triangleModularity, total);
+
   total = 0;
   //CLI::createAllPartitions();
-  for (int i = 0; i < g->numNodes(); i++)
+  for (int i = 1; i <= g->numNodes(); i++)
   {
     nodes.push_back(i);
   }
   float _motifModularity = CLI::cicleModularity(3);
-  printf("Motif modularity: %f\n", _motifModularity);
+  printf("Circle modularity: %f\nTotal: %d\n", _motifModularity, total);
 }
 
 int CLI::kronecker(int a, int b)
 {
-  return partition[a - 1] == partition[b - 1] ? 1 : 0;
+  int zeroOrOne = partition[a - 1] == partition[b - 1] ? 1 : 0;
+  //cout << "A: " << a << " P[a]: " << partition[a - 1] << " B: " << b << " P[b]: " << partition[b - 1] << " -> " << zeroOrOne << " Partition: " << int_array_to_string(partition, 10) << endl;
+
+  return zeroOrOne;
 }
 
 float CLI::triangleModularity()
@@ -72,7 +80,7 @@ float CLI::triangleModularity()
   }
 
   float _motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
-  printf("Motif modularity: %f\n", _motifModularity);
+  //printf("Motif modularity: %f\n", _motifModularity);
 
   return _motifModularity;
 }
@@ -113,10 +121,13 @@ void CLI::combinationCicleModularity()
     g4 *= CLI::nullcaseWeight(combination[i], combination[i + 1]);
   }
 
+  total++;
   n1 += g1;
   n2 += g2;
   n3 += g3;
   n4 += g4;
+
+  //cout << "n1: " << n1 << " n2: " << n2 << " n3: " << n3 << " n4: " << n4 << endl;
 }
 
 void pretty_print(const vector<int> &v)
@@ -183,18 +194,37 @@ void CLI::randomPartition(int maxCommunities)
 void CLI::createAllPartitions()
 {
   int numNodes = g->numNodes();
+  bestModularity = 0;
+  bestPartition = new int[numNodes];
   CLI::createAllPartitionsStep(0, numNodes);
+}
+
+string int_array_to_string(int int_array[], int size_of_array)
+{
+  string returnstring = "";
+  for (int temp = 0; temp < size_of_array; temp++)
+    returnstring += to_string(int_array[temp]);
+  return returnstring;
 }
 
 void CLI::createAllPartitionsStep(int level, int numberNodes)
 {
   if (level == numberNodes - 1)
   {
-    CLI::triangleModularity();
+    float modularity = CLI::triangleModularity();
+    if (modularity > bestModularity)
+    {
+      bestModularity = modularity;
+      memcpy(bestPartition, partition, sizeof(int) * numberNodes);
+      cout << "New best modularity: " << modularity << endl
+           << "Paritition: " << int_array_to_string(partition, numberNodes) << endl;
+    }
     return;
   }
-  partition[level] = 0;
-  CLI::createAllPartitionsStep(level + 1, numberNodes);
-  partition[level] = 1;
-  CLI::createAllPartitionsStep(level + 1, numberNodes);
+  int maxCommunities = numberNodes;
+  for (int i = 0; i < maxCommunities; i++)
+  {
+    partition[level] = i;
+    CLI::createAllPartitionsStep(level + 1, numberNodes);
+  }
 }

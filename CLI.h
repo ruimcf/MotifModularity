@@ -8,8 +8,6 @@ class CLI
 private:
   static Graph *g;
   static int *partition;
-  static std::vector<float> bestModularity;
-  static std::vector<int *> bestPartitions;
   static vector<int> nodes;
   static vector<int> combination;
   static float n1;
@@ -37,3 +35,4 @@ public:
 };
 
 void pretty_print(const vector<int> &v);
+string int_array_to_string(int int_array[], int size_of_array);
