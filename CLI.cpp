@@ -30,7 +30,7 @@ void CLI::start(int argc, char **argv)
   partition = new int[n];
   char partitionFile[MAX_BUF];
   strcpy(partitionFile, argv[2]);
-  CLI::readPartition(partitionFile);
+  //CLI::readPartition(partitionFile);
   cout << "Parition read: " << int_array_to_string(partition, n) << endl;
   //CLI::randomPartition(2);
 
@@ -39,18 +39,18 @@ void CLI::start(int argc, char **argv)
   printf("Triangle modularity: %f\nTotal: %d\n", _triangleModularity, total);
 
   total = 0;
-  //CLI::createAllPartitions();
-  for (int i = 1; i <= g->numNodes(); i++)
+  CLI::createAllPartitions();
+  for (int i = 0; i < g->numNodes(); i++)
   {
     nodes.push_back(i);
   }
-  float _motifModularity = CLI::cicleModularity(3);
-  printf("Circle modularity: %f\nTotal: %d\n", _motifModularity, total);
+  //float _motifModularity = CLI::cicleModularity(3);
+  //printf("Circle modularity: %f\nTotal: %d\n", _motifModularity, total);
 }
 
 int CLI::kronecker(int a, int b)
 {
-  int zeroOrOne = partition[a - 1] == partition[b - 1] ? 1 : 0;
+  int zeroOrOne = partition[a] == partition[b] ? 1 : 0;
   //cout << "A: " << a << " P[a]: " << partition[a - 1] << " B: " << b << " P[b]: " << partition[b - 1] << " -> " << zeroOrOne << " Partition: " << int_array_to_string(partition, 10) << endl;
 
   return zeroOrOne;
@@ -75,6 +75,7 @@ float CLI::triangleModularity()
         numberMotifsGraph += g->hasEdge(i, j) * g->hasEdge(j, k) * g->hasEdge(i, k);
         numberMotifsRandomGraphPartitions += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
         numberMotifsRandomGraph += CLI::nullcaseWeight(i, j) * CLI::nullcaseWeight(j, k) * CLI::nullcaseWeight(i, k);
+        //cout << "n1: " << numberMotifsInPartitions << " n2: " << numberMotifsGraph << " n3: " << numberMotifsRandomGraphPartitions << " n4: " << numberMotifsRandomGraph << endl;
       }
     }
   }
@@ -108,10 +109,10 @@ void CLI::iterateCombinations(int offset, int k)
 
 void CLI::combinationCicleModularity()
 {
-  int g1 = CLI::maskedWeight(combination.front(), combination.back());
-  int g2 = g->hasEdge(combination.front(), combination.back());
-  int g3 = CLI::maskedNullcaseWeight(combination.front(), combination.back());
-  int g4 = CLI::nullcaseWeight(combination.front(), combination.back());
+  int g1 = CLI::maskedWeight(combination.back(), combination.front());
+  int g2 = g->hasEdge(combination.back(), combination.front());
+  int g3 = CLI::maskedNullcaseWeight(combination.back(), combination.front());
+  int g4 = CLI::nullcaseWeight(combination.back(), combination.front());
 
   for (int i = 0; i < combination.size() - 1; i++)
   {
