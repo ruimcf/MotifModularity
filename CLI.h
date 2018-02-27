@@ -2,6 +2,7 @@
 #include "gtries/GraphUtils.h"
 #include "gtries/Error.h"
 #include <string>
+#include <math.h>
 
 class CLI
 {
