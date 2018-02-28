@@ -252,7 +252,7 @@ int numberForEvenPartitions(int numNodes)
  * Psedo código
  */
 
-float FUNCTION()
+float CLI::singleNodeGreedyAlgorithm()
 {
     int chosenNode;
     float currentModularity;
@@ -262,12 +262,13 @@ float FUNCTION()
     int timesToFail = 3;
     while (true)
     {
-        chosenNode = Random(numNodes);
+        srand(time(NULL));
+        chosenNode = rand() % g->numNodes();
         startModule = partition[chosenNode];
         bestModule = NULL;
-        currentModularity = triangleModularity();
+        currentModularity = CLI::triangleModularity();
         int modularityForEachPartition[] = new int[numPartitions];
-        for (i = 0; i < numPartitions; i++)
+        for (int i = 0; i < numPartitions; i++)
         {
             partition[chosenNode] = i;
             modularityForEachPartition[i] = triangleModularity();
