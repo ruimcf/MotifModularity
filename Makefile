@@ -25,6 +25,7 @@ SRC =                   \
 	gtries/GraphUtils.cpp \
 	gtries/Error.cpp \
 	CLI.cpp	\
+	FailObject.cpp \
 	main.cpp 
 
 OBJ =  ${SRC:.cpp=.o}
