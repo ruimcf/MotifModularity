@@ -249,10 +249,6 @@ int numberForEvenPartitions(int numNodes)
     return (int)ceil(numNodes / 3.0);
 }
 
-/**
- * Psedo código
- */
-
 float CLI::singleNodeGreedyAlgorithm()
 {
     int numPartitions = numberForEvenPartitions(g->numNodes());
@@ -262,9 +258,9 @@ float CLI::singleNodeGreedyAlgorithm()
     int chosenNodePartition;
     float bestModularity;
     int betterPartition;
-    int timesToFail = 100;
     bool running = true;
-    while (running)
+    FailObject failObject;
+    while (!failObject.finished())
     {
         srand(time(NULL));
         chosenNode = rand() % g->numNodes();
@@ -285,15 +281,12 @@ float CLI::singleNodeGreedyAlgorithm()
         }
         if (betterPartition == -1)
         {
-            timesToFail--;
-            if (timesToFail <= 0)
-            {
-                running = false;
-            }
+            failObject.recordFail();
             partition[chosenNode] = chosenNodePartition;
         }
         else
         {
+            failObject.recordSuccess();
             partition[chosenNode] = betterPartition;
         }
     }
