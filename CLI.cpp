@@ -31,23 +31,23 @@ void CLI::start(int argc, char **argv)
     char partitionFile[MAX_BUF];
     strcpy(partitionFile, argv[2]);
     //CLI::readPartition(partitionFile);
-    cout << "Parition read: " << int_array_to_string(partition, n) << endl;
+    // cout << "Parition read: " << int_array_to_string(partition, n) << endl;
     //CLI::randomPartition(2);
 
     printf("Num nodes: %d\n", g->numNodes());
-    float _triangleModularity = CLI::triangleModularity();
-    printf("Triangle modularity: %f\nTotal: %d\n", _triangleModularity, total);
+    // float _triangleModularity = CLI::triangleModularity();
+    // printf("Triangle modularity: %f\nTotal: %d\n", _triangleModularity, total);
 
-    total = 0;
-    CLI::createAllPartitions();
-    for (int i = 0; i < g->numNodes(); i++)
-    {
-        nodes.push_back(i);
-    }
+    // total = 0;
+    // CLI::createAllPartitions();
+    // for (int i = 0; i < g->numNodes(); i++)
+    // {
+    //     nodes.push_back(i);
+    // }
     //float _motifModularity = CLI::cicleModularity(3);
     //printf("Circle modularity: %f\nTotal: %d\n", _motifModularity, total);
 
-    CLI::randomPartition(numberForEvenPartitions(g->numNodes()));
+    CLI::singleNodeGreedyAlgorithm();
 }
 
 int CLI::kronecker(int a, int b)
@@ -175,7 +175,7 @@ void CLI::readPartition(const char *s)
     fclose(f);
 }
 
-void CLI::randomPartition(int maxCommunities)
+int CLI::randomPartition(int maxCommunities)
 {
     std::vector<int> communities(maxCommunities, 0);
     srand(time(NULL));
@@ -192,6 +192,7 @@ void CLI::randomPartition(int maxCommunities)
             numberCommunities++;
 
     printf("Number of communities: %d\n", numberCommunities);
+    return numberCommunities;
 }
 
 void CLI::createAllPartitions()
@@ -254,39 +255,51 @@ int numberForEvenPartitions(int numNodes)
 
 float CLI::singleNodeGreedyAlgorithm()
 {
+    int numPartitions = numberForEvenPartitions(g->numNodes());
+    CLI::randomPartition(numPartitions);
     int chosenNode;
-    float currentModularity;
-    int startModule;
+    float currentModularity = CLI::triangleModularity();
+    int chosenNodePartition;
     float bestModularity;
-    int bestModule;
-    int timesToFail = 3;
-    while (true)
+    int betterPartition;
+    int timesToFail = 100;
+    bool running = true;
+    while (running)
     {
         srand(time(NULL));
         chosenNode = rand() % g->numNodes();
-        startModule = partition[chosenNode];
-        bestModule = NULL;
-        currentModularity = CLI::triangleModularity();
-        int modularityForEachPartition[] = new int[numPartitions];
+        chosenNodePartition = partition[chosenNode];
+        betterPartition = -1;
         for (int i = 0; i < numPartitions; i++)
         {
-            partition[chosenNode] = i;
-            modularityForEachPartition[i] = triangleModularity();
-            if (modularityForEachPartition[i] > currentModularity)
+            if (i != chosenNodePartition)
             {
-                currentModularity = modularityForEachPartition[i];
-                bestModule = i;
+                partition[chosenNode] = i;
+                float currentPartitionModularity = triangleModularity();
+                if (currentPartitionModularity > currentModularity)
+                {
+                    currentModularity = currentPartitionModularity;
+                    betterPartition = i;
+                }
             }
         }
-        if (bestModule == NULL)
+        if (betterPartition == -1)
         {
             timesToFail--;
             if (timesToFail <= 0)
             {
-                return currentModularity;
+                running = false;
             }
+            partition[chosenNode] = chosenNodePartition;
         }
-
-        partition[chosenNode] = bestModule;
+        else
+        {
+            partition[chosenNode] = betterPartition;
+        }
     }
+
+    cout << "Best modularity: " << currentModularity << endl
+         << "Partition: " << int_array_to_string(partition, g->numNodes()) << endl;
+
+    return currentModularity;
 }

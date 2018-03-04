@@ -3,6 +3,7 @@
 #include "gtries/Error.h"
 #include <string>
 #include <math.h>
+#include "FailObject.h"
 
 class CLI
 {
@@ -21,7 +22,7 @@ private:
   static int maskedNullcaseWeight(int a, int b);
 
   static void readPartition(const char *s);
-  static void randomPartition(int maxCummunities);
+  static int randomPartition(int maxCummunities);
   static void createAllPartitions();
   static void createAllPartitionsStep(int level, int numNodes);
 
@@ -30,6 +31,8 @@ private:
   static void computeCicleModularity();
   static void combinationCicleModularity();
   static float triangleModularity();
+
+  static float singleNodeGreedyAlgorithm();
 
 public:
   static void start(int argc, char **argv);
