@@ -1,4 +1,5 @@
 #include "FailObject.h"
+#include "gtries/Error.h"
 
 FailObject::FailObject()
 {

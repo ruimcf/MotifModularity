@@ -26,6 +26,7 @@ SRC =                   \
 	gtries/Error.cpp \
 	CLI.cpp	\
 	FailObject.cpp \
+	Partition.cpp \
 	main.cpp 
 
 OBJ =  ${SRC:.cpp=.o}
