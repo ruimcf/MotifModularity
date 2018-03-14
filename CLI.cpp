@@ -3,9 +3,9 @@
 using namespace std;
 
 Graph *CLI::g;
-int *CLI::partition;
 vector<int> CLI::nodes;
 vector<int> CLI::combination;
+Partition CLI::networkPartition;
 int total = 0;
 float CLI::n1 = 0, CLI::n2 = 0, CLI::n3 = 0, CLI::n4 = 0;
 float bestModularity;
@@ -27,16 +27,17 @@ void CLI::start(int argc, char **argv)
     GraphUtils::readFileTxt(g, fileName, dir, weight);
 
     int n = g->numNodes();
-    partition = new int[n];
+    networkPartition.setNumberNodes(n);
+
     char partitionFile[MAX_BUF];
     strcpy(partitionFile, argv[2]);
-    //CLI::readPartition(partitionFile);
-    // cout << "Parition read: " << int_array_to_string(partition, n) << endl;
+    networkPartition.readPartition(partitionFile);
+    cout << "Parition read: " << int_array_to_string(networkPartition.getPartition(), n) << endl;
     //CLI::randomPartition(2);
 
     printf("Num nodes: %d\n", g->numNodes());
-    // float _triangleModularity = CLI::triangleModularity();
-    // printf("Triangle modularity: %f\nTotal: %d\n", _triangleModularity, total);
+    float _triangleModularity = CLI::triangleModularity();
+    printf("Triangle modularity: %f\nTotal: %d\n", _triangleModularity, total);
 
     // total = 0;
     // CLI::createAllPartitions();
@@ -47,15 +48,12 @@ void CLI::start(int argc, char **argv)
     //float _motifModularity = CLI::cicleModularity(3);
     //printf("Circle modularity: %f\nTotal: %d\n", _motifModularity, total);
 
-    CLI::singleNodeGreedyAlgorithm();
+    //CLI::singleNodeGreedyAlgorithm();
 }
 
 int CLI::kronecker(int a, int b)
 {
-    int zeroOrOne = partition[a] == partition[b] ? 1 : 0;
-    //cout << "A: " << a << " P[a]: " << partition[a - 1] << " B: " << b << " P[b]: " << partition[b - 1] << " -> " << zeroOrOne << " Partition: " << int_array_to_string(partition, 10) << endl;
-
-    return zeroOrOne;
+    return networkPartition.kronecker(a, b);
 }
 
 float CLI::triangleModularity()
@@ -159,42 +157,6 @@ int CLI::maskedWeight(int a, int b)
     return g->hasEdge(a, b) * CLI::kronecker(a, b);
 }
 
-void CLI::readPartition(const char *s)
-{
-    FILE *f = fopen(s, "r");
-    if (!f)
-        Error::msg(NULL);
-
-    int a, size = 0;
-
-    while (fscanf(f, "%d", &a) == 1)
-    {
-        partition[size] = a;
-        size++;
-    }
-    fclose(f);
-}
-
-int CLI::randomPartition(int maxCommunities)
-{
-    std::vector<int> communities(maxCommunities, 0);
-    srand(time(NULL));
-    int n = g->numNodes();
-    int numberCommunities = 0;
-    for (int i = 0; i < n; i++)
-    {
-        int x = rand() % maxCommunities;
-        communities[x] += 1;
-        partition[i] = x;
-    }
-    for (std::vector<int>::iterator it = communities.begin(); it != communities.end(); ++it)
-        if (*it > 0)
-            numberCommunities++;
-
-    printf("Number of communities: %d\n", numberCommunities);
-    return numberCommunities;
-}
-
 void CLI::createAllPartitions()
 {
     int numNodes = g->numNodes();
@@ -219,16 +181,16 @@ void CLI::createAllPartitionsStep(int level, int numberNodes)
         if (modularity >= bestModularity)
         {
             bestModularity = modularity;
-            memcpy(bestPartition, partition, sizeof(int) * numberNodes);
+            memcpy(bestPartition, networkPartition.getPartition(), sizeof(int) * numberNodes);
             cout << "New best modularity: " << modularity << endl
-                 << "Paritition: " << int_array_to_string(partition, numberNodes) << endl;
+                 << "Paritition: " << int_array_to_string(networkPartition.getPartition(), numberNodes) << endl;
         }
         return;
     }
     int maxCommunities = numberNodes;
     for (int i = 0; i < maxCommunities; i++)
     {
-        partition[level] = i;
+        networkPartition.setNodeCommunity(level, i);
         CLI::createAllPartitionsStep(level + 1, numberNodes);
     }
 }
@@ -252,7 +214,7 @@ int numberForEvenPartitions(int numNodes)
 float CLI::singleNodeGreedyAlgorithm()
 {
     int numPartitions = numberForEvenPartitions(g->numNodes());
-    CLI::randomPartition(numPartitions);
+    networkPartition.randomPartition(numPartitions);
     int chosenNode;
     float currentModularity = CLI::triangleModularity();
     int chosenNodePartition;
@@ -264,13 +226,13 @@ float CLI::singleNodeGreedyAlgorithm()
     {
         srand(time(NULL));
         chosenNode = rand() % g->numNodes();
-        chosenNodePartition = partition[chosenNode];
+        chosenNodePartition = networkPartition.getNodeCommunity(chosenNode);
         betterPartition = -1;
         for (int i = 0; i < numPartitions; i++)
         {
             if (i != chosenNodePartition)
             {
-                partition[chosenNode] = i;
+                networkPartition.setNodeCommunity(chosenNode, i);
                 float currentPartitionModularity = triangleModularity();
                 if (currentPartitionModularity > currentModularity)
                 {
@@ -282,17 +244,17 @@ float CLI::singleNodeGreedyAlgorithm()
         if (betterPartition == -1)
         {
             failObject.recordFail();
-            partition[chosenNode] = chosenNodePartition;
+            networkPartition.setNodeCommunity(chosenNode, chosenNodePartition);
         }
         else
         {
             failObject.recordSuccess();
-            partition[chosenNode] = betterPartition;
+            networkPartition.setNodeCommunity(chosenNode, betterPartition);
         }
     }
 
     cout << "Best modularity: " << currentModularity << endl
-         << "Partition: " << int_array_to_string(partition, g->numNodes()) << endl;
+         << "Partition: " << int_array_to_string(networkPartition.getPartition(), g->numNodes()) << endl;
 
     return currentModularity;
 }

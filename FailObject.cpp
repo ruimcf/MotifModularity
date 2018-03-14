@@ -1,5 +1,4 @@
 #include "FailObject.h"
-#include "gtries/Error.h"
 
 FailObject::FailObject()
 {
@@ -28,7 +27,7 @@ void FailObject::recordSuccess()
 
 bool FailObject::finished()
 {
-    if (consecutiveTimesFailed > 500000 && totalTimesFailed > 100000)
+    if (consecutiveTimesFailed > 100000 && totalTimesFailed > 100000)
     {
         return true;
     }

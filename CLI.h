@@ -4,12 +4,14 @@
 #include <string>
 #include <math.h>
 #include "FailObject.h"
+#include "Partition.h"
 
 class CLI
 {
 private:
   static Graph *g;
-  static int *partition;
+  // static int *partition;
+  static Partition networkPartition;
   static vector<int> nodes;
   static vector<int> combination;
   static float n1;
@@ -21,8 +23,6 @@ private:
   static int nullcaseWeight(int a, int b);
   static int maskedNullcaseWeight(int a, int b);
 
-  static void readPartition(const char *s);
-  static int randomPartition(int maxCummunities);
   static void createAllPartitions();
   static void createAllPartitionsStep(int level, int numNodes);
 

@@ -6,6 +6,26 @@ Partition::Partition(int a)
     partition = new int[a];
 }
 
+Partition::Partition()
+{
+    partition = NULL;
+}
+
+void Partition::setNumberNodes(int number)
+{
+    if (partition == NULL)
+    {
+        partition = new int[number];
+    }
+    else
+    {
+        printf("DESTROYED PREVIOUS PARTITION\n");
+        delete[] partition;
+        partition = new int[number];
+    }
+    numberOfNodes = number;
+}
+
 void Partition::setNodeCommunity(int nodeId, int communityId)
 {
     partition[nodeId] = communityId;
@@ -64,4 +84,9 @@ void Partition::readPartition(const char *s)
         size++;
     }
     fclose(f);
+}
+
+int *Partition::getPartition()
+{
+    return partition;
 }
