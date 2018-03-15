@@ -27,7 +27,7 @@ void FailObject::recordSuccess()
 
 bool FailObject::finished()
 {
-    if (consecutiveTimesFailed > 100000 && totalTimesFailed > 100000)
+    if (consecutiveTimesFailed > 500000 && totalTimesFailed > 100000)
     {
         return true;
     }

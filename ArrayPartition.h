@@ -1,16 +1,16 @@
-#ifndef _PARTITION_
-#define _PARTITION_
+#ifndef _ARRAYPARTITION_
+#define _ARRAYPARTITION_
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
 #include "gtries/Error.h"
 
-class Partition
+class ArrayPartition
 {
   public:
-    Partition(int);
-    Partition();
+    ArrayPartition(int);
+    ArrayPartition();
     void setNumberNodes(int number);
     void setNodeCommunity(int nodeId, int communityId);
     int getNodeCommunity(int nodeId);

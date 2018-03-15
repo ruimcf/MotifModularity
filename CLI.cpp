@@ -5,7 +5,7 @@ using namespace std;
 Graph *CLI::g;
 vector<int> CLI::nodes;
 vector<int> CLI::combination;
-Partition CLI::networkPartition;
+ArrayPartition CLI::networkPartition;
 int total = 0;
 float CLI::n1 = 0, CLI::n2 = 0, CLI::n3 = 0, CLI::n4 = 0;
 float bestModularity;
@@ -48,7 +48,7 @@ void CLI::start(int argc, char **argv)
     //float _motifModularity = CLI::cicleModularity(3);
     //printf("Circle modularity: %f\nTotal: %d\n", _motifModularity, total);
 
-    //CLI::singleNodeGreedyAlgorithm();
+    CLI::singleNodeGreedyAlgorithm();
 }
 
 int CLI::kronecker(int a, int b)

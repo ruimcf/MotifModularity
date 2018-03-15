@@ -1,47 +1,43 @@
-#include "Partition.h"
+#include "CommunityPartition.h"
 
-Partition::Partition(int a)
+CommunityPartition::CommunityPartition()
 {
-    numberOfNodes = a;
-    partition = new int[a];
+    nodePartition = NULL;
+    communityPartition = NULL;
 }
 
-Partition::Partition()
+void CommunityPartition::setNumberNodes(int number)
 {
-    partition = NULL;
+    numberNodes = number;
 }
 
-void Partition::setNumberNodes(int number)
+void CommunityPartition::setNumberCommunities(int number)
 {
-    if (partition == NULL)
-    {
-        partition = new int[number];
-    }
-    else
-    {
-        printf("DESTROYED PREVIOUS PARTITION\n");
-        delete[] partition;
-        partition = new int[number];
-    }
-    numberOfNodes = number;
+    numberCommunities = number;
 }
 
-void Partition::setNodeCommunity(int nodeId, int communityId)
+void CommunityPartition::init(int nNodes, int nCommunities)
+{
+    numberNodes = nNodes;
+    numberCommunities = nCommunities;
+}
+
+void CommunityPartition::setNodeCommunity(int nodeId, int communityId)
 {
     partition[nodeId] = communityId;
 }
 
-int Partition::getNodeCommunity(int nodeId)
+int CommunityPartition::getNodeCommunity(int nodeId)
 {
     return partition[nodeId];
 }
 
-int Partition::kronecker(int nodeA, int nodeB)
+int CommunityPartition::kronecker(int nodeA, int nodeB)
 {
     return partition[nodeA] == partition[nodeB] ? 1 : 0;
 }
 
-void Partition::randomPartition(int maxCommunities)
+void CommunityPartition::randomPartition(int maxCommunities)
 {
     std::vector<int> communities(maxCommunities, 0);
     srand(time(NULL));
@@ -60,17 +56,17 @@ void Partition::randomPartition(int maxCommunities)
     numberOfCommunities = numberCommunities;
 }
 
-int Partition::numberCommunities()
+int CommunityPartition::numberCommunities()
 {
     return numberOfCommunities;
 }
 
-int Partition::numberNodes()
+int CommunityPartition::numberNodes()
 {
     return numberOfNodes;
 }
 
-void Partition::readPartition(const char *s)
+void CommunityPartition::readPartition(const char *s)
 {
     FILE *f = fopen(s, "r");
     if (!f)
@@ -86,7 +82,7 @@ void Partition::readPartition(const char *s)
     fclose(f);
 }
 
-int *Partition::getPartition()
+int *CommunityPartition::getPartition()
 {
     return partition;
 }

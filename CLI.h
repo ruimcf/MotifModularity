@@ -4,14 +4,14 @@
 #include <string>
 #include <math.h>
 #include "FailObject.h"
-#include "Partition.h"
+#include "ArrayPartition.h"
 
 class CLI
 {
 private:
   static Graph *g;
   // static int *partition;
-  static Partition networkPartition;
+  static ArrayPartition networkPartition;
   static vector<int> nodes;
   static vector<int> combination;
   static float n1;
