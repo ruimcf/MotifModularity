@@ -1,9 +1,8 @@
 #include "CommunityPartition.h"
+using namespace std;
 
 CommunityPartition::CommunityPartition()
 {
-    nodePartition = NULL;
-    communityPartition = NULL;
 }
 
 void CommunityPartition::setNumberNodes(int number)
@@ -20,6 +19,15 @@ void CommunityPartition::init(int nNodes, int nCommunities)
 {
     numberNodes = nNodes;
     numberCommunities = nCommunities;
+    nodePartition.clear();
+    communityPartition.clear();
+    nodePartition.reserve(numberNodes);
+    communityPartition.reserve(numberCommunities);
+    for (int i = 0; i < numberCommunities; i++)
+    {
+        vector<int> a;
+        communityPartition.push_back(a);
+    }
 }
 
 void CommunityPartition::setNodeCommunity(int nodeId, int communityId)
