@@ -213,7 +213,7 @@ int numberForEvenPartitions(int numNodes)
 
 float CLI::singleNodeGreedyAlgorithm()
 {
-    int numPartitions = numberForEvenPartitions(g->numNodes());
+    int numPartitions = 2;
     networkPartition.randomPartition(numPartitions);
     int chosenNode;
     float currentModularity = CLI::triangleModularity();
@@ -222,9 +222,9 @@ float CLI::singleNodeGreedyAlgorithm()
     int betterPartition;
     bool running = true;
     FailObject failObject;
+    srand(time(NULL));
     while (!failObject.finished())
     {
-        srand(time(NULL));
         chosenNode = rand() % g->numNodes();
         chosenNodePartition = networkPartition.getNodeCommunity(chosenNode);
         betterPartition = -1;
@@ -248,6 +248,7 @@ float CLI::singleNodeGreedyAlgorithm()
         }
         else
         {
+            cout << currentModularity << " " << failObject.getConsecutiveTimesFailed() << endl;
             failObject.recordSuccess();
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
         }

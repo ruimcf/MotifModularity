@@ -28,8 +28,7 @@ public:
 private:
   int numberNodes;
   int numberCommunities;
-  std::vector<int> nodePartition;
-  std::vector<std::vector<int>> communityPartition;
+  std::vector<std::list<int>> partition;
 };
 
 #endif

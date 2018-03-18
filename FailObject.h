@@ -3,18 +3,19 @@
 
 class FailObject
 {
-  public:
-    FailObject();
-    void recordFail();
-    void recordSuccess();
-    bool finished();
+public:
+  FailObject();
+  void recordFail();
+  void recordSuccess();
+  bool finished();
+  int getConsecutiveTimesFailed() { return consecutiveTimesFailed; };
 
-  protected:
-    int totalTimesFailed;
-    int consecutiveTimesFailed;
-    int totalTimesSuccess;
-    int consecutiveTimesSuccess;
-    int totalTimes;
+protected:
+  int totalTimesFailed;
+  int consecutiveTimesFailed;
+  int totalTimesSuccess;
+  int consecutiveTimesSuccess;
+  int totalTimes;
 };
 
 #endif

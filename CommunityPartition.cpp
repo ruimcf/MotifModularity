@@ -19,30 +19,75 @@ void CommunityPartition::init(int nNodes, int nCommunities)
 {
     numberNodes = nNodes;
     numberCommunities = nCommunities;
-    nodePartition.clear();
-    communityPartition.clear();
-    nodePartition.reserve(numberNodes);
-    communityPartition.reserve(numberCommunities);
-    for (int i = 0; i < numberCommunities; i++)
+    partition.clear();
+    partition.reserve(numberCommunities);
+    for (int i = 0; i < numberCommunities; ++i)
     {
-        vector<int> a;
-        communityPartition.push_back(a);
+        list<int> a;
+        partition.push_back(a);
     }
 }
 
 void CommunityPartition::setNodeCommunity(int nodeId, int communityId)
 {
-    partition[nodeId] = communityId;
+    int nodeCommunity = CommunityPartition::getNodeCommunity(nodeId);
+
+    //the node is already in the desired position
+    if (nodeCommunity == communityId)
+        return;
+
+    //if the node is in a community, remove it from there
+    if (nodeCommunity >= 0)
+    {
+        partition[nodeCommunity].remove(nodeId);
+    }
+
+    //Insert node in desired community
+    // if empty, insert immediatly
+    if (partition[nodeCommunity].empty())
+    {
+        partition[nodeCommunity].push_back(nodeId);
+        return;
+    }
+
+    // Insert in order
+    for (list<int>::iterator it = partition[nodeCommunity].begin(); it != partition[nodeCommunity].end(); ++it)
+    {
+        if ((*it) > nodeId)
+        {
+            partition[nodeCommunity].insert(it, nodeId);
+            return;
+        }
+    }
+
+    // Insert in last
+    partition[nodeCommunity].push_back(nodeId);
+
+    //NEED TO ORDER!!!!!!!!
 }
 
 int CommunityPartition::getNodeCommunity(int nodeId)
 {
-    return partition[nodeId];
+    for (vector<list<int>>::iterator v_it = partition.begin(); v_it != partition.end(); ++v_it)
+    {
+        for (list<int>::iterator l_it = (*v_it).begin(); l_it != (*v_it).end(); ++l_it)
+        {
+            if ((*l_it) > nodeId)
+            {
+                break;
+            }
+            if ((*l_it) == nodeId)
+            {
+                return std::distance(partition.begin(), v_it);
+            }
+        }
+    }
+    return -1;
 }
 
 int CommunityPartition::kronecker(int nodeA, int nodeB)
 {
-    return partition[nodeA] == partition[nodeB] ? 1 : 0;
+    return CommunityPartition::getNodeCommunity(nodeA) == CommunityPartition::getNodeCommunity(nodeB) ? 1 : 0;
 }
 
 void CommunityPartition::randomPartition(int maxCommunities)
