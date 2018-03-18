@@ -28,6 +28,7 @@ Last Update: 11/02/2012
 #include <ctime>
 #include <list>
 #include <map>
+#include <set>
 
 #include <cstdio>
 #include <cstdlib>
@@ -36,13 +37,13 @@ Last Update: 11/02/2012
 
 #define MAX_BUF 1024 // Maximum string buffer size
 
-#define VERSION      "0.1"
+#define VERSION "0.1"
 #define PROGRAM_NAME "gtrieScanner"
 
-#define SEPARATOR    "------------------------------------------"
+#define SEPARATOR "------------------------------------------"
 
 // Limits for subgraph size
-#define MIN_MOTIF_SIZE  3
+#define MIN_MOTIF_SIZE 3
 #define MAX_MOTIF_SIZE 50
 
 #define ERROR_HEADER "Error: "
@@ -51,30 +52,38 @@ Last Update: 11/02/2012
 
 #define EPSILON 0.00000001
 
-#define BIT_SET(n,i)   ((n)|=(1<<(i)))
-#define BIT_CLEAR(n,i) ((n)&=~(1<<(i)))
-#define BIT_VALUE(n,i) (((n)>>(i))&1)
+#define BIT_SET(n, i) ((n) |= (1 << (i)))
+#define BIT_CLEAR(n, i) ((n) &= ~(1 << (i)))
+#define BIT_VALUE(n, i) (((n) >> (i)) & 1)
 
 #define smallNode char
 
-#define INVALID_FILE   "__NULL__"    // Invalid file name string
+#define INVALID_FILE "__NULL__" // Invalid file name string
 
-#define DEFAULT_RESULTS "results"    // Default name for results file
-#define DEFAULT_OCC "occ"            // Default name for occurrences file
+#define DEFAULT_RESULTS "results" // Default name for results file
+#define DEFAULT_OCC "occ"         // Default name for occurrences file
 
-typedef enum {NOMETHOD, ESU, GTRIE, SUBGRAPHS} MethodType;
-typedef enum {NOOUTPUT, TEXT, HTML}            OutputType;
-typedef enum {NOFORMAT, SIMPLE, SIMPLE_WEIGHT} FormatType;
+typedef enum { NOMETHOD,
+               ESU,
+               GTRIE,
+               SUBGRAPHS } MethodType;
+typedef enum { NOOUTPUT,
+               TEXT,
+               HTML } OutputType;
+typedef enum { NOFORMAT,
+               SIMPLE,
+               SIMPLE_WEIGHT } FormatType;
 
 using namespace std; // Could be avoided if wanted
 
-typedef std::pair<int,int> iPair;
+typedef std::pair<int, int> iPair;
 typedef std::vector<int> VInt;
 typedef std::vector<VInt> VVInt;
 typedef vector<smallNode *> VVsmallNode;
-typedef map< string, int> mapStringInt;
+typedef map<string, int> mapStringInt;
 
-typedef struct {
+typedef struct
+{
   char *s;
   int f_original;
   double avg_random;
@@ -82,10 +91,10 @@ typedef struct {
   double z_score;
 } ResultType;
 
-
 // Class for "global" variables
-class Global {
- public:
+class Global
+{
+public:
   static bool show_occ;  // Show occurrences?
   static FILE *occ_file; // FILE handle for dumping occurrences;
 };

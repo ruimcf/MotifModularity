@@ -214,18 +214,29 @@ int numberForEvenPartitions(int numNodes)
 float CLI::singleNodeGreedyAlgorithm()
 {
     int numPartitions = 2;
+    numPartitions = numberForEvenPartitions(g->numNodes());
     networkPartition.randomPartition(numPartitions);
-    int chosenNode;
+    int chosenNode, chosenIndex;
     float currentModularity = CLI::triangleModularity();
     int chosenNodePartition;
     float bestModularity;
     int betterPartition;
     bool running = true;
     FailObject failObject;
-    srand(time(NULL));
-    while (!failObject.finished())
+    int seed = time(NULL);
+    srand(seed);
+    vector<int> allNodes;
+    allNodes.reserve(g->numNodes());
+    for (int i = 0; i < g->numNodes(); ++i)
     {
-        chosenNode = rand() % g->numNodes();
+        allNodes.push_back(i);
+    }
+    vector<int> availableNodes(allNodes);
+    while (!failObject.finished() && !availableNodes.empty())
+    {
+        chosenIndex = rand() % availableNodes.size();
+        chosenNode = availableNodes[chosenIndex];
+
         chosenNodePartition = networkPartition.getNodeCommunity(chosenNode);
         betterPartition = -1;
         for (int i = 0; i < numPartitions; i++)
@@ -245,12 +256,14 @@ float CLI::singleNodeGreedyAlgorithm()
         {
             failObject.recordFail();
             networkPartition.setNodeCommunity(chosenNode, chosenNodePartition);
+            availableNodes.erase(availableNodes.begin() + chosenIndex);
         }
         else
         {
             cout << currentModularity << " " << failObject.getConsecutiveTimesFailed() << endl;
             failObject.recordSuccess();
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
+            availableNodes = allNodes;
         }
     }
 
