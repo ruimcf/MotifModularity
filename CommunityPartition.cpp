@@ -66,6 +66,28 @@ void CommunityPartition::setNodeCommunity(int nodeId, int communityId)
     //NEED TO ORDER!!!!!!!!
 }
 
+bool compareFunction(const list<int> &i, const list<int> &j)
+{
+    if (i.empty() && j.empty())
+        return true;
+
+    if (!i.empty() && j.empty())
+        return true;
+
+    if (i.empty() && !j.empty())
+        return false;
+
+    if (i.front() < j.front())
+        return true;
+
+    return false;
+}
+
+void CommunityPartition::sortPartition()
+{
+    std::sort(partition.begin(), partition.end(), )
+}
+
 int CommunityPartition::getNodeCommunity(int nodeId)
 {
     for (vector<list<int>>::iterator v_it = partition.begin(); v_it != partition.end(); ++v_it)

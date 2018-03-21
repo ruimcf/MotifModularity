@@ -29,6 +29,7 @@ private:
   int numberNodes;
   int numberCommunities;
   std::vector<std::list<int>> partition;
+  void sortPartition();
 };
 
 #endif
