@@ -34,6 +34,9 @@ Last Update: 11/02/2012
 #include <cstdlib>
 #include <cstring>
 #include <climits>
+#include <time.h>
+
+#define SEED time(NULL)
 
 #define MAX_BUF 1024 // Maximum string buffer size
 

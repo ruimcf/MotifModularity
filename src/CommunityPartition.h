@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
-#include "gtries/Error.h"
+#include "../include/gtries/Common.h"
+#include "../include/gtries/Error.h"
 
 class CommunityPartition
 {
@@ -18,7 +19,7 @@ public:
   int getNodeCommunity(int nodeId);
   int getNumberCommunities();
   int getNumberNodes();
-  int *getPartition();
+  std::vector<std::list<int>> getPartition();
 
   int kronecker(int nodeA, int nodeB);
 
@@ -30,6 +31,7 @@ private:
   int numberCommunities;
   std::vector<std::list<int>> partition;
   void sortPartition();
+  void insertNodeCommunity(int nodeId, int communityId);
 };
 
 #endif

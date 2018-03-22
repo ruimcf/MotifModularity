@@ -43,27 +43,33 @@ void CommunityPartition::setNodeCommunity(int nodeId, int communityId)
     }
 
     //Insert node in desired community
+    CommunityPartition::insertNodeCommunity(nodeId, communityId);
+
+    //Might be necessary to reorder the communities
+    CommunityPartition::sortPartition();
+}
+
+void CommunityPartition::insertNodeCommunity(int nodeId, int communityId)
+{
     // if empty, insert immediatly
-    if (partition[nodeCommunity].empty())
+    if (partition[communityId].empty())
     {
-        partition[nodeCommunity].push_back(nodeId);
+        partition[communityId].push_back(nodeId);
         return;
     }
 
     // Insert in order
-    for (list<int>::iterator it = partition[nodeCommunity].begin(); it != partition[nodeCommunity].end(); ++it)
+    for (list<int>::iterator it = partition[communityId].begin(); it != partition[communityId].end(); ++it)
     {
         if ((*it) > nodeId)
         {
-            partition[nodeCommunity].insert(it, nodeId);
+            partition[communityId].insert(it, nodeId);
             return;
         }
     }
 
     // Insert in last
-    partition[nodeCommunity].push_back(nodeId);
-
-    //NEED TO ORDER!!!!!!!!
+    partition[communityId].push_back(nodeId);
 }
 
 bool compareFunction(const list<int> &i, const list<int> &j)
@@ -85,7 +91,7 @@ bool compareFunction(const list<int> &i, const list<int> &j)
 
 void CommunityPartition::sortPartition()
 {
-    std::sort(partition.begin(), partition.end(), )
+    std::sort(partition.begin(), partition.end(), compareFunction);
 }
 
 int CommunityPartition::getNodeCommunity(int nodeId)
@@ -115,30 +121,30 @@ int CommunityPartition::kronecker(int nodeA, int nodeB)
 void CommunityPartition::randomPartition(int maxCommunities)
 {
     std::vector<int> communities(maxCommunities, 0);
-    srand(time(NULL));
-    for (int nodeId = 0; nodeId < numberOfNodes; nodeId++)
+    srand(SEED);
+    for (int nodeId = 0; nodeId < numberNodes; nodeId++)
     {
         int randomCommunity = rand() % maxCommunities;
         communities[randomCommunity] += 1;
-        partition[nodeId] = randomCommunity;
+        CommunityPartition::insertNodeCommunity(nodeId, randomCommunity);
     }
-    int numberCommunities = 0;
+    numberCommunities = 0;
     for (std::vector<int>::iterator it = communities.begin(); it != communities.end(); ++it)
         if (*it > 0)
             numberCommunities++;
 
     printf("Number of communities: %d\n", numberCommunities);
-    numberOfCommunities = numberCommunities;
+    CommunityPartition::sortPartition();
 }
 
-int CommunityPartition::numberCommunities()
+int CommunityPartition::getNumberCommunities()
 {
-    return numberOfCommunities;
+    return numberCommunities;
 }
 
-int CommunityPartition::numberNodes()
+int CommunityPartition::getNumberNodes()
 {
-    return numberOfNodes;
+    return numberNodes;
 }
 
 void CommunityPartition::readPartition(const char *s)
@@ -147,17 +153,18 @@ void CommunityPartition::readPartition(const char *s)
     if (!f)
         Error::msg(NULL);
 
-    int a, size = 0;
+    int communityId, nodeId = 0;
 
-    while (fscanf(f, "%d", &a) == 1)
+    while (fscanf(f, "%d", &communityId) == 1)
     {
-        partition[size] = a;
-        size++;
+        CommunityPartition::insertNodeCommunity(nodeId, communityId);
+        nodeId++;
     }
     fclose(f);
+    CommunityPartition::sortPartition();
 }
 
-int *CommunityPartition::getPartition()
+std::vector<std::list<int>> CommunityPartition::getPartition()
 {
     return partition;
 }

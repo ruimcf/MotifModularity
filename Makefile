@@ -21,13 +21,13 @@ CLIBS=
 
 # Source files
 SRC =                   \
-	gtries/GraphMatrix.cpp	\
-	gtries/GraphUtils.cpp \
-	gtries/Error.cpp \
-	CLI.cpp	\
-	FailObject.cpp \
-	ArrayPartition.cpp \
-	main.cpp 
+	include/gtries/GraphMatrix.cpp	\
+	include/gtries/GraphUtils.cpp \
+	include/gtries/Error.cpp \
+	src/CLI.cpp	\
+	src/FailObject.cpp \
+	src/ArrayPartition.cpp \
+	src/main.cpp 
 
 OBJ =  ${SRC:.cpp=.o}
 

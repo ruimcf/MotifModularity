@@ -18,6 +18,7 @@ void CLI::start(int argc, char **argv)
         printf("Use with more arg");
         return;
     }
+    cout << "SEED: " << SEED << endl;
     char fileName[MAX_BUF];
     strcpy(fileName, argv[1]);
     printf("Filename %s\n", fileName);
@@ -32,7 +33,7 @@ void CLI::start(int argc, char **argv)
     char partitionFile[MAX_BUF];
     strcpy(partitionFile, argv[2]);
     networkPartition.readPartition(partitionFile);
-    cout << "Parition read: " << int_array_to_string(networkPartition.getPartition(), n) << endl;
+    cout << "Partition read: " << int_array_to_string(networkPartition.getPartition(), n) << endl;
     //CLI::randomPartition(2);
 
     printf("Num nodes: %d\n", g->numNodes());
@@ -223,8 +224,7 @@ float CLI::singleNodeGreedyAlgorithm()
     int betterPartition;
     bool running = true;
     FailObject failObject;
-    int seed = time(NULL);
-    srand(seed);
+    srand(SEED);
     vector<int> allNodes;
     allNodes.reserve(g->numNodes());
     for (int i = 0; i < g->numNodes(); ++i)

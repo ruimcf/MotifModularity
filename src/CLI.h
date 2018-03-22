@@ -1,6 +1,6 @@
-#include "gtries/GraphMatrix.h"
-#include "gtries/GraphUtils.h"
-#include "gtries/Error.h"
+#include "../include/gtries/GraphMatrix.h"
+#include "../include/gtries/GraphUtils.h"
+#include "../include/gtries/Error.h"
 #include <string>
 #include <math.h>
 #include "FailObject.h"
