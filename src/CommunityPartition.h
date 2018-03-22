@@ -26,6 +26,8 @@ public:
   void readPartition(const char *s);
   void randomPartition(int maxCommunities);
 
+  void printPartition();
+
 private:
   int numberNodes;
   int numberCommunities;

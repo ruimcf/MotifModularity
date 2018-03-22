@@ -168,3 +168,16 @@ std::vector<std::list<int>> CommunityPartition::getPartition()
 {
     return partition;
 }
+
+void CommunityPartition::printPartition()
+{
+    for (int i = 0; i < partition.size(); ++i)
+    {
+        cout << "Community " << i << ": " << endl;
+        for (list<int>::iterator it = partition[i].begin(); it != partition[i].end(); ++it)
+        {
+            cout << *it << " ";
+        }
+        cout << endl;
+    }
+}
