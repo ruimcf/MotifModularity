@@ -96,7 +96,7 @@ void CommunityPartition::sortPartition()
 
 int CommunityPartition::getNodeCommunity(int nodeId)
 {
-    for (vector<list<int>>::iterator v_it = partition.begin(); v_it != partition.end(); ++v_it)
+    for (vector< list<int> >::iterator v_it = partition.begin(); v_it != partition.end(); ++v_it)
     {
         for (list<int>::iterator l_it = (*v_it).begin(); l_it != (*v_it).end(); ++l_it)
         {
@@ -164,7 +164,7 @@ void CommunityPartition::readPartition(const char *s)
     CommunityPartition::sortPartition();
 }
 
-std::vector<std::list<int>> CommunityPartition::getPartition()
+std::vector< std::list<int> > CommunityPartition::getPartition()
 {
     return partition;
 }

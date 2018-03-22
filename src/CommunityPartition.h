@@ -19,7 +19,7 @@ public:
   int getNodeCommunity(int nodeId);
   int getNumberCommunities();
   int getNumberNodes();
-  std::vector<std::list<int>> getPartition();
+  std::vector< std::list<int> > getPartition();
 
   int kronecker(int nodeA, int nodeB);
 
@@ -31,7 +31,7 @@ public:
 private:
   int numberNodes;
   int numberCommunities;
-  std::vector<std::list<int>> partition;
+  std::vector< std::list<int> > partition;
   void sortPartition();
   void insertNodeCommunity(int nodeId, int communityId);
 };
