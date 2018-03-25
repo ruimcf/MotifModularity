@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
-#include "../include/gtries/Error.h"
+#include "Error.h"
 
 class ArrayPartition
 {

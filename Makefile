@@ -13,7 +13,7 @@ CC=g++
 
 # Default Options to use
 # CFLAGS= -Wall -Wno-write-strings -O0 -g
-CFLAGS= -Wno-write-strings -O3
+CFLAGS= -Wno-write-strings -O3 -I ./include/headers
 #CFLAGSFINAL= -O3
 CLIBS=
 

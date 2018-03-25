@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
-#include "../include/gtries/Common.h"
-#include "../include/gtries/Error.h"
+#include "Common.h"
+#include "Error.h"
 
 class CommunityPartition
 {

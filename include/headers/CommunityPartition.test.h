@@ -1,5 +1,5 @@
 
-#include "../CommunityPartition.h"
+#include "CommunityPartition.h"
 
 
 class Test {
