@@ -24,7 +24,7 @@ void CLI::start(int argc, char **argv)
     printf("Filename %s\n", fileName);
     g = new GraphMatrix();
     bool dir = false;
-    bool weight = true;
+    bool weight = false;
     GraphUtils::readFileTxt(g, fileName, dir, weight);
 
     int n = g->numNodes();
