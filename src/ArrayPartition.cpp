@@ -1,4 +1,5 @@
 #include "ArrayPartition.h"
+#include "Random.h"
 
 ArrayPartition::ArrayPartition(int a)
 {
@@ -44,10 +45,9 @@ int ArrayPartition::kronecker(int nodeA, int nodeB)
 void ArrayPartition::randomPartition(int maxCommunities)
 {
     std::vector<int> communities(maxCommunities, 0);
-    srand(time(NULL));
     for (int nodeId = 0; nodeId < numberOfNodes; nodeId++)
     {
-        int randomCommunity = rand() % maxCommunities;
+        int randomCommunity = Random::getInteger(0, maxCommunities - 1);
         communities[randomCommunity] += 1;
         partition[nodeId] = randomCommunity;
     }

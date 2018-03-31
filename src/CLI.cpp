@@ -1,4 +1,5 @@
 #include "CLI.h"
+#include "Random.h"
 
 using namespace std;
 
@@ -89,7 +90,10 @@ void CLI::start(int argc, char **argv)
     weighted = false;
     seed = time(NULL);
     CLI::parseArgs(argc, argv);
+    CLI::openResultsFile();
     cout << "SEED: " << seed << endl;
+    CLI::writeLineToFile("SEED: " + to_string(seed) + "\n");
+    Random::seed(seed);
     g = new GraphMatrix();
     if(networkFile.empty()){
         cout << "no network given" << endl;
@@ -110,7 +114,6 @@ void CLI::start(int argc, char **argv)
         networkPartition.randomPartition(2);
     }
 
-    CLI::openResultsFile();
 
     CLI::singleNodeGreedyAlgorithm();
 
@@ -298,7 +301,6 @@ float CLI::singleNodeGreedyAlgorithm()
     int betterPartition;
     bool running = true;
     FailObject failObject;
-    srand(seed);
     vector<int> allNodes;
     allNodes.reserve(g->numNodes());
     for (int i = 0; i < g->numNodes(); ++i)
@@ -308,7 +310,7 @@ float CLI::singleNodeGreedyAlgorithm()
     vector<int> availableNodes(allNodes);
     while (!failObject.finished() && !availableNodes.empty())
     {
-        chosenIndex = rand() % availableNodes.size();
+        chosenIndex = Random::getInteger(0, availableNodes.size() - 1);
         chosenNode = availableNodes[chosenIndex];
 
         chosenNodePartition = networkPartition.getNodeCommunity(chosenNode);

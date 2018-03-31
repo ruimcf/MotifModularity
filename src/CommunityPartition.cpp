@@ -1,4 +1,6 @@
 #include "CommunityPartition.h"
+#include "Random.h"
+
 using namespace std;
 
 CommunityPartition::CommunityPartition()
@@ -121,10 +123,9 @@ int CommunityPartition::kronecker(int nodeA, int nodeB)
 void CommunityPartition::randomPartition(int maxCommunities)
 {
     std::vector<int> communities(maxCommunities, 0);
-    srand(time(NULL));
     for (int nodeId = 0; nodeId < numberNodes; nodeId++)
     {
-        int randomCommunity = rand() % maxCommunities;
+        int randomCommunity = Random::getInteger(0, maxCommunities - 1);
         communities[randomCommunity] += 1;
         CommunityPartition::insertNodeCommunity(nodeId, randomCommunity);
     }

@@ -24,6 +24,7 @@ SRC =                   \
 	include/gtries/GraphMatrix.cpp	\
 	include/gtries/GraphUtils.cpp \
 	include/gtries/Error.cpp \
+	include/gtries/Random.cpp \
 	src/CLI.cpp	\
 	src/FailObject.cpp \
 	src/ArrayPartition.cpp \
