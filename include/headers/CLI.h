@@ -9,6 +9,13 @@
 class CLI
 {
 private:
+  static bool directed;
+  static bool weighted;
+  static string partitionFile;
+  static string networkFile;
+  static bool readPartition;
+  static int seed;
+
   static Graph *g;
   // static int *partition;
   static ArrayPartition networkPartition;
@@ -34,6 +41,7 @@ private:
 
   static float singleNodeGreedyAlgorithm();
 
+  static void parseArgs(int argc, char **argv);
 public:
   static void start(int argc, char **argv);
 };

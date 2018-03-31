@@ -5,11 +5,56 @@ using namespace std;
 Graph *CLI::g;
 vector<int> CLI::nodes;
 vector<int> CLI::combination;
+bool CLI::directed, CLI::weighted, CLI::readPartition;
+string CLI::networkFile;
+string CLI::partitionFile;
+int CLI::seed;
 ArrayPartition CLI::networkPartition;
 int total = 0;
 float CLI::n1 = 0, CLI::n2 = 0, CLI::n3 = 0, CLI::n4 = 0;
 float bestModularity;
 int *bestPartition;
+
+void CLI::parseArgs(int argc, char **argv){
+    for(int i = 1; i < argc; ++i){
+        string arg = argv[i];
+        if(arg == "--directed" || arg == "-d"){
+            directed = true;
+        }
+        else if(arg == "--undirected" || arg == "-ud"){
+            directed = false;
+        }
+        else if(arg == "--weighted" || arg == "-w"){
+            weighted = true;
+        }
+        else if(arg == "--unweighted" || arg == "-uw"){
+            weighted = false;
+        }
+        else if(arg == "--partition" || arg == "-p"){
+            if(++i > argc){
+                cout << "partition few args" << endl;
+                return;
+            }
+            readPartition = true;
+            partitionFile = argv[i];
+        }
+        else if(arg == "--network" || arg == "-n"){
+            if(++i > argc){
+                cout << "network few args" << endl;
+                return;
+            }
+            networkFile = argv[i];
+        }
+        else if(arg == "--seed" || arg == "-s"){
+            if(++i >= argc){
+                cout << "seed few args" << endl;
+                return;
+            }
+            cout << i << " " << argc << endl;
+            seed = atoi(argv[i]);
+        }
+    }
+}
 
 void CLI::start(int argc, char **argv)
 {
@@ -18,27 +63,36 @@ void CLI::start(int argc, char **argv)
         printf("Use with more arg");
         return;
     }
-    cout << "SEED: " << SEED << endl;
+    readPartition = false;
+    directed = false;
+    weighted = false;
+    seed = time(NULL);
+    CLI::parseArgs(argc, argv);
+    cout << "SEED: " << seed << endl;
     char fileName[MAX_BUF];
     strcpy(fileName, argv[1]);
     printf("Filename %s\n", fileName);
     g = new GraphMatrix();
-    bool dir = false;
-    bool weight = false;
-    GraphUtils::readFileTxt(g, fileName, dir, weight);
-
+    if(networkFile.empty()){
+        cout << "no network given" << endl;
+        return;
+    }
+    GraphUtils::readFileTxt(g, networkFile.c_str(), directed, weighted);
     int n = g->numNodes();
     networkPartition.setNumberNodes(n);
 
-    char partitionFile[MAX_BUF];
-    strcpy(partitionFile, argv[2]);
-    networkPartition.readPartition(partitionFile);
-    cout << "Partition read: " << int_array_to_string(networkPartition.getPartition(), n) << endl;
-    //CLI::randomPartition(2);
+    if(readPartition){
+        networkPartition.readPartition(partitionFile.c_str());
+        cout << "Partition read: " << int_array_to_string(networkPartition.getPartition(), n) << endl;
+        printf("Num nodes: %d\n", g->numNodes());
+        float modularity = CLI::triangleModularity();
+        printf("Triangle modularity: %f\nTotal: %d\n", modularity, total);
+    }
+    else {
+        networkPartition.randomPartition(2);
+    }
 
-    printf("Num nodes: %d\n", g->numNodes());
-    float _triangleModularity = CLI::triangleModularity();
-    printf("Triangle modularity: %f\nTotal: %d\n", _triangleModularity, total);
+    CLI::singleNodeGreedyAlgorithm();
 
     // total = 0;
     // CLI::createAllPartitions();
@@ -48,8 +102,6 @@ void CLI::start(int argc, char **argv)
     // }
     //float _motifModularity = CLI::cicleModularity(3);
     //printf("Circle modularity: %f\nTotal: %d\n", _motifModularity, total);
-
-    CLI::singleNodeGreedyAlgorithm();
 }
 
 int CLI::kronecker(int a, int b)
@@ -224,7 +276,7 @@ float CLI::singleNodeGreedyAlgorithm()
     int betterPartition;
     bool running = true;
     FailObject failObject;
-    srand(SEED);
+    srand(seed);
     vector<int> allNodes;
     allNodes.reserve(g->numNodes());
     for (int i = 0; i < g->numNodes(); ++i)
@@ -260,7 +312,8 @@ float CLI::singleNodeGreedyAlgorithm()
         }
         else
         {
-            cout << currentModularity << " " << failObject.getConsecutiveTimesFailed() << endl;
+            cout << "Current modularity: " << currentModularity << "\tTimes failed: " << failObject.getConsecutiveTimesFailed() << endl;
+            cout << "Partition: " << int_array_to_string(networkPartition.getPartition(), g->numNodes()) << endl;
             failObject.recordSuccess();
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
             availableNodes = allNodes;

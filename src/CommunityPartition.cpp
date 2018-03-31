@@ -121,7 +121,7 @@ int CommunityPartition::kronecker(int nodeA, int nodeB)
 void CommunityPartition::randomPartition(int maxCommunities)
 {
     std::vector<int> communities(maxCommunities, 0);
-    srand(SEED);
+    srand(time(NULL));
     for (int nodeId = 0; nodeId < numberNodes; nodeId++)
     {
         int randomCommunity = rand() % maxCommunities;
