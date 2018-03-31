@@ -5,6 +5,9 @@
 #include <math.h>
 #include "FailObject.h"
 #include "ArrayPartition.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 class CLI
 {
@@ -15,6 +18,8 @@ private:
   static string networkFile;
   static bool readPartition;
   static int seed;
+
+  static ofstream resultsFile;
 
   static Graph *g;
   // static int *partition;
@@ -40,6 +45,10 @@ private:
   static float triangleModularity();
 
   static float singleNodeGreedyAlgorithm();
+
+  static void openResultsFile();
+  static void writeLineToFile(string line);
+  static void closeResultsFile();
 
   static void parseArgs(int argc, char **argv);
 public:

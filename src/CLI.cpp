@@ -7,6 +7,7 @@ vector<int> CLI::nodes;
 vector<int> CLI::combination;
 bool CLI::directed, CLI::weighted, CLI::readPartition;
 string CLI::networkFile;
+ofstream CLI::resultsFile;
 string CLI::partitionFile;
 int CLI::seed;
 ArrayPartition CLI::networkPartition;
@@ -56,6 +57,26 @@ void CLI::parseArgs(int argc, char **argv){
     }
 }
 
+void CLI::openResultsFile(){
+    //clear file if it exists
+    string resultPath = "results/" + networkFile;
+    resultsFile.open(resultPath, ios::trunc);
+    if(resultsFile.is_open()){
+        cout << "Opened file for results " << resultPath << endl;
+    } 
+    else {
+        cout << "Failed to open File " << resultPath << endl;
+    }
+}
+
+void CLI::writeLineToFile(string line){
+    resultsFile << line;
+}
+
+void CLI::closeResultsFile(){
+    resultsFile.close();
+}
+
 void CLI::start(int argc, char **argv)
 {
     if (argc < 3)
@@ -69,9 +90,6 @@ void CLI::start(int argc, char **argv)
     seed = time(NULL);
     CLI::parseArgs(argc, argv);
     cout << "SEED: " << seed << endl;
-    char fileName[MAX_BUF];
-    strcpy(fileName, argv[1]);
-    printf("Filename %s\n", fileName);
     g = new GraphMatrix();
     if(networkFile.empty()){
         cout << "no network given" << endl;
@@ -92,7 +110,11 @@ void CLI::start(int argc, char **argv)
         networkPartition.randomPartition(2);
     }
 
+    CLI::openResultsFile();
+
     CLI::singleNodeGreedyAlgorithm();
+
+    CLI::closeResultsFile();
 
     // total = 0;
     // CLI::createAllPartitions();
@@ -312,16 +334,27 @@ float CLI::singleNodeGreedyAlgorithm()
         }
         else
         {
-            cout << "Current modularity: " << currentModularity << "\tTimes failed: " << failObject.getConsecutiveTimesFailed() << endl;
-            cout << "Partition: " << int_array_to_string(networkPartition.getPartition(), g->numNodes()) << endl;
+            stringstream ss1, ss2;
+            ss1 << "Current modularity: " << currentModularity << "\tTimes failed: " << failObject.getConsecutiveTimesFailed() << endl;
+            ss2 << "Partition: " << int_array_to_string(networkPartition.getPartition(), g->numNodes()) << endl;
+            cout << ss1.str();
+            cout << ss2.str();
+            writeLineToFile(ss1.str());
+            writeLineToFile(ss2.str());
+
             failObject.recordSuccess();
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
             availableNodes = allNodes;
         }
     }
 
-    cout << "Best modularity: " << currentModularity << endl
-         << "Partition: " << int_array_to_string(networkPartition.getPartition(), g->numNodes()) << endl;
+    stringstream ss1, ss2;
+    ss1 << "Best modularity: " << currentModularity << endl;
+    ss2 << "Partition: " << int_array_to_string(networkPartition.getPartition(), g->numNodes()) << endl;
+    cout << ss1.str();
+    cout << ss2.str();
+    writeLineToFile(ss1.str());
+    writeLineToFile(ss2.str());
 
     return currentModularity;
 }

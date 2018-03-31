@@ -1,0 +1,14 @@
+Current modularity: -0.0222318	Times failed: 0
+Partition: 2131013330
+Current modularity: -0.00722534	Times failed: 1
+Partition: 2131032330
+Current modularity: 0.157204	Times failed: 1
+Partition: 3131002330
+Current modularity: 0.162206	Times failed: 0
+Partition: 1131032330
+Current modularity: 0.688841	Times failed: 0
+Partition: 1121022330
+Current modularity: 0.76198	Times failed: 9
+Partition: 1111322330
+Best modularity: 0.76198
+Partition: 1111122330
