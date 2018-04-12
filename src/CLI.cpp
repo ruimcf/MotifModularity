@@ -107,6 +107,7 @@ void CLI::start(int argc, char **argv)
         networkPartition.readPartition(partitionFile.c_str());
         cout << "Partition read: " << int_array_to_string(networkPartition.getPartition(), n) << endl;
         printf("Num nodes: %d\n", g->numNodes());
+        networkPartition.writePartitionFile(networkFile);
         float modularity = CLI::triangleModularity();
         printf("Triangle modularity: %f\nTotal: %d\n", modularity, total);
     }
