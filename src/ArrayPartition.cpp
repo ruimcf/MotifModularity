@@ -1,5 +1,7 @@
 #include "ArrayPartition.h"
 #include "Random.h"
+#include <iostream>
+#include <fstream>
 
 ArrayPartition::ArrayPartition(int a)
 {
@@ -89,4 +91,19 @@ void ArrayPartition::readPartition(const char *s)
 int *ArrayPartition::getPartition()
 {
     return partition;
+}
+
+void ArrayPartition::writePartitionFile(std::string name){
+    ofstream file;
+    file.open("results/partitions/"+name+".tsv", ios::trunc);
+    if(!file.is_open()){
+        cout << "Error opening partition file for writing" << endl;
+        return;
+    }
+    file << "Id Community" << endl;
+    for(int i = 0; i < numberOfNodes; i++){
+        file << i+1 << " " << partition[i] << endl;
+    }
+
+    cout << "Wrote partition to file " << "results/partitions/"+name+".tsv" << endl;
 }

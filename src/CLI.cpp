@@ -291,8 +291,8 @@ int numberForEvenPartitions(int numNodes)
 
 float CLI::singleNodeGreedyAlgorithm()
 {
-    int numPartitions = 2;
-    numPartitions = numberForEvenPartitions(g->numNodes());
+    int numPartitions = 4;
+    // numPartitions = numberForEvenPartitions(g->numNodes());
     networkPartition.randomPartition(numPartitions);
     int chosenNode, chosenIndex;
     float currentModularity = CLI::triangleModularity();
@@ -336,6 +336,8 @@ float CLI::singleNodeGreedyAlgorithm()
         }
         else
         {
+            networkPartition.setNodeCommunity(chosenNode, betterPartition);
+            
             stringstream ss1, ss2;
             ss1 << "Current modularity: " << currentModularity << "\tTimes failed: " << failObject.getConsecutiveTimesFailed() << endl;
             ss2 << "Partition: " << int_array_to_string(networkPartition.getPartition(), g->numNodes()) << endl;
@@ -345,7 +347,6 @@ float CLI::singleNodeGreedyAlgorithm()
             writeLineToFile(ss2.str());
 
             failObject.recordSuccess();
-            networkPartition.setNodeCommunity(chosenNode, betterPartition);
             availableNodes = allNodes;
         }
     }

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>
+#include <string>
 #include "Error.h"
 
 class ArrayPartition
@@ -22,6 +23,8 @@ public:
 
   void readPartition(const char *s);
   void randomPartition(int maxCommunities);
+
+  void writePartitionFile(std::string name);
 
 private:
   int numberOfNodes;
