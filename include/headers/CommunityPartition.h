@@ -19,14 +19,17 @@ public:
   int getNodeCommunity(int nodeId);
   int getNumberCommunities();
   int getNumberNodes();
-  std::vector< std::list<int> > getPartition();
 
   int kronecker(int nodeA, int nodeB);
 
   void readPartition(const char *s);
   void randomPartition(int maxCommunities);
 
-  void printPartition();
+  std::vector<int> getPartitionByNode();
+  std::string toStringPartitionByNode();
+
+  std::vector< std::list<int> > getPartitionByCommunity();
+  std::string toStringPartitionByCommunity();
 
 private:
   int numberNodes;

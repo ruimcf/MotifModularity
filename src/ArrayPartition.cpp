@@ -2,52 +2,43 @@
 #include "Random.h"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 ArrayPartition::ArrayPartition(int a)
 {
-    numberOfNodes = a;
-    partition = new int[a];
+    numberNodes = a;
+    partition.reserve(a);
 }
 
 ArrayPartition::ArrayPartition()
 {
-    partition = NULL;
 }
 
 void ArrayPartition::setNumberNodes(int number)
 {
-    if (partition == NULL)
-    {
-        partition = new int[number];
-    }
-    else
-    {
-        printf("DESTROYED PREVIOUS PARTITION\n");
-        delete[] partition;
-        partition = new int[number];
-    }
-    numberOfNodes = number;
+    partition.resize(number);
+    numberNodes = number;
 }
 
 void ArrayPartition::setNodeCommunity(int nodeId, int communityId)
 {
-    partition[nodeId] = communityId;
+    partition.at(nodeId) = communityId;
 }
 
 int ArrayPartition::getNodeCommunity(int nodeId)
 {
-    return partition[nodeId];
+    return partition.at(nodeId);
 }
 
 int ArrayPartition::kronecker(int nodeA, int nodeB)
 {
-    return partition[nodeA] == partition[nodeB] ? 1 : 0;
+    return partition.at(nodeA) == partition.at(nodeB) ? 1 : 0;
 }
 
 void ArrayPartition::randomPartition(int maxCommunities)
 {
     std::vector<int> communities(maxCommunities, 0);
-    for (int nodeId = 0; nodeId < numberOfNodes; nodeId++)
+    for (int nodeId = 0; nodeId < numberNodes; nodeId++)
     {
         int randomCommunity = Random::getInteger(0, maxCommunities - 1);
         communities[randomCommunity] += 1;
@@ -59,17 +50,17 @@ void ArrayPartition::randomPartition(int maxCommunities)
             numberCommunities++;
 
     printf("Number of communities: %d\n", numberCommunities);
-    numberOfCommunities = numberCommunities;
+    numberCommunities = numberCommunities;
 }
 
-int ArrayPartition::numberCommunities()
+int ArrayPartition::getNumberCommunities()
 {
-    return numberOfCommunities;
+    return numberCommunities;
 }
 
-int ArrayPartition::numberNodes()
+int ArrayPartition::getNumberNodes()
 {
-    return numberOfNodes;
+    return numberNodes;
 }
 
 void ArrayPartition::readPartition(const char *s)
@@ -82,28 +73,40 @@ void ArrayPartition::readPartition(const char *s)
 
     while (fscanf(f, "%d", &a) == 1)
     {
-        partition[size] = a;
+        partition.at(size) = a;
         size++;
     }
     fclose(f);
 }
 
-int *ArrayPartition::getPartition()
+std::vector<int> ArrayPartition::getPartitionByNode()
 {
     return partition;
 }
 
+std::string ArrayPartition::toStringPartitionByNode()
+{
+    std::stringstream ss;
+    for(int i = 0; i < numberNodes; i++)
+    {
+        ss << std::to_string(partition[i]);
+    }
+
+    return ss.str();
+}
+
 void ArrayPartition::writePartitionFile(std::string name){
     ofstream file;
-    file.open("results/partitions/"+name+".tsv", ios::trunc);
+    std::string filePath = "results/partitions/"+name+".tsv";
+    file.open(filePath, ios::trunc);
     if(!file.is_open()){
         cout << "Error opening partition file for writing" << endl;
         return;
     }
     file << "Id Community" << endl;
-    for(int i = 0; i < numberOfNodes; i++){
-        file << i+1 << " " << partition[i] << endl;
+    for(int i = 0; i < numberNodes; i++){
+        file << i+1 << "\t" << partition[i] << endl;
     }
 
-    cout << "Wrote partition to file " << "results/partitions/"+name+".tsv" << endl;
+    cout << "Wrote partition to file " << filePath << endl;
 }

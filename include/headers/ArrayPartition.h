@@ -12,24 +12,29 @@ class ArrayPartition
 public:
   ArrayPartition(int);
   ArrayPartition();
+
   void setNumberNodes(int number);
   void setNodeCommunity(int nodeId, int communityId);
   int getNodeCommunity(int nodeId);
-  int numberCommunities();
-  int numberNodes();
-  int *getPartition();
+  int getNumberCommunities();
+  int getNumberNodes();
 
   int kronecker(int nodeA, int nodeB);
 
   void readPartition(const char *s);
   void randomPartition(int maxCommunities);
 
+  std::vector<int> getPartitionByNode();
+  std::string toStringPartitionByNode();
+
+  // std::string toStringPartitionByCommunity();
+
   void writePartitionFile(std::string name);
 
 private:
-  int numberOfNodes;
-  int *partition;
-  int numberOfCommunities;
+  int numberNodes;
+  std::vector<int> partition;
+  int numberCommunities;
 };
 
 #endif

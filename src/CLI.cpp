@@ -105,7 +105,7 @@ void CLI::start(int argc, char **argv)
 
     if(readPartition){
         networkPartition.readPartition(partitionFile.c_str());
-        cout << "Partition read: " << int_array_to_string(networkPartition.getPartition(), n) << endl;
+        cout << "Partition read: " << networkPartition.toStringPartitionByNode() << endl;
         printf("Num nodes: %d\n", g->numNodes());
         networkPartition.writePartitionFile(networkFile);
         float modularity = CLI::triangleModularity();
@@ -130,11 +130,6 @@ void CLI::start(int argc, char **argv)
     //printf("Circle modularity: %f\nTotal: %d\n", _motifModularity, total);
 }
 
-int CLI::kronecker(int a, int b)
-{
-    return networkPartition.kronecker(a, b);
-}
-
 float CLI::triangleModularity()
 {
     int n = g->numNodes();
@@ -154,13 +149,11 @@ float CLI::triangleModularity()
                 numberMotifsGraph += g->hasEdge(i, j) * g->hasEdge(j, k) * g->hasEdge(i, k);
                 numberMotifsRandomGraphPartitions += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
                 numberMotifsRandomGraph += CLI::nullcaseWeight(i, j) * CLI::nullcaseWeight(j, k) * CLI::nullcaseWeight(i, k);
-                //cout << "n1: " << numberMotifsInPartitions << " n2: " << numberMotifsGraph << " n3: " << numberMotifsRandomGraphPartitions << " n4: " << numberMotifsRandomGraph << endl;
             }
         }
     }
 
     float _motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
-    //printf("Motif modularity: %f\n", _motifModularity);
 
     return _motifModularity;
 }
@@ -206,8 +199,6 @@ void CLI::combinationCicleModularity()
     n2 += g2;
     n3 += g3;
     n4 += g4;
-
-    //cout << "n1: " << n1 << " n2: " << n2 << " n3: " << n3 << " n4: " << n4 << endl;
 }
 
 void pretty_print(const vector<int> &v)
@@ -236,20 +227,17 @@ int CLI::maskedWeight(int a, int b)
     return g->hasEdge(a, b) * CLI::kronecker(a, b);
 }
 
+int CLI::kronecker(int a, int b)
+{
+    return networkPartition.kronecker(a, b);
+}
+
 void CLI::createAllPartitions()
 {
     int numNodes = g->numNodes();
     bestModularity = 0;
     bestPartition = new int[numNodes];
     CLI::createAllPartitionsStep(0, numNodes);
-}
-
-string int_array_to_string(int int_array[], int size_of_array)
-{
-    string returnstring = "";
-    for (int temp = 0; temp < size_of_array; temp++)
-        returnstring += to_string(int_array[temp]);
-    return returnstring;
 }
 
 void CLI::createAllPartitionsStep(int level, int numberNodes)
@@ -260,9 +248,9 @@ void CLI::createAllPartitionsStep(int level, int numberNodes)
         if (modularity >= bestModularity)
         {
             bestModularity = modularity;
-            memcpy(bestPartition, networkPartition.getPartition(), sizeof(int) * numberNodes);
+            memcpy(bestPartition, networkPartition.getPartitionByNode().data(), sizeof(int) * numberNodes);
             cout << "New best modularity: " << modularity << endl
-                 << "Paritition: " << int_array_to_string(networkPartition.getPartition(), numberNodes) << endl;
+                 << "Paritition: " << networkPartition.toStringPartitionByNode() << endl;
         }
         return;
     }
@@ -292,23 +280,24 @@ int numberForEvenPartitions(int numNodes)
 
 float CLI::singleNodeGreedyAlgorithm()
 {
-    int numPartitions = 4;
+    int chosenNode, chosenIndex, chosenNodePartition, betterPartition, numPartitions;
+    float bestModularity, currentModularity;
+    vector<int> allNodes;
+
+    currentModularity = CLI::triangleModularity();
+
+    numPartitions = 4;
     // numPartitions = numberForEvenPartitions(g->numNodes());
     networkPartition.randomPartition(numPartitions);
-    int chosenNode, chosenIndex;
-    float currentModularity = CLI::triangleModularity();
-    int chosenNodePartition;
-    float bestModularity;
-    int betterPartition;
-    bool running = true;
+
     FailObject failObject;
-    vector<int> allNodes;
     allNodes.reserve(g->numNodes());
     for (int i = 0; i < g->numNodes(); ++i)
     {
         allNodes.push_back(i);
     }
     vector<int> availableNodes(allNodes);
+
     while (!failObject.finished() && !availableNodes.empty())
     {
         chosenIndex = Random::getInteger(0, availableNodes.size() - 1);
@@ -338,27 +327,24 @@ float CLI::singleNodeGreedyAlgorithm()
         else
         {
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
-            
-            stringstream ss1, ss2;
-            ss1 << "Current modularity: " << currentModularity << "\tTimes failed: " << failObject.getConsecutiveTimesFailed() << endl;
-            ss2 << "Partition: " << int_array_to_string(networkPartition.getPartition(), g->numNodes()) << endl;
-            cout << ss1.str();
-            cout << ss2.str();
-            writeLineToFile(ss1.str());
-            writeLineToFile(ss2.str());
+
+            stringstream ss;
+            ss << "Current modularity: " << currentModularity << endl;
+            ss << "Times failed: " << failObject.getConsecutiveTimesFailed() << endl;
+            ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
+            cout << ss.str();
+            writeLineToFile(ss.str());
 
             failObject.recordSuccess();
             availableNodes = allNodes;
         }
     }
 
-    stringstream ss1, ss2;
-    ss1 << "Best modularity: " << currentModularity << endl;
-    ss2 << "Partition: " << int_array_to_string(networkPartition.getPartition(), g->numNodes()) << endl;
-    cout << ss1.str();
-    cout << ss2.str();
-    writeLineToFile(ss1.str());
-    writeLineToFile(ss2.str());
+    stringstream ss;
+    ss << "Best modularity: " << currentModularity << endl;
+    ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
+    cout << ss.str();
+    writeLineToFile(ss.str());
 
     return currentModularity;
 }

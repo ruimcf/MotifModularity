@@ -1,5 +1,6 @@
 #include "CommunityPartition.h"
 #include "Random.h"
+#include <sstream>
 
 using namespace std;
 
@@ -165,20 +166,51 @@ void CommunityPartition::readPartition(const char *s)
     CommunityPartition::sortPartition();
 }
 
-std::vector< std::list<int> > CommunityPartition::getPartition()
+std::vector< std::list<int> > CommunityPartition::getPartitionByCommunity()
 {
     return partition;
 }
 
-void CommunityPartition::printPartition()
+std::string CommunityPartition::toStringPartitionByCommunity()
 {
+    std::stringstream ss;
     for (int i = 0; i < partition.size(); ++i)
     {
-        cout << "Community " << i << ": " << endl;
+        ss << "Community " << i << ":" << endl;
         for (list<int>::iterator it = partition[i].begin(); it != partition[i].end(); ++it)
         {
-            cout << *it << " ";
+            ss << *it << "\t";
         }
         cout << endl;
     }
+
+    return ss.str();
+}
+
+std::vector<int> CommunityPartition::getPartitionByNode()
+{
+    vector<int> arrayPartition;
+    arrayPartition.reserve(numberNodes);
+    for (int i = 0; i < partition.size(); ++i)
+    {
+        for (list<int>::iterator it = partition[i].begin(); it != partition[i].end(); ++it)
+        {
+            arrayPartition[*it] = i;
+        }
+    }
+
+    return arrayPartition; 
+}
+
+std::string CommunityPartition::toStringPartitionByNode()
+{
+    vector<int> arrayPartition = getPartitionByNode();
+    std::stringstream ss;
+
+    for(int i = 0; i < numberNodes; i++)
+    {
+        ss << arrayPartition[i] << "\t";
+    }
+
+    return ss.str();
 }
