@@ -115,6 +115,10 @@ void CLI::start(int argc, char **argv)
         networkPartition.randomPartition(2);
     }
 
+    for (int i = 0; i < g->numNodes(); i++)
+    {
+        nodes.push_back(i);
+    }
 
     CLI::singleNodeGreedyAlgorithm();
 
@@ -122,10 +126,6 @@ void CLI::start(int argc, char **argv)
 
     // total = 0;
     // CLI::createAllPartitions();
-    // for (int i = 0; i < g->numNodes(); i++)
-    // {
-    //     nodes.push_back(i);
-    // }
     //float _motifModularity = CLI::cicleModularity(3);
     //printf("Circle modularity: %f\nTotal: %d\n", _motifModularity, total);
 }
@@ -160,6 +160,8 @@ float CLI::triangleModularity()
 
 float CLI::cicleModularity(int size)
 {
+    n1 = n2 = n3 = n4 = 0;
+    combination.clear();
     CLI::iterateCombinations(0, size);
     return n1 / n2 - n3 / n4;
 }
@@ -284,11 +286,18 @@ float CLI::singleNodeGreedyAlgorithm()
     float bestModularity, currentModularity;
     vector<int> allNodes;
 
-    currentModularity = CLI::triangleModularity();
 
     numPartitions = 4;
     // numPartitions = numberForEvenPartitions(g->numNodes());
     networkPartition.randomPartition(numPartitions);
+    
+    // currentModularity = CLI::cicleModularity(3);
+    // cout << "Current Modularity 1 " << currentModularity << endl;
+    // currentModularity = CLI::cicleModularity(3);
+    // cout << "Current Modularity 2 " << currentModularity << endl;
+
+    currentModularity = CLI::cicleModularity(3);
+    // cout << "Current Modularity " << currentModularity << endl;
 
     FailObject failObject;
     allNodes.reserve(g->numNodes());
@@ -310,7 +319,7 @@ float CLI::singleNodeGreedyAlgorithm()
             if (i != chosenNodePartition)
             {
                 networkPartition.setNodeCommunity(chosenNode, i);
-                float currentPartitionModularity = triangleModularity();
+                float currentPartitionModularity = CLI::cicleModularity(3);
                 if (currentPartitionModularity > currentModularity)
                 {
                     currentModularity = currentPartitionModularity;
