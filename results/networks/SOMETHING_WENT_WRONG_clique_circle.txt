@@ -1,0 +1,7 @@
+SEED: 1522530062
+Current modularity: -0.0128451	Times failed: 0
+Partition: 1320330200
+Current modularity: -0.00617551	Times failed: 1
+Partition: 1320313200
+Best modularity: -0.00617551
+Partition: 1320312200

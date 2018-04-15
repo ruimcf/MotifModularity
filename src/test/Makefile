@@ -6,14 +6,14 @@
 # ------------------------------------------------
 
 # Executable name
-EXEC_NAME=motifModularity
+EXEC_NAME=test
 
 # Compiler to use
 CC=g++
 
 # Default Options to use
 # CFLAGS= -Wall -Wno-write-strings -O0 -g
-CFLAGS= -Wno-write-strings -O3 -I ./include/headers
+CFLAGS= -Wno-write-strings -O3 -I ../../include/headers
 #CFLAGSFINAL= -O3
 CLIBS=
 
@@ -21,14 +21,9 @@ CLIBS=
 
 # Source files
 SRC =                   \
-	include/gtries/GraphMatrix.cpp	\
-	include/gtries/GraphUtils.cpp \
-	include/gtries/Error.cpp \
-	include/gtries/Random.cpp \
-	src/CLI.cpp	\
-	src/FailObject.cpp \
-	src/ArrayPartition.cpp \
-	src/main.cpp 
+		../../include/gtries/Error.cpp \
+		../CommunityPartition.cpp \
+		CommunityPartition.test.cpp
 
 OBJ =  ${SRC:.cpp=.o}
 

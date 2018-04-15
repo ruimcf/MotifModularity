@@ -1,15 +1,29 @@
-#include "gtries/GraphMatrix.h"
-#include "gtries/GraphUtils.h"
-#include "gtries/Error.h"
+#include "GraphMatrix.h"
+#include "GraphUtils.h"
+#include "Error.h"
 #include <string>
 #include <math.h>
 #include "FailObject.h"
+#include "ArrayPartition.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 class CLI
 {
 private:
+  static bool directed;
+  static bool weighted;
+  static string partitionFile;
+  static string networkFile;
+  static bool readPartition;
+  static int seed;
+
+  static ofstream resultsFile;
+
   static Graph *g;
-  static int *partition;
+  // static int *partition;
+  static ArrayPartition networkPartition;
   static vector<int> nodes;
   static vector<int> combination;
   static float n1;
@@ -21,8 +35,6 @@ private:
   static int nullcaseWeight(int a, int b);
   static int maskedNullcaseWeight(int a, int b);
 
-  static void readPartition(const char *s);
-  static int randomPartition(int maxCummunities);
   static void createAllPartitions();
   static void createAllPartitionsStep(int level, int numNodes);
 
@@ -34,6 +46,11 @@ private:
 
   static float singleNodeGreedyAlgorithm();
 
+  static void openResultsFile();
+  static void writeLineToFile(string line);
+  static void closeResultsFile();
+
+  static void parseArgs(int argc, char **argv);
 public:
   static void start(int argc, char **argv);
 };
