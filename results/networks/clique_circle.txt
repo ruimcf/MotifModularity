@@ -1,7 +1,21 @@
-SEED: 1522530062
-Current modularity: -0.0128451	Times failed: 0
-Partition: 1320330200
-Current modularity: -0.00617551	Times failed: 1
-Partition: 1320313200
-Best modularity: -0.00617551
-Partition: 1320312200
+SEED: 18
+Current modularity: -0.0177855
+Times failed: 0
+Partition: 0123300231
+Current modularity: -0.0138949
+Times failed: 1
+Partition: 0123310231
+Current modularity: 0.125832
+Times failed: 0
+Partition: 3123310231
+Current modularity: 0.232458
+Times failed: 1
+Partition: 3323310231
+Current modularity: 0.677808
+Times failed: 3
+Partition: 3333310231
+Current modularity: 0.76198
+Times failed: 2
+Partition: 3333310201
+Best modularity: 0.76198
+Partition: 3333310201

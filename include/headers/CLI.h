@@ -26,10 +26,10 @@ private:
   static ArrayPartition networkPartition;
   static vector<int> nodes;
   static vector<int> combination;
-  static float n1;
-  static float n2;
-  static float n3;
-  static float n4;
+  static double n1;
+  static double n2;
+  static double n3;
+  static double n4;
   static int kronecker(int a, int b);
   static int maskedWeight(int a, int b);
   static int nullcaseWeight(int a, int b);
@@ -38,13 +38,16 @@ private:
   static void createAllPartitions();
   static void createAllPartitionsStep(int level, int numNodes);
 
-  static float cicleModularity(int size);
+  static double cicleModularity(int size);
   static void iterateCombinations(int offset, int k);
   static void computeCicleModularity();
   static void combinationCicleModularity();
-  static float triangleModularity();
+  static double triangleModularity();
 
-  static float singleNodeGreedyAlgorithm();
+  static std::vector<double> constantMotifValues();
+  static double triangleModularityPreCalculated(std::vector<double> constantMotifValues);
+
+  static double singleNodeGreedyAlgorithm();
 
   static void openResultsFile();
   static void writeLineToFile(string line);
