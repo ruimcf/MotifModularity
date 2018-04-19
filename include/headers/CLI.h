@@ -47,6 +47,9 @@ private:
   static std::vector<double> constantMotifValues();
   static double triangleModularityPreCalculated(std::vector<double> constantMotifValues);
 
+  static std::vector<double> firstIterationTriangleModularity();
+  static std::vector<double> changingNodeTriangleModularity(std::vector<double> previousValues, int changedNode, int previousCommunity);
+
   static double singleNodeGreedyAlgorithm();
 
   static void openResultsFile();

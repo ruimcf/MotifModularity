@@ -4,6 +4,7 @@
 
 using namespace std;
 
+int __number = 0;
 Graph *CLI::g;
 vector<int> CLI::nodes;
 vector<int> CLI::combination;
@@ -180,8 +181,44 @@ double CLI::triangleModularity()
     double motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
 
     // cout << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
+    cout << "#" << __number++ << " Modularity:" << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
 
     return motifModularity;
+}
+
+vector<double> CLI::firstIterationTriangleModularity()
+{
+    int n = g->numNodes();
+    double numberMotifsInPartitions = 0;
+    double numberMotifsGraph = 0;
+    double numberMotifsRandomGraphPartitions = 0;
+    double numberMotifsRandomGraph = 0;
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = i + 1; j < n; j++)
+        {
+            for (int k = j + 1; k < n; k++)
+            {
+                total++;
+                numberMotifsInPartitions += CLI::maskedWeight(i, j) * CLI::maskedWeight(j, k) * CLI::maskedWeight(i, k);
+                numberMotifsGraph += g->hasEdge(i, j) * g->hasEdge(j, k) * g->hasEdge(i, k);
+                numberMotifsRandomGraphPartitions += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
+                numberMotifsRandomGraph += CLI::nullcaseWeight(i, j) * CLI::nullcaseWeight(j, k) * CLI::nullcaseWeight(i, k);
+            }
+        }
+    }
+
+    double motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
+    vector<double> values;
+    values.push_back(numberMotifsInPartitions);
+    values.push_back(numberMotifsGraph); 
+    values.push_back(numberMotifsRandomGraphPartitions);
+    values.push_back(numberMotifsRandomGraph);
+    values.push_back(motifModularity);
+
+    // cout << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
+    return values;
 }
 
 double CLI::triangleModularityPreCalculated(std::vector<double> motifValues)
@@ -248,6 +285,103 @@ double CLI::triangleModularityPreCalculated(std::vector<double> motifValues)
     // cout << motifModularity << "\t" << numberMotifsInPartitions << "\t" << motifValues.at(0) << "\t" << numberMotifsRandomGraphPartitions << "\t" <<  motifValues.at(1) << endl; 
 
     return motifModularity;
+}
+
+/**
+ * Calculate the modularity when one node has changed from a previous computation
+ * previousValues content:
+ * 0 - previousNumberMotifsInPartitions
+ * 1 - numberMotifsGraph (constant)
+ * 2 - previousNumberMotifsRandomGraphPartitions
+ * 3 - numberMotifsRandomGraph (constant)
+ * 
+ * return content:
+ * 0 - numberMotifsInPartitions
+ * 1 - numberMotifsGraph
+ * 2 - numberMotifsRandomGraphPartitions
+ * 3 - numberMotifsRandomGraph
+ * 4 - triangleModularity
+ */
+  
+vector<double> CLI::changingNodeTriangleModularity(vector<double> previousValues, int changedNode, int previousCommunity)
+{
+    double previousNumberMotifsInPartitions = previousValues[0];
+    double numberMotifsGraph = previousValues[1];
+    double previousNumberMotifsRandomGraphPartitions = previousValues[2];
+    double numberMotifsRandomGraph = previousValues[3];
+    double newMotifs = 0;
+    double previousMotifs = 0;
+    double newRandomMotifs = 0;
+    double previousRandomMotifs = 0;
+    double numberMotifsInPartitions, numberMotifsRandomGraphPartitions, modularity;
+    int newCommunity = networkPartition.getNodeCommunity(changedNode);
+
+    vector<int> neighbours;
+    for(int i=0; i < g->numNodes(); i++)
+    {
+        if(g->hasEdge(changedNode, i))
+        {
+            if(changedNode == i){
+                cout << "ERROR: THIS SHOULDNT HAVE A CONNECTION TO THE SAME NODE" << endl;
+            }
+            neighbours.push_back(i);
+        }
+    }
+
+    vector<int> neighboursInPreviousCommunity;
+    vector<int> neighboursInNewCommunity;
+    for(int i = 0; i < neighbours.size(); i++)
+    {
+        if(networkPartition.getNodeCommunity(neighbours[i]) == previousCommunity)
+        {
+            neighboursInPreviousCommunity.push_back(neighbours[i]);
+        }
+        else if(networkPartition.getNodeCommunity(neighbours[i]) == newCommunity)
+        {
+            neighboursInPreviousCommunity.push_back(neighbours[i]);
+        }
+    }
+
+    for(int i = 0; i < neighboursInPreviousCommunity.size(); i++)
+    {
+        for(int j = i + 1; j < neighboursInPreviousCommunity.size(); j++)
+        {
+            int nodeA = neighboursInPreviousCommunity[i];
+            int nodeB = neighboursInPreviousCommunity[j];
+            if(g->hasEdge(nodeA, nodeB))
+            {
+                previousMotifs += 1;
+            }
+            previousRandomMotifs += CLI::nullcaseWeight(nodeA, nodeB) * CLI::nullcaseWeight(nodeB, changedNode) * CLI::nullcaseWeight(nodeA, changedNode);
+        }
+    }
+
+    for(int i = 0; i < neighboursInNewCommunity.size(); i++)
+    {
+        for(int j = i + 1; j < neighboursInNewCommunity.size(); j++)
+        {
+            int nodeA = neighboursInNewCommunity[i];
+            int nodeB = neighboursInNewCommunity[j];
+            if(g->hasEdge(nodeA, nodeB))
+            {
+                newMotifs += 1;
+            }
+            newRandomMotifs += CLI::nullcaseWeight(nodeA, nodeB) * CLI::nullcaseWeight(nodeB, changedNode) * CLI::nullcaseWeight(nodeA, changedNode);
+        }
+    }
+
+    numberMotifsInPartitions = previousNumberMotifsInPartitions + newMotifs - previousMotifs;
+    numberMotifsRandomGraphPartitions = previousNumberMotifsRandomGraphPartitions + newRandomMotifs - previousRandomMotifs;
+    modularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
+
+    cout << "#" << __number++ << " Modularity:" << modularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
+    std::vector<double> values;
+    values.push_back(numberMotifsInPartitions);
+    values.push_back(numberMotifsGraph); 
+    values.push_back(numberMotifsRandomGraphPartitions);
+    values.push_back(numberMotifsRandomGraph);
+    values.push_back(modularity);
+    return values;
 }
 
 vector<double> CLI::constantMotifValues()
@@ -409,9 +543,19 @@ double CLI::singleNodeGreedyAlgorithm()
     // currentModularity = CLI::cicleModularity(3);
     // cout << "Current Modularity 2 " << currentModularity << endl;
 
-    std::vector<double> motifValues = CLI::constantMotifValues();
-    currentModularity = CLI::triangleModularityPreCalculated(motifValues);
+    // std::vector<double> motifValues = CLI::constantMotifValues();
+    // currentModularity = CLI::triangleModularityPreCalculated(motifValues);
     currentModularity = CLI::triangleModularity();
+    // cout << "Current Modularity " << currentModularity << endl;
+    std::vector<double> bestPartitionValues;
+    std::vector<double> values = CLI::firstIterationTriangleModularity();
+    // cout << "values " << values[0] << endl;
+    double previousNumberMotifsInPartitions = values[0];
+    double numberMotifsGraph = values[1];
+    double previousNumberMotifsRandomGraphPartitions = values[2];
+    double numberMotifsRandomGraph = values[3];
+    currentModularity = values[4];
+
     
     cout << "Current Modularity " << currentModularity << endl;
 
@@ -435,12 +579,15 @@ double CLI::singleNodeGreedyAlgorithm()
             if (i != chosenNodePartition)
             {
                 networkPartition.setNodeCommunity(chosenNode, i);
-                // double currentPartitionModularity = CLI::triangleModularity();
-                double currentPartitionModularity = CLI::triangleModularityPreCalculated(motifValues);
+                double currentPartitionModularity = CLI::triangleModularity();
+                // double currentPartitionModularity = CLI::triangleModularityPreCalculated(motifValues);
+                vector<double> currentPartitionValues = CLI::changingNodeTriangleModularity(values, chosenNode, chosenNodePartition);
+                currentPartitionModularity = currentPartitionValues[4];
                 if (currentPartitionModularity > currentModularity)
                 {
                     currentModularity = currentPartitionModularity;
                     betterPartition = i;
+                    bestPartitionValues = currentPartitionValues;
                 }
             }
         }
@@ -453,6 +600,7 @@ double CLI::singleNodeGreedyAlgorithm()
         else
         {
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
+            values = bestPartitionValues;
 
             stringstream ss;
             ss << "Current modularity: " << currentModularity << endl;
