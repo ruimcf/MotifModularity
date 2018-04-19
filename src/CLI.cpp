@@ -1,5 +1,6 @@
 #include "CLI.h"
 #include "Random.h"
+#include <ctime>
 
 using namespace std;
 
@@ -140,8 +141,11 @@ void CLI::start(int argc, char **argv)
         nodes.push_back(i);
     }
 
+    clock_t begin = clock();
     CLI::singleNodeGreedyAlgorithm();
-
+    clock_t end = clock();
+    double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
+    cout << "Elapsed seconds: " << elapsedSecs << endl;
     CLI::closeResultsFile();
 
     // total = 0;
@@ -195,8 +199,9 @@ double CLI::triangleModularityPreCalculated(std::vector<double> motifValues)
             {
                 for (int k = j + 1; k < n; k++)
                 {
-                    if(CLI::kronecker(j,k))
+                    if(CLI::kronecker(j,k) && CLI::kronecker(i, k))
                     {
+                        numberMotifsInPartitions += g->hasEdge(j, k) * g->hasEdge(i, k) * g->hasEdge(i, j);
                         numberMotifsRandomGraphPartitions += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
                     }
                 }
@@ -204,22 +209,40 @@ double CLI::triangleModularityPreCalculated(std::vector<double> motifValues)
         }
     }
 
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = i + 1; j < n; j++)
-        {
-            if (g->hasEdge(i, j) && CLI::kronecker(i,j))
-            {
-                for (int k = j + 1; k < n; k++)
-                {
-                    if (g->hasEdge(j, k) && g->hasEdge(i, k))
-                    {
-                        numberMotifsInPartitions += CLI::maskedWeight(i, j) * CLI::maskedWeight(j, k) * CLI::maskedWeight(i, k);
-                    }
-                }
-            }
-        }
-    }
+    
+    // for (int i = 0; i < n; i++)
+    // {
+    //     for (int j = i + 1; j < n; j++)
+    //     {
+    //         if(CLI::kronecker(i,j)) 
+    //         {
+    //             for (int k = j + 1; k < n; k++)
+    //             {
+    //                 if(CLI::kronecker(j,k))
+    //                 {
+    //                     numberMotifsRandomGraphPartitions += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
+    // for (int i = 0; i < n; i++)
+    // {
+    //     for (int j = i + 1; j < n; j++)
+    //     {
+    //         if (g->hasEdge(i, j) && CLI::kronecker(i,j))
+    //         {
+    //             for (int k = j + 1; k < n; k++)
+    //             {
+    //                 if (g->hasEdge(j, k) && g->hasEdge(i, k) && CLI::kronecker(i,k) && CLI::kronecker(j,k))
+    //                 {
+    //                     numberMotifsInPartitions += 1;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
     double motifModularity = numberMotifsInPartitions / motifValues.at(0) - numberMotifsRandomGraphPartitions / motifValues.at(1);
 
     // cout << motifModularity << "\t" << numberMotifsInPartitions << "\t" << motifValues.at(0) << "\t" << numberMotifsRandomGraphPartitions << "\t" <<  motifValues.at(1) << endl; 
