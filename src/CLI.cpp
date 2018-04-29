@@ -546,18 +546,18 @@ double CLI::singleNodeGreedyAlgorithm()
     // currentModularity = CLI::cicleModularity(3);
     // cout << "Current Modularity 2 " << currentModularity << endl;
 
-    // std::vector<double> motifValues = CLI::constantMotifValues();
-    // currentModularity = CLI::triangleModularityPreCalculated(motifValues);
-    currentModularity = CLI::triangleModularity();
+    std::vector<double> motifValues = CLI::constantMotifValues();
+    currentModularity = CLI::triangleModularityPreCalculated(motifValues);
+    // currentModularity = CLI::triangleModularity();
     // cout << "Current Modularity " << currentModularity << endl;
-    std::vector<double> bestPartitionValues;
-    std::vector<double> values = CLI::firstIterationTriangleModularity();
+    // std::vector<double> bestPartitionValues;
+    // std::vector<double> values = CLI::firstIterationTriangleModularity();
     // cout << "values " << values[0] << endl;
-    double previousNumberMotifsInPartitions = values[0];
-    double numberMotifsGraph = values[1];
-    double previousNumberMotifsRandomGraphPartitions = values[2];
-    double numberMotifsRandomGraph = values[3];
-    currentModularity = values[4];
+    // double previousNumberMotifsInPartitions = values[0];
+    // double numberMotifsGraph = values[1];
+    // double previousNumberMotifsRandomGraphPartitions = values[2];
+    // double numberMotifsRandomGraph = values[3];
+    // currentModularity = values[4];
 
     
     cout << "Current Modularity " << currentModularity << endl;
@@ -582,16 +582,16 @@ double CLI::singleNodeGreedyAlgorithm()
             if (i != chosenNodePartition)
             {
                 networkPartition.setNodeCommunity(chosenNode, i);
-                double currentPartitionModularity = CLI::triangleModularity();
-                // double currentPartitionModularity = CLI::triangleModularityPreCalculated(motifValues);
-                cout << "pnmp2 " << values[0] << endl;
-                vector<double> currentPartitionValues = CLI::changingNodeTriangleModularity(values, chosenNode, chosenNodePartition);
-                currentPartitionModularity = currentPartitionValues[4];
+                // double currentPartitionModularity = CLI::triangleModularity();
+                double currentPartitionModularity = CLI::triangleModularityPreCalculated(motifValues);
+                // cout << "pnmp2 " << values[0] << endl;
+                // vector<double> currentPartitionValues = CLI::changingNodeTriangleModularity(values, chosenNode, chosenNodePartition);
+                // currentPartitionModularity = currentPartitionValues[4];
                 if (currentPartitionModularity > currentModularity)
                 {
                     currentModularity = currentPartitionModularity;
                     betterPartition = i;
-                    bestPartitionValues = currentPartitionValues;
+                    // bestPartitionValues = currentPartitionValues;
                 }
             }
         }
@@ -604,7 +604,7 @@ double CLI::singleNodeGreedyAlgorithm()
         else
         {
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
-            values = bestPartitionValues;
+            // values = bestPartitionValues;
 
             stringstream ss;
             ss << "Current modularity: " << currentModularity << endl;
