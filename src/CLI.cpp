@@ -181,7 +181,7 @@ double CLI::triangleModularity()
     double motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
 
     // cout << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
-    cout << "#" << __number++ << " Modularity:" << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
+    cout << "#" << __number++ << "Normal Triangularity " << " Modularity:" << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
 
     return motifModularity;
 }
@@ -217,7 +217,7 @@ vector<double> CLI::firstIterationTriangleModularity()
     values.push_back(numberMotifsRandomGraph);
     values.push_back(motifModularity);
 
-    // cout << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
+    cout << "First Iteration Modularity" << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
     return values;
 }
 
@@ -315,6 +315,7 @@ vector<double> CLI::changingNodeTriangleModularity(vector<double> previousValues
     double previousRandomMotifs = 0;
     double numberMotifsInPartitions, numberMotifsRandomGraphPartitions, modularity;
     int newCommunity = networkPartition.getNodeCommunity(changedNode);
+    cout << "pnmp2 " << previousNumberMotifsInPartitions << endl;
 
     vector<int> neighbours;
     for(int i=0; i < g->numNodes(); i++)
@@ -373,8 +374,10 @@ vector<double> CLI::changingNodeTriangleModularity(vector<double> previousValues
     numberMotifsInPartitions = previousNumberMotifsInPartitions + newMotifs - previousMotifs;
     numberMotifsRandomGraphPartitions = previousNumberMotifsRandomGraphPartitions + newRandomMotifs - previousRandomMotifs;
     modularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
+    cout << "numberMotifs in partitions: " << previousNumberMotifsInPartitions << " + " << newMotifs << " - " << previousMotifs << " = " << numberMotifsInPartitions << endl;
+    cout << "numberMotifs RandomGraph Partitions: " << previousNumberMotifsRandomGraphPartitions << " + " << newRandomMotifs << " - " << previousRandomMotifs << " = " << numberMotifsRandomGraphPartitions << endl;
 
-    cout << "#" << __number++ << " Modularity:" << modularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
+    cout << "#" << __number++ << "ChangedNode Modularity:" << modularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
     std::vector<double> values;
     values.push_back(numberMotifsInPartitions);
     values.push_back(numberMotifsGraph); 
@@ -581,6 +584,7 @@ double CLI::singleNodeGreedyAlgorithm()
                 networkPartition.setNodeCommunity(chosenNode, i);
                 double currentPartitionModularity = CLI::triangleModularity();
                 // double currentPartitionModularity = CLI::triangleModularityPreCalculated(motifValues);
+                cout << "pnmp2 " << values[0] << endl;
                 vector<double> currentPartitionValues = CLI::changingNodeTriangleModularity(values, chosenNode, chosenNodePartition);
                 currentPartitionModularity = currentPartitionValues[4];
                 if (currentPartitionModularity > currentModularity)
