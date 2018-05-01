@@ -45,9 +45,10 @@ void Motif::readFromFile(std::string path)
     int node1, node2;
     while(ifs >> node1 && ifs >> node2)
     {
+        //Subtract 1 to the node id to match the graph adjacency matrix
         std::vector<int> pair;
-        pair.push_back(node1);
-        pair.push_back(node2);
+        pair.push_back(node1 - 1);
+        pair.push_back(node2 - 1);
         adjacencyList.push_back(pair);
     }
 }
@@ -71,4 +72,14 @@ void Motif::print()
 std::vector<std::vector<int> > Motif::getAdjacencyList()
 {
     return adjacencyList;
+}
+
+bool Motif::isDirected()
+{
+    return directed;
+}
+
+vector<int> Motif::getCommunities()
+{
+    return communities;
 }

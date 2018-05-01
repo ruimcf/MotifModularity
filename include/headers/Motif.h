@@ -13,7 +13,9 @@ class Motif
         int getCommunity(int nodeId);
         void print();
         int getSize();
+        bool isDirected();
         std::vector< std::vector<int> > getAdjacencyList();
+        std::vector<int> getCommunities();
 
     private:
         bool directed;

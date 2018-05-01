@@ -491,7 +491,53 @@ void CLI::countCombinationMotifs()
     //I need to check different permutations of this set of nodes
     //But for now I will use only the given one
 
-    
+    bool motifEdgesCheck = CLI::combinationHasMotifEdges();
+
+    bool motifCommunitiesCheck = true;
+
+
+    //Total graph contains the motif with this combination
+    if (motifEdgesCheck){
+        n2 += 1
+    }
+}
+
+// Check if the combination edges are according the motif
+// i.e. check if the combination is an occurence of the motif
+bool CLI::combinationHasMotifEdges()
+{
+    vector< vector<int> > adjacencyList = motif.getAdjacencyList();
+    for(int i = 0; i < adjacencyList.size(); i++)
+    {
+        if(!g->hasEdge(adjacencyList[i][0], adjacencyList[i][1])){
+            return false;
+        }
+    } 
+    return true;
+}
+
+bool CLI::combinationHasMotifsCommunities()
+{
+    vector<int> communities = motif.getCommunities();
+    for(int i = 0; i < communities.size(); i++)
+    {
+        for(int j = i + 1; j < communities.size(); j++)
+        {
+            // If one of the nodes can be in any community we continue
+            if(communities[i] == -1 || communities[j] == -1){
+                continue;
+            }
+            // If the communities are different in the motif, they have
+            // to be different in the partition
+            else if(communities[i] != communities[j]){
+                if(CLI::kronecker(combination[i], combination[j]))
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    forLoopEnd:
 }
 
 void CLI::combinationCicleModularity()

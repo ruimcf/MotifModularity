@@ -26,6 +26,8 @@ private:
   static void motifModularity();
   static void nodeCombination(int offset, int left);
   static void countCombinationMotifs();
+  static bool combinationHasMotifEdges();
+  static bool combinationHasMotifCommunities();
 
   static void setNodes();
 
