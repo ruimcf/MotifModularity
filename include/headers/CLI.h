@@ -23,6 +23,11 @@ private:
   static int seed;
 
   static Motif motif;
+  static void motifModularity();
+  static void nodeCombination(int offset, int left);
+  static void countCombinationMotifs();
+
+  static void setNodes();
 
   static ofstream resultsFile;
 

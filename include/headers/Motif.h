@@ -12,11 +12,15 @@ class Motif
         void readFromFile(std::string path);
         int getCommunity(int nodeId);
         void print();
+        int getSize();
+        std::vector< std::vector<int> > getAdjacencyList();
 
     private:
+        bool directed;
         int size;
         std::vector<int> communities;
-        std::vector< std::vector<int> > adjacencyMatrix;
+        // std::vector< std::vector<int> > adjacencyMatrix;
+        std::vector< std::vector<int> > adjacencyList;
 };
 
 #endif

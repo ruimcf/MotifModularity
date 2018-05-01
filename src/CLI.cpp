@@ -207,6 +207,16 @@ double CLI::triangleModularity()
     return motifModularity;
 }
 
+void CLI::setNodes()
+{
+    nodes.clear();
+    nodes.reserve(g->numNodes());
+    for (int i = 0; i < g->numNodes(); i++)
+    {
+        nodes.push_back(i);
+    }
+}
+
 vector<double> CLI::firstIterationTriangleModularity()
 {
     int n = g->numNodes();
@@ -451,6 +461,37 @@ void CLI::iterateCombinations(int offset, int k)
         CLI::iterateCombinations(i + 1, k - 1);
         combination.pop_back();
     }
+}
+
+void CLI::motifModularity()
+{
+    n1 = n2 = n3 = n4 = 0;
+    combination.clear();
+    CLI::setNodes();
+    CLI::nodeCombination(0, motif.getSize());
+}
+
+void CLI::nodeCombination(int offset, int left)
+{
+    if(left == 0)
+    {
+        CLI::countCombinationMotifs();
+        return;
+    }
+    for (int i = offset; i < g->numNodes(); i++)
+    {
+        combination.push_back(nodes[i]);
+        CLI::iterateCombinations(i + 1, left - 1);
+        combination.pop_back();
+    } 
+}
+
+void CLI::countCombinationMotifs()
+{
+    //I need to check different permutations of this set of nodes
+    //But for now I will use only the given one
+
+    
 }
 
 void CLI::combinationCicleModularity()

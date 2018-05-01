@@ -11,6 +11,10 @@ Motif::Motif()
     cout << "motif init" << endl;
 }
 
+int Motif::getSize()
+{
+    return size;
+}
 void Motif::readFromFile(std::string path)
 {
     ifstream ifs;
@@ -19,29 +23,33 @@ void Motif::readFromFile(std::string path)
         cout << "Error opening motif file" << endl;
         return;
     }
-    int _size;
-    ifs >> _size;
-    size = _size;
-    vector<int> _communities;
+    ifs >> size;
+
+    string directedOrUndirected;
+    ifs >> directedOrUndirected;
+    if (directedOrUndirected == "directed")
+        directed = true;
+    else if (directedOrUndirected == "undirected")
+        directed = false;
+
+    communities.clear();
+    communities.reserve(size);
     for(int i = 0; i < size; i++)
     {
         int nodeCommunity;
         ifs >> nodeCommunity;
-        _communities.push_back(nodeCommunity);
-    }
-    vector< vector<int> > adjMatrix;
-    for(int i = 0; i < size; i++){
-        vector<int> line;
-        for(int j = 0; j < size; j++){
-            int hasEdge;
-            ifs >> hasEdge;
-            line.push_back(hasEdge);
-        }
-        adjMatrix.push_back(line);
+        communities.push_back(nodeCommunity);
     }
 
-    communities = _communities;
-    adjacencyMatrix = adjMatrix;
+    adjacencyList.clear();
+    int node1, node2;
+    while(ifs >> node1 && ifs >> node2)
+    {
+        std::vector<int> pair;
+        pair.push_back(node1);
+        pair.push_back(node2);
+        adjacencyList.push_back(pair);
+    }
 }
 
 void Motif::print()
@@ -53,13 +61,14 @@ void Motif::print()
         cout << communities[i] << "\t";
     }
     cout << endl;
-    cout << "Adjacency Matrix:" << endl;
-    for(int i = 0; i < size; i++)
+    cout << "Adjacency List:" << endl;
+    for(int i = 0; i < adjacencyList.size(); i++)
     {
-        for(int j = 0; j < size; j++)
-        {
-            cout << adjacencyMatrix.at(i).at(j) << "\t";
-        }
-        cout << endl;
+        cout << adjacencyList.at(i).at(0) << "\t" << adjacencyList.at(i).at(1) << endl;
     } 
+}
+
+std::vector<std::vector<int> > Motif::getAdjacencyList()
+{
+    return adjacencyList;
 }
