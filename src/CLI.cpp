@@ -8,12 +8,14 @@ int __number = 0;
 Graph *CLI::g;
 vector<int> CLI::nodes;
 vector<int> CLI::combination;
-bool CLI::directed, CLI::weighted, CLI::readPartition;
+bool CLI::directed, CLI::weighted, CLI::readPartition, CLI::readMotif;
 string CLI::networkFile;
 ofstream CLI::resultsFile;
 string CLI::partitionFile;
+string CLI::motifFile;
 int CLI::seed;
 ArrayPartition CLI::networkPartition;
+Motif CLI::motif;
 int total = 0;
 double CLI::n1 = 0, CLI::n2 = 0, CLI::n3 = 0, CLI::n4 = 0;
 double bestModularity;
@@ -69,6 +71,17 @@ void CLI::parseArgs(int argc, char **argv)
             cout << i << " " << argc << endl;
             seed = atoi(argv[i]);
         }
+
+        else if (arg == "--motif" || arg == "-m")
+        {
+            if (++i > argc)
+            {
+                cout << "motif few args" << endl;
+                return;
+            }
+            readMotif = true;
+            motifFile = argv[i];
+        }
     }
 }
 
@@ -105,6 +118,7 @@ void CLI::start(int argc, char **argv)
         return;
     }
     readPartition = false;
+    readMotif = false;
     directed = false;
     weighted = false;
     seed = time(NULL);
@@ -122,6 +136,13 @@ void CLI::start(int argc, char **argv)
     GraphUtils::readFileTxt(g, networkFile.c_str(), directed, weighted);
     int n = g->numNodes();
     networkPartition.setNumberNodes(n);
+
+    if (readMotif){
+        motif.readFromFile(motifFile);
+        motif.print();
+    }
+
+    getchar();
 
     if (readPartition)
     {

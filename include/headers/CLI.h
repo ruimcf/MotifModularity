@@ -5,6 +5,7 @@
 #include <math.h>
 #include "FailObject.h"
 #include "ArrayPartition.h"
+#include "Motif.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -16,8 +17,12 @@ private:
   static bool weighted;
   static string partitionFile;
   static string networkFile;
+  static string motifFile;
+  static bool readMotif;
   static bool readPartition;
   static int seed;
+
+  static Motif motif;
 
   static ofstream resultsFile;
 

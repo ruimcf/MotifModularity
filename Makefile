@@ -28,6 +28,7 @@ SRC =                   \
 	src/CLI.cpp	\
 	src/FailObject.cpp \
 	src/ArrayPartition.cpp \
+	src/Motif.cpp \
 	src/main.cpp 
 
 OBJ =  ${SRC:.cpp=.o}
