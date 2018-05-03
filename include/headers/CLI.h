@@ -28,6 +28,7 @@ private:
   static void countCombinationMotifs();
   static bool combinationHasMotifEdges();
   static bool combinationHasMotifCommunities();
+  static int combinationNullcaseWeights();
 
   static void setNodes();
 

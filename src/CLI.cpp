@@ -493,13 +493,21 @@ void CLI::countCombinationMotifs()
 
     bool motifEdgesCheck = CLI::combinationHasMotifEdges();
 
-    bool motifCommunitiesCheck = true;
-
-
-    //Total graph contains the motif with this combination
-    if (motifEdgesCheck){
-        n2 += 1
+    if (motifEdgesCheck)
+    {
+        int combinationWeights = CLI::combinationNullcaseWeights();
+        bool motifCommunitiesCheck = CLI::combinationHasMotifCommunities();
+        if(motifCommunitiesCheck) 
+        {
+            //This partition contains a motif
+            n1 += 1;
+            n3 += combinationWeights;
+        }
+        //Total graph contains a motif
+        n2 += 1;
+        n4 += combinationWeights;
     }
+
 }
 
 // Check if the combination edges are according the motif
@@ -509,14 +517,15 @@ bool CLI::combinationHasMotifEdges()
     vector< vector<int> > adjacencyList = motif.getAdjacencyList();
     for(int i = 0; i < adjacencyList.size(); i++)
     {
-        if(!g->hasEdge(adjacencyList[i][0], adjacencyList[i][1])){
+        if(!g->hasEdge(combination[adjacencyList[i][0]], combination[adjacencyList[i][1]])){
             return false;
         }
     } 
     return true;
 }
 
-bool CLI::combinationHasMotifsCommunities()
+// Check if the combination communities are in accordance with the motif communities
+bool CLI::combinationHasMotifCommunities()
 {
     vector<int> communities = motif.getCommunities();
     for(int i = 0; i < communities.size(); i++)
@@ -529,15 +538,35 @@ bool CLI::combinationHasMotifsCommunities()
             }
             // If the communities are different in the motif, they have
             // to be different in the partition
-            else if(communities[i] != communities[j]){
+            else if (communities[i] != communities[j]){
                 if(CLI::kronecker(combination[i], combination[j]))
+                {
+                    return false;
+                }
+            }
+            // If the communities are the same on the motif for the pair,
+            // they have to be the same on the partition
+            else {
+                if(!CLI::kronecker(combination[i], combination[j]))
                 {
                     return false;
                 }
             }
         }
     }
-    forLoopEnd:
+    return true;
+}
+
+// For each motif edges, calculate the nullcaseWeight and return the product of them
+int CLI::combinationNullcaseWeights()
+{
+    vector< vector<int> > adjacencyList = motif.getAdjacencyList();
+    int product = 1;
+    for(int i = 0; i < adjacencyList.size(); i++)
+    {
+        product *= CLI::nullcaseWeight(combination[adjacencyList[i][0]], combination[adjacencyList[i][1]]);
+    }
+    return product;
 }
 
 void CLI::combinationCicleModularity()
