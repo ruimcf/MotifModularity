@@ -142,7 +142,6 @@ void CLI::start(int argc, char **argv)
         motif.print();
     }
 
-    getchar();
 
     if (readPartition)
     {
@@ -157,6 +156,7 @@ void CLI::start(int argc, char **argv)
     {
         networkPartition.randomPartition(2);
     }
+        getchar();
 
     for (int i = 0; i < g->numNodes(); i++)
     {
@@ -463,12 +463,13 @@ void CLI::iterateCombinations(int offset, int k)
     }
 }
 
-void CLI::motifModularity()
+ double CLI::motifModularity()
 {
     n1 = n2 = n3 = n4 = 0;
     combination.clear();
     CLI::setNodes();
     CLI::nodeCombination(0, motif.getSize());
+    return n1 / n2 - n3 / n4;
 }
 
 void CLI::nodeCombination(int offset, int left)
@@ -683,8 +684,10 @@ double CLI::singleNodeGreedyAlgorithm()
     // currentModularity = CLI::cicleModularity(3);
     // cout << "Current Modularity 2 " << currentModularity << endl;
 
-    std::vector<double> motifValues = CLI::constantMotifValues();
-    currentModularity = CLI::triangleModularityPreCalculated(motifValues);
+    // std::vector<double> motifValues = CLI::constantMotifValues();
+    // currentModularity = CLI::triangleModularityPreCalculated(motifValues);
+
+    currentModularity = CLI::motifModularity();
     // currentModularity = CLI::triangleModularity();
     // cout << "Current Modularity " << currentModularity << endl;
     // std::vector<double> bestPartitionValues;
@@ -720,7 +723,8 @@ double CLI::singleNodeGreedyAlgorithm()
             {
                 networkPartition.setNodeCommunity(chosenNode, i);
                 // double currentPartitionModularity = CLI::triangleModularity();
-                double currentPartitionModularity = CLI::triangleModularityPreCalculated(motifValues);
+                // double currentPartitionModularity = CLI::trianangleModularityPreCalculated(motifValues);
+                double currentPartitionModularity = CLI::motifModularity();
                 // cout << "pnmp2 " << values[0] << endl;
                 // vector<double> currentPartitionValues = CLI::changingNodeTriangleModularity(values, chosenNode, chosenNodePartition);
                 // currentPartitionModularity = currentPartitionValues[4];
