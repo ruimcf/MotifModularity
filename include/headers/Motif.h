@@ -21,8 +21,14 @@ class Motif
         bool directed;
         int size;
         std::vector<int> communities;
-        // std::vector< std::vector<int> > adjacencyMatrix;
+        std::vector< std::vector<int> > adjacencyMatrix;
         std::vector< std::vector<int> > adjacencyList;
+        void setAdjacencyMatrix();
+        void calculateOrbits();
+        void go(int pos);
+        std::vector< std::vector<bool> > orbits;
+        std::vector<bool> used;
+        std::vector<int> perm;
 };
 
 #endif
