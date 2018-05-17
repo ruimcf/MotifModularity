@@ -70,6 +70,11 @@ void Motif::print()
     {
         cout << adjacencyList.at(i).at(0) << "\t" << adjacencyList.at(i).at(1) << endl;
     }
+    std::cout << "Orbit rules:" << std::endl;
+    for(int i = 0; i < orbitRules.size(); i++)
+    {
+        std::cout << orbitRules[i][0] << "\t" << orbitRules[i][1] << std::endl;
+    }
 }
 
 std::vector<std::vector<int> > Motif::getAdjacencyList()
@@ -125,6 +130,7 @@ void Motif::calculateOrbits()
     }
 
     go(0);
+    setOrbitRules();
 }
 
 void Motif::go(int pos)
@@ -133,9 +139,9 @@ void Motif::go(int pos)
 
     if (pos == size)
     {
-        for (int i = 0; i < size; i++)
-            printf("%d", perm[i]);
-        putchar('\n');
+        // for (int i = 0; i < size; i++)
+        //     printf("%d", perm[i]);
+        // putchar('\n');
 
         for (int i = 0; i < size; i++)
             orbits[i][perm[i]] = true;
@@ -165,4 +171,39 @@ void Motif::go(int pos)
             }
         }
     }
+}
+
+void Motif::setOrbitRules()
+{
+    orbitRules.clear();
+    for(int i = 0; i < size; i++)
+    {
+        int lastNode = -1;
+        for(int j = 0; j < size; j++)
+        {
+            if(orbits[i][j])
+            {
+                if(lastNode != -1)
+                {
+                    bool rulesAlreadyExists = false;
+                    for(int k = 0; k < orbitRules.size(); k++)
+                        if (orbitRules[k][0] == lastNode && orbitRules[k][1] == j)
+                            rulesAlreadyExists = true;
+
+                    if(!rulesAlreadyExists) {
+                        std::vector<int> pair;
+                        pair.push_back(lastNode);
+                        pair.push_back(j);
+                        orbitRules.push_back(pair);
+                    }
+                } 
+                lastNode = j;
+            }
+        }
+    }
+}
+
+std::vector< std::vector<int> > Motif::getOrbitRules()
+{
+    return orbitRules;
 }

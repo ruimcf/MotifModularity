@@ -142,6 +142,7 @@ void CLI::start(int argc, char **argv)
         motif.print();
     }
 
+        getchar();
 
     if (readPartition)
     {
@@ -156,7 +157,6 @@ void CLI::start(int argc, char **argv)
     {
         networkPartition.randomPartition(2);
     }
-        getchar();
 
     for (int i = 0; i < g->numNodes(); i++)
     {

@@ -16,6 +16,7 @@ class Motif
         bool isDirected();
         std::vector< std::vector<int> > getAdjacencyList();
         std::vector<int> getCommunities();
+        std::vector< std::vector<int> > getOrbitRules();
 
     private:
         bool directed;
@@ -29,6 +30,8 @@ class Motif
         std::vector< std::vector<bool> > orbits;
         std::vector<bool> used;
         std::vector<int> perm;
+        std::vector< std::vector<int> > orbitRules;
+        void setOrbitRules();
 };
 
 #endif
