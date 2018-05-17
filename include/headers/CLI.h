@@ -24,7 +24,7 @@ private:
 
   static Motif motif;
   static double motifModularity();
-  static void nodeCombination(int offset, int left);
+  static void nodeCombination(int offset);
   static void countCombinationMotifs();
   static bool combinationHasMotifEdges();
   static bool combinationHasMotifCommunities();
@@ -39,6 +39,7 @@ private:
   static ArrayPartition networkPartition;
   static vector<int> nodes;
   static vector<int> combination;
+  static vector<bool> used;
   static double n1;
   static double n2;
   static double n3;

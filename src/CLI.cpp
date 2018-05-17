@@ -8,6 +8,7 @@ int __number = 0;
 Graph *CLI::g;
 vector<int> CLI::nodes;
 vector<int> CLI::combination;
+vector<bool> CLI::used;
 bool CLI::directed, CLI::weighted, CLI::readPartition, CLI::readMotif;
 string CLI::networkFile;
 ofstream CLI::resultsFile;
@@ -142,7 +143,6 @@ void CLI::start(int argc, char **argv)
         motif.print();
     }
 
-        getchar();
 
     if (readPartition)
     {
@@ -158,6 +158,7 @@ void CLI::start(int argc, char **argv)
         networkPartition.randomPartition(2);
     }
 
+        getchar();
     for (int i = 0; i < g->numNodes(); i++)
     {
         nodes.push_back(i);
@@ -209,11 +210,16 @@ double CLI::triangleModularity()
 
 void CLI::setNodes()
 {
+    combination.clear();
+    used.clear();
     nodes.clear();
     nodes.reserve(g->numNodes());
+    used.reserve(g->numNodes());
+    combination.reserve(g->numNodes());
     for (int i = 0; i < g->numNodes(); i++)
     {
         nodes.push_back(i);
+        used.push_back(false);
     }
 }
 
@@ -466,24 +472,29 @@ void CLI::iterateCombinations(int offset, int k)
  double CLI::motifModularity()
 {
     n1 = n2 = n3 = n4 = 0;
-    combination.clear();
     CLI::setNodes();
-    CLI::nodeCombination(0, motif.getSize());
+    CLI::nodeCombination(0);
     return n1 / n2 - n3 / n4;
 }
 
-void CLI::nodeCombination(int offset, int left)
+void CLI::nodeCombination(int offset)
 {
-    if(left == 0)
+    if(offset == motif.getSize())
     {
         CLI::countCombinationMotifs();
         return;
     }
     for (int i = offset; i < g->numNodes(); i++)
     {
-        combination.push_back(nodes[i]);
-        CLI::iterateCombinations(i + 1, left - 1);
-        combination.pop_back();
+        if(!used[i])
+        {
+            used[i] = true;
+            combination.push_back(nodes[i]);
+            //Aqui posso verificar: as edges criadas são validas para a motif? os nodes estão de acordo as regras da motif?
+            CLI::nodeCombination(offset + 1);
+            combination.pop_back();
+            used[i] = false;
+        }
     } 
 }
 
@@ -491,6 +502,13 @@ void CLI::countCombinationMotifs()
 {
     //I need to check different permutations of this set of nodes
     //But for now I will use only the given one
+    vector<vector<int> > orbitRules = motif.getOrbitRules();
+    for(int i = 0; i < orbitRules.size(); i++)
+    {
+        if(combination.at(orbitRules[i][0]) >= combination.at(orbitRules[i][1])){
+            return;
+        }
+    }
 
     bool motifEdgesCheck = CLI::combinationHasMotifEdges();
 
