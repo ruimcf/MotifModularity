@@ -5,7 +5,6 @@
 using namespace std;
 
 int __number = 0;
-int ___number = 0;
 Graph *CLI::g;
 vector<int> CLI::nodes;
 vector<int> CLI::combination;
