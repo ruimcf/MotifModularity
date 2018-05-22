@@ -8,12 +8,15 @@ int __number = 0;
 Graph *CLI::g;
 vector<int> CLI::nodes;
 vector<int> CLI::combination;
-bool CLI::directed, CLI::weighted, CLI::readPartition;
+vector<bool> CLI::used;
+bool CLI::directed, CLI::weighted, CLI::readPartition, CLI::readMotif;
 string CLI::networkFile;
 ofstream CLI::resultsFile;
 string CLI::partitionFile;
+string CLI::motifFile;
 int CLI::seed;
 ArrayPartition CLI::networkPartition;
+Motif CLI::motif;
 int total = 0;
 double CLI::n1 = 0, CLI::n2 = 0, CLI::n3 = 0, CLI::n4 = 0;
 double bestModularity;
@@ -69,6 +72,17 @@ void CLI::parseArgs(int argc, char **argv)
             cout << i << " " << argc << endl;
             seed = atoi(argv[i]);
         }
+
+        else if (arg == "--motif" || arg == "-m")
+        {
+            if (++i > argc)
+            {
+                cout << "motif few args" << endl;
+                return;
+            }
+            readMotif = true;
+            motifFile = argv[i];
+        }
     }
 }
 
@@ -105,6 +119,7 @@ void CLI::start(int argc, char **argv)
         return;
     }
     readPartition = false;
+    readMotif = false;
     directed = false;
     weighted = false;
     seed = time(NULL);
@@ -123,6 +138,12 @@ void CLI::start(int argc, char **argv)
     int n = g->numNodes();
     networkPartition.setNumberNodes(n);
 
+    if (readMotif){
+        motif.readFromFile(motifFile);
+        motif.print();
+    }
+
+
     if (readPartition)
     {
         networkPartition.readPartition(partitionFile.c_str());
@@ -131,12 +152,16 @@ void CLI::start(int argc, char **argv)
         networkPartition.writePartitionFile(networkFile);
         double modularity = CLI::triangleModularity();
         printf("Triangle modularity: %f\nTotal: %d\n", modularity, total);
+        total = 0;
+        double motifModularity = CLI::motifModularity();
+        printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
     }
     else
     {
         networkPartition.randomPartition(2);
     }
 
+    getchar();
     for (int i = 0; i < g->numNodes(); i++)
     {
         nodes.push_back(i);
@@ -181,9 +206,24 @@ double CLI::triangleModularity()
     double motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
 
     // cout << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
-    cout << "#" << __number++ << "Normal Triangularity " << " Modularity:" << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
+    cout << "#" << __number++ << " Triangular Motularity: " << motifModularity << "\t\t" << numberMotifsInPartitions << "\t\t" << numberMotifsGraph << "\t\t" << numberMotifsRandomGraphPartitions << "\t\t" << numberMotifsRandomGraph << endl; 
 
     return motifModularity;
+}
+
+void CLI::setNodes()
+{
+    combination.clear();
+    used.clear();
+    nodes.clear();
+    nodes.reserve(g->numNodes());
+    used.reserve(g->numNodes());
+    combination.reserve(g->numNodes());
+    for (int i = 0; i < g->numNodes(); i++)
+    {
+        nodes.push_back(i);
+        used.push_back(false);
+    }
 }
 
 vector<double> CLI::firstIterationTriangleModularity()
@@ -432,6 +472,126 @@ void CLI::iterateCombinations(int offset, int k)
     }
 }
 
+ double CLI::motifModularity()
+{
+    n1 = n2 = n3 = n4 = 0;
+    CLI::setNodes();
+    CLI::nodeCombination(0);
+    return n1 / n2 - n3 / n4;
+}
+
+void CLI::nodeCombination(int offset)
+{
+    if(offset == motif.getSize())
+    {
+        CLI::countCombinationMotifs();
+        return;
+    }
+    for (int i = offset; i < g->numNodes(); i++)
+    {
+        if(!used[i])
+        {
+            used[i] = true;
+            combination.push_back(nodes[i]);
+            //Aqui posso verificar: as edges criadas são validas para a motif? os nodes estão de acordo as regras da motif?
+            CLI::nodeCombination(offset + 1);
+            combination.pop_back();
+            used[i] = false;
+        }
+    } 
+}
+
+void CLI::countCombinationMotifs()
+{
+    //I need to check different permutations of this set of nodes
+    //But for now I will use only the given one
+    vector<vector<int> > orbitRules = motif.getOrbitRules();
+    for(int i = 0; i < orbitRules.size(); i++)
+    {
+        if(combination.at(orbitRules[i][0]) >= combination.at(orbitRules[i][1])){
+            return;
+        }
+    }
+    total++;
+
+    bool motifEdgesCheck = CLI::combinationHasMotifEdges();
+    bool motifCommunitiesCheck = CLI::combinationHasMotifCommunities();
+    int combinationWeights = CLI::combinationNullcaseWeights();
+
+    if (motifEdgesCheck)
+    {
+        //This partition contains a motif
+        if(motifCommunitiesCheck) 
+            n1 += 1;
+        //Total graph contains a motif
+        n2 += 1;
+    }
+
+    if(motifCommunitiesCheck) 
+        n3 += combinationWeights;
+
+    n4 += combinationWeights;
+}
+
+// Check if the combination edges are according the motif
+// i.e. check if the combination is an occurence of the motif
+bool CLI::combinationHasMotifEdges()
+{
+    vector< vector<int> > adjacencyList = motif.getAdjacencyList();
+    for(int i = 0; i < adjacencyList.size(); i++)
+    {
+        if(!g->hasEdge(combination[adjacencyList[i][0]], combination[adjacencyList[i][1]])){
+            return false;
+        }
+    } 
+    return true;
+}
+
+// Check if the combination communities are in accordance with the motif communities
+bool CLI::combinationHasMotifCommunities()
+{
+    vector<int> communities = motif.getCommunities();
+    for(int i = 0; i < communities.size(); i++)
+    {
+        for(int j = i + 1; j < communities.size(); j++)
+        {
+            // If one of the nodes can be in any community we continue
+            if(communities[i] == -1 || communities[j] == -1){
+                continue;
+            }
+            // If the communities are different in the motif, they have
+            // to be different in the partition
+            else if (communities[i] != communities[j]){
+                if(CLI::kronecker(combination[i], combination[j]))
+                {
+                    return false;
+                }
+            }
+            // If the communities are the same on the motif for the pair,
+            // they have to be the same on the partition
+            else {
+                if(!CLI::kronecker(combination[i], combination[j]))
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+// For each motif edges, calculate the nullcaseWeight and return the product of them
+int CLI::combinationNullcaseWeights()
+{
+    vector< vector<int> > adjacencyList = motif.getAdjacencyList();
+    int product = 1;
+    for(int i = 0; i < adjacencyList.size(); i++)
+    {
+        product *= CLI::nullcaseWeight(combination[adjacencyList[i][0]], combination[adjacencyList[i][1]]);
+    }
+    return product;
+}
+
 void CLI::combinationCicleModularity()
 {
     int g1 = CLI::maskedWeight(combination.back(), combination.front());
@@ -533,6 +693,7 @@ int numberForEvenPartitions(int numNodes)
 
 double CLI::singleNodeGreedyAlgorithm()
 {
+    cout << "--- Starting greedy ---" << endl;
     int chosenNode, chosenIndex, chosenNodePartition, betterPartition, numPartitions;
     double bestModularity, currentModularity;
     vector<int> allNodes;
@@ -546,8 +707,10 @@ double CLI::singleNodeGreedyAlgorithm()
     // currentModularity = CLI::cicleModularity(3);
     // cout << "Current Modularity 2 " << currentModularity << endl;
 
-    std::vector<double> motifValues = CLI::constantMotifValues();
-    currentModularity = CLI::triangleModularityPreCalculated(motifValues);
+    // std::vector<double> motifValues = CLI::constantMotifValues();
+    // currentModularity = CLI::triangleModularityPreCalculated(motifValues);
+
+    currentModularity = CLI::motifModularity();
     // currentModularity = CLI::triangleModularity();
     // cout << "Current Modularity " << currentModularity << endl;
     // std::vector<double> bestPartitionValues;
@@ -582,8 +745,9 @@ double CLI::singleNodeGreedyAlgorithm()
             if (i != chosenNodePartition)
             {
                 networkPartition.setNodeCommunity(chosenNode, i);
-                // double currentPartitionModularity = CLI::triangleModularity();
-                double currentPartitionModularity = CLI::triangleModularityPreCalculated(motifValues);
+                // double t_currentPartitionModularity = CLI::triangleModularity();
+                // double currentPartitionModularity = CLI::trianangleModularityPreCalculated(motifValues);
+                double currentPartitionModularity = CLI::motifModularity();
                 // cout << "pnmp2 " << values[0] << endl;
                 // vector<double> currentPartitionValues = CLI::changingNodeTriangleModularity(values, chosenNode, chosenNodePartition);
                 // currentPartitionModularity = currentPartitionValues[4];
