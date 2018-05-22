@@ -5,6 +5,7 @@
 using namespace std;
 
 int __number = 0;
+int ___number = 0;
 Graph *CLI::g;
 vector<int> CLI::nodes;
 vector<int> CLI::combination;
@@ -152,13 +153,16 @@ void CLI::start(int argc, char **argv)
         networkPartition.writePartitionFile(networkFile);
         double modularity = CLI::triangleModularity();
         printf("Triangle modularity: %f\nTotal: %d\n", modularity, total);
+        total = 0;
+        double motifModularity = CLI::motifModularity();
+        printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
     }
     else
     {
         networkPartition.randomPartition(2);
     }
 
-        getchar();
+    getchar();
     for (int i = 0; i < g->numNodes(); i++)
     {
         nodes.push_back(i);
@@ -203,7 +207,7 @@ double CLI::triangleModularity()
     double motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
 
     // cout << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
-    cout << "#" << __number++ << "Normal Triangularity " << " Modularity:" << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
+    cout << "#" << __number++ << " Triangular Motularity: " << motifModularity << "\t\t" << numberMotifsInPartitions << "\t\t" << numberMotifsGraph << "\t\t" << numberMotifsRandomGraphPartitions << "\t\t" << numberMotifsRandomGraph << endl; 
 
     return motifModularity;
 }
@@ -509,24 +513,25 @@ void CLI::countCombinationMotifs()
             return;
         }
     }
+    total++;
 
     bool motifEdgesCheck = CLI::combinationHasMotifEdges();
+    bool motifCommunitiesCheck = CLI::combinationHasMotifCommunities();
+    int combinationWeights = CLI::combinationNullcaseWeights();
 
     if (motifEdgesCheck)
     {
-        int combinationWeights = CLI::combinationNullcaseWeights();
-        bool motifCommunitiesCheck = CLI::combinationHasMotifCommunities();
+        //This partition contains a motif
         if(motifCommunitiesCheck) 
-        {
-            //This partition contains a motif
             n1 += 1;
-            n3 += combinationWeights;
-        }
         //Total graph contains a motif
         n2 += 1;
-        n4 += combinationWeights;
     }
 
+    if(motifCommunitiesCheck) 
+        n3 += combinationWeights;
+
+    n4 += combinationWeights;
 }
 
 // Check if the combination edges are according the motif
@@ -689,6 +694,7 @@ int numberForEvenPartitions(int numNodes)
 
 double CLI::singleNodeGreedyAlgorithm()
 {
+    cout << "--- Starting greedy ---" << endl;
     int chosenNode, chosenIndex, chosenNodePartition, betterPartition, numPartitions;
     double bestModularity, currentModularity;
     vector<int> allNodes;
@@ -740,7 +746,7 @@ double CLI::singleNodeGreedyAlgorithm()
             if (i != chosenNodePartition)
             {
                 networkPartition.setNodeCommunity(chosenNode, i);
-                // double currentPartitionModularity = CLI::triangleModularity();
+                // double t_currentPartitionModularity = CLI::triangleModularity();
                 // double currentPartitionModularity = CLI::trianangleModularityPreCalculated(motifValues);
                 double currentPartitionModularity = CLI::motifModularity();
                 // cout << "pnmp2 " << values[0] << endl;
