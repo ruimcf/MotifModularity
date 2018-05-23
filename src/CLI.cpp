@@ -161,7 +161,6 @@ void CLI::start(int argc, char **argv)
         networkPartition.randomPartition(2);
     }
 
-    getchar();
     for (int i = 0; i < g->numNodes(); i++)
     {
         nodes.push_back(i);
@@ -206,7 +205,7 @@ double CLI::triangleModularity()
     double motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
 
     // cout << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
-    cout << "#" << __number++ << " Triangular Motularity: " << motifModularity << "\t\t" << numberMotifsInPartitions << "\t\t" << numberMotifsGraph << "\t\t" << numberMotifsRandomGraphPartitions << "\t\t" << numberMotifsRandomGraph << endl; 
+    // cout << "#" << __number++ << " Triangular Motularity: " << motifModularity << "\t\t" << numberMotifsInPartitions << "\t\t" << numberMotifsGraph << "\t\t" << numberMotifsRandomGraphPartitions << "\t\t" << numberMotifsRandomGraph << endl; 
 
     return motifModularity;
 }
@@ -745,7 +744,7 @@ double CLI::singleNodeGreedyAlgorithm()
             if (i != chosenNodePartition)
             {
                 networkPartition.setNodeCommunity(chosenNode, i);
-                // double t_currentPartitionModularity = CLI::triangleModularity();
+                // double currentPartitionModularity = CLI::triangleModularity();
                 // double currentPartitionModularity = CLI::trianangleModularityPreCalculated(motifValues);
                 double currentPartitionModularity = CLI::motifModularity();
                 // cout << "pnmp2 " << values[0] << endl;

@@ -15,6 +15,7 @@ class Motif
         int getSize();
         bool isDirected();
         std::vector< std::vector<int> > getAdjacencyList();
+        std::vector< std::vector<int> > getAdjacencyListSize(int size);
         std::vector<int> getCommunities();
         std::vector< std::vector<int> > getOrbitRules();
 
@@ -24,6 +25,7 @@ class Motif
         std::vector<int> communities;
         std::vector< std::vector<int> > adjacencyMatrix;
         std::vector< std::vector<int> > adjacencyList;
+        std::vector< std::vector< std::vector<int> > > adjacencyListSizes;
         void setAdjacencyMatrix();
         void calculateOrbits();
         void go(int pos);

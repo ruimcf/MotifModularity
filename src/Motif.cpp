@@ -42,6 +42,13 @@ void Motif::readFromFile(std::string path)
         communities.push_back(nodeCommunity);
     }
 
+    adjacencyListSizes.clear();
+    for (int i = 0; i < size; i++)
+    {
+        vector< vector<int> > adjList;
+        adjacencyListSizes.push_back(adjList);
+    }
+
     adjacencyList.clear();
     int node1, node2;
     while (ifs >> node1 && ifs >> node2)
@@ -50,10 +57,23 @@ void Motif::readFromFile(std::string path)
         std::vector<int> pair;
         pair.push_back(node1 - 1);
         pair.push_back(node2 - 1);
+        int max = node1 < node2 ? node2 : node1;
+        for(int i = max-1; i < adjacencyListSizes.size(); ++i)
+        {
+            adjacencyListSizes.at(i).push_back(pair);
+        }
         adjacencyList.push_back(pair);
     }
 
     calculateOrbits();
+}
+
+/**
+ * Returns the edges for motif nodes until indice size
+ */
+std::vector< std::vector<int> > Motif::getAdjacencyListSize(int size)
+{
+    return adjacencyListSizes.at(size);
 }
 
 void Motif::print()
@@ -69,6 +89,13 @@ void Motif::print()
     for (int i = 0; i < adjacencyList.size(); i++)
     {
         cout << adjacencyList.at(i).at(0) << "\t" << adjacencyList.at(i).at(1) << endl;
+    }
+    cout << "Adjacency List Sizes:" << endl;
+    for (int i = 0; i < adjacencyListSizes.size(); i++)
+    {
+        cout << "Size " << i << endl;
+        for (int j = 0; j < adjacencyListSizes.at(i).size(); j++)
+        cout << adjacencyListSizes.at(i).at(j).at(0) << "\t" << adjacencyListSizes.at(i).at(j).at(1) << endl;
     }
     std::cout << "Orbit rules:" << std::endl;
     for(int i = 0; i < orbitRules.size(); i++)
