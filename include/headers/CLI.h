@@ -30,6 +30,12 @@ private:
   static bool combinationHasMotifCommunities();
   static int combinationNullcaseWeights();
 
+  static double optimizedMotifModularity();
+  static void optimizedNodeCombination(int offset, bool edgesCheck, bool communitiesCheck);
+  static bool optimizedCombinationHasMotifEdges();
+  static bool optimizedCombinationHasMotifCommunities();
+  static bool optimizedCombinationOrbitRules();
+
   static void setNodes();
 
   static ofstream resultsFile;

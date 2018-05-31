@@ -15,8 +15,10 @@ class Motif
         int getSize();
         bool isDirected();
         std::vector< std::vector<int> > getAdjacencyList();
+        std::vector< std::vector<int> > getAdjacencyListSize(int size);
         std::vector<int> getCommunities();
         std::vector< std::vector<int> > getOrbitRules();
+        std::vector< std::vector<int> > getOrbitRulesSize(int size);
 
     private:
         bool directed;
@@ -24,6 +26,8 @@ class Motif
         std::vector<int> communities;
         std::vector< std::vector<int> > adjacencyMatrix;
         std::vector< std::vector<int> > adjacencyList;
+        //at each pos, the edges that connect to node pos and pos is > than the other node
+        std::vector< std::vector< std::vector<int> > > adjacencyListSizes;
         void setAdjacencyMatrix();
         void calculateOrbits();
         void go(int pos);
@@ -31,6 +35,7 @@ class Motif
         std::vector<bool> used;
         std::vector<int> perm;
         std::vector< std::vector<int> > orbitRules;
+        std::vector< std::vector< std::vector<int> > > orbitRulesSize;
         void setOrbitRules();
 };
 

@@ -42,6 +42,13 @@ void Motif::readFromFile(std::string path)
         communities.push_back(nodeCommunity);
     }
 
+    adjacencyListSizes.clear();
+    for (int i = 0; i < size; i++)
+    {
+        vector< vector<int> > adjList;
+        adjacencyListSizes.push_back(adjList);
+    }
+
     adjacencyList.clear();
     int node1, node2;
     while (ifs >> node1 && ifs >> node2)
@@ -50,10 +57,20 @@ void Motif::readFromFile(std::string path)
         std::vector<int> pair;
         pair.push_back(node1 - 1);
         pair.push_back(node2 - 1);
+        int max = pair[0] >= pair[1] ? pair[0] : pair[1];
+        adjacencyListSizes.at(max).push_back(pair);
         adjacencyList.push_back(pair);
     }
 
     calculateOrbits();
+}
+
+/**
+ * Returns the edges for motif nodes until indice size
+ */
+std::vector< std::vector<int> > Motif::getAdjacencyListSize(int size)
+{
+    return adjacencyListSizes.at(size);
 }
 
 void Motif::print()
@@ -69,6 +86,13 @@ void Motif::print()
     for (int i = 0; i < adjacencyList.size(); i++)
     {
         cout << adjacencyList.at(i).at(0) << "\t" << adjacencyList.at(i).at(1) << endl;
+    }
+    cout << "Adjacency List Sizes:" << endl;
+    for (int i = 0; i < adjacencyListSizes.size(); i++)
+    {
+        cout << "Size " << i << endl;
+        for (int j = 0; j < adjacencyListSizes.at(i).size(); j++)
+        cout << adjacencyListSizes.at(i).at(j).at(0) << "\t" << adjacencyListSizes.at(i).at(j).at(1) << endl;
     }
     std::cout << "Orbit rules:" << std::endl;
     for(int i = 0; i < orbitRules.size(); i++)
@@ -173,9 +197,22 @@ void Motif::go(int pos)
     }
 }
 
+std::vector< std::vector<int> > Motif::getOrbitRulesSize(int size)
+{
+    return orbitRulesSize.at(size);
+}
+
+
 void Motif::setOrbitRules()
 {
     orbitRules.clear();
+    orbitRulesSize.clear();
+    for(int i = 0; i < size; ++i)
+    {
+        std::vector< std::vector<int> > pairsForSize;
+        orbitRulesSize.push_back(pairsForSize);
+    }
+
     for(int i = 0; i < size; i++)
     {
         int lastNode = -1;
@@ -189,6 +226,20 @@ void Motif::setOrbitRules()
                     for(int k = 0; k < orbitRules.size(); k++)
                         if (orbitRules[k][0] == lastNode && orbitRules[k][1] == j)
                             rulesAlreadyExists = true;
+
+                    bool sizeRulesAlreadyExists = false;
+                    for(int k = 0; k < orbitRulesSize[j].size(); k++){
+                        if(orbitRulesSize[j][k][0] == lastNode)
+                            sizeRulesAlreadyExists = true;
+                    } 
+
+                    if(!sizeRulesAlreadyExists) {
+                        std::vector<int> pair;
+                        pair.push_back(lastNode);
+                        pair.push_back(j);
+                        orbitRulesSize[j].push_back(pair);
+                        // cout << "Orbit Rule added size " << j << ": " << lastNode << " - " << j << endl;
+                    }
 
                     if(!rulesAlreadyExists) {
                         std::vector<int> pair;
