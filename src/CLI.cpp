@@ -527,7 +527,7 @@ void CLI::optimizedNodeCombination(int offset, bool edgesCheck, bool communities
 
 bool CLI::optimizedCombinationOrbitRules()
 {
-    vector< vector<int> > orbitRules = motif.getOrbitRulesSize(combination.size()-1);
+    const vector< vector<int> >& orbitRules = motif.getOrbitRulesSize(combination.size()-1);
     for(int i = 0; i < orbitRules.size(); i++)
     {
         if(combination.at(orbitRules[i][0]) >= combination.at(orbitRules[i][1])){
@@ -540,7 +540,7 @@ bool CLI::optimizedCombinationOrbitRules()
 // the new node added complies with the motif edges?
 bool CLI::optimizedCombinationHasMotifEdges()
 {
-    vector< vector<int> > adjacencyList = motif.getAdjacencyListSize(combination.size()-1);
+    const vector< vector<int> >& adjacencyList = motif.getAdjacencyListSize(combination.size()-1);
     for(int i = 0; i < adjacencyList.size(); i++)
     {
         if(!g->hasEdge(combination[adjacencyList[i][0]], combination[adjacencyList[i][1]])){
@@ -611,7 +611,7 @@ void CLI::countCombinationMotifs()
 {
     //I need to check different permutations of this set of nodes
     //But for now I will use only the given one
-    vector<vector<int> > orbitRules = motif.getOrbitRules();
+    const vector<vector<int> > & orbitRules = motif.getOrbitRules();
     for(int i = 0; i < orbitRules.size(); i++)
     {
         if(combination.at(orbitRules[i][0]) >= combination.at(orbitRules[i][1])){
@@ -643,7 +643,7 @@ void CLI::countCombinationMotifs()
 // i.e. check if the combination is an occurence of the motif
 bool CLI::combinationHasMotifEdges()
 {
-    vector< vector<int> > adjacencyList = motif.getAdjacencyList();
+    const vector< vector<int> > & adjacencyList = motif.getAdjacencyList();
     for(int i = 0; i < adjacencyList.size(); i++)
     {
         if(!g->hasEdge(combination[adjacencyList[i][0]], combination[adjacencyList[i][1]])){
@@ -689,7 +689,7 @@ bool CLI::combinationHasMotifCommunities()
 // For each motif edges, calculate the nullcaseWeight and return the product of them
 int CLI::combinationNullcaseWeights()
 {
-    vector< vector<int> > adjacencyList = motif.getAdjacencyList();
+    const vector< vector<int> > & adjacencyList = motif.getAdjacencyList();
     int product = 1;
     for(int i = 0; i < adjacencyList.size(); i++)
     {

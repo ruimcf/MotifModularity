@@ -1,0 +1,84 @@
+SEED: 18
+Current modularity: 0.0742198
+Times failed: 0
+Partition: 3330333311012330003123200003001331
+Current modularity: 0.0744927
+Times failed: 0
+Partition: 3330333311012330003123202003001331
+Current modularity: 0.0745769
+Times failed: 0
+Partition: 3330333311022330003123202003001331
+Current modularity: 0.0909709
+Times failed: 2
+Partition: 3330333311022330003123202002001331
+Current modularity: 0.105798
+Times failed: 5
+Partition: 3330333311022330003123202002001330
+Current modularity: 0.118816
+Times failed: 0
+Partition: 3330333311022330003323202002001330
+Current modularity: 0.13681
+Times failed: 0
+Partition: 3330333331022330003323202002001330
+Current modularity: 0.15523
+Times failed: 1
+Partition: 3330333331022330033323202002001330
+Current modularity: 0.155237
+Times failed: 0
+Partition: 3330333331022330033313202002001330
+Current modularity: 0.207489
+Times failed: 0
+Partition: 3330333331022330033313202002001030
+Current modularity: 0.226638
+Times failed: 3
+Partition: 3330333331022330333313202002001030
+Current modularity: 0.263858
+Times failed: 3
+Partition: 3330333331322330333313202002001030
+Current modularity: 0.26386
+Times failed: 8
+Partition: 3330333331322330333313102002001030
+Current modularity: 0.26386
+Times failed: 1
+Partition: 3330333331312330333313102002001030
+Current modularity: 0.28387
+Times failed: 3
+Partition: 3330333331312330333313100002001030
+Current modularity: 0.451825
+Times failed: 0
+Partition: 3333333331312330333313100002001030
+Current modularity: 0.451826
+Times failed: 2
+Partition: 3333333331322330333313100002001030
+Current modularity: 0.456626
+Times failed: 3
+Partition: 3333333331322330332313100002001030
+Current modularity: 0.625453
+Times failed: 6
+Partition: 3333333331322330332313100002001000
+Current modularity: 0.639867
+Times failed: 2
+Partition: 3333333331322330332313100000001000
+Current modularity: 0.659961
+Times failed: 5
+Partition: 3333333331322330332303100000001000
+Current modularity: 0.673475
+Times failed: 2
+Partition: 3333333331322330332303100000000000
+Current modularity: 0.71994
+Times failed: 0
+Partition: 3333333301322330332303100000000000
+Current modularity: 0.739501
+Times failed: 17
+Partition: 3333333301322330330303100000000000
+Current modularity: 0.761651
+Times failed: 2
+Partition: 3333333301322300330303100000000000
+Current modularity: 0.781235
+Times failed: 14
+Partition: 3333333301323300330303100000000000
+Current modularity: 0.800697
+Times failed: 15
+Partition: 3333333301323300330303000000000000
+Best modularity: 0.800697
+Partition: 3333333301323300330303000000000000
