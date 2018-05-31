@@ -57,11 +57,8 @@ void Motif::readFromFile(std::string path)
         std::vector<int> pair;
         pair.push_back(node1 - 1);
         pair.push_back(node2 - 1);
-        int max = node1 < node2 ? node2 : node1;
-        for(int i = max-1; i < adjacencyListSizes.size(); ++i)
-        {
-            adjacencyListSizes.at(i).push_back(pair);
-        }
+        int max = pair[0] >= pair[1] ? pair[0] : pair[1];
+        adjacencyListSizes.at(max).push_back(pair);
         adjacencyList.push_back(pair);
     }
 
@@ -200,9 +197,22 @@ void Motif::go(int pos)
     }
 }
 
+std::vector< std::vector<int> > Motif::getOrbitRulesSize(int size)
+{
+    return orbitRulesSize.at(size);
+}
+
+
 void Motif::setOrbitRules()
 {
     orbitRules.clear();
+    orbitRulesSize.clear();
+    for(int i = 0; i < size; ++i)
+    {
+        std::vector< std::vector<int> > pairsForSize;
+        orbitRulesSize.push_back(pairsForSize);
+    }
+
     for(int i = 0; i < size; i++)
     {
         int lastNode = -1;
@@ -216,6 +226,20 @@ void Motif::setOrbitRules()
                     for(int k = 0; k < orbitRules.size(); k++)
                         if (orbitRules[k][0] == lastNode && orbitRules[k][1] == j)
                             rulesAlreadyExists = true;
+
+                    bool sizeRulesAlreadyExists = false;
+                    for(int k = 0; k < orbitRulesSize[j].size(); k++){
+                        if(orbitRulesSize[j][k][0] == lastNode)
+                            sizeRulesAlreadyExists = true;
+                    } 
+
+                    if(!sizeRulesAlreadyExists) {
+                        std::vector<int> pair;
+                        pair.push_back(lastNode);
+                        pair.push_back(j);
+                        orbitRulesSize[j].push_back(pair);
+                        // cout << "Orbit Rule added size " << j << ": " << lastNode << " - " << j << endl;
+                    }
 
                     if(!rulesAlreadyExists) {
                         std::vector<int> pair;

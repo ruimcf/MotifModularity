@@ -155,12 +155,16 @@ void CLI::start(int argc, char **argv)
         total = 0;
         double motifModularity = CLI::motifModularity();
         printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
+        total = 0;
+        double optimizedMotifModularity = CLI::optimizedMotifModularity();
+        printf("Optimized Motif modularity: %f\nTotal: %d\n", optimizedMotifModularity, total);
     }
     else
     {
         networkPartition.randomPartition(2);
     }
 
+    getchar();
     for (int i = 0; i < g->numNodes(); i++)
     {
         nodes.push_back(i);
@@ -471,7 +475,110 @@ void CLI::iterateCombinations(int offset, int k)
     }
 }
 
- double CLI::motifModularity()
+double CLI::optimizedMotifModularity()
+{
+    n1 = n2 = n3 = n4 = 0;
+    CLI::setNodes();
+    CLI::optimizedNodeCombination(0, true, true);
+    return n1 / n2 - n3 / n4;
+}
+
+void CLI::optimizedNodeCombination(int offset, bool edgesCheck, bool communitiesCheck)
+{
+    if(offset == motif.getSize())
+    {
+        int combinationWeights = CLI::combinationNullcaseWeights();
+
+        if(edgesCheck && communitiesCheck)
+            n1 += 1;
+        if(edgesCheck)
+            n2 += 1;
+        if(communitiesCheck)
+            n3 += combinationWeights;
+
+        n4 += combinationWeights;
+        total++;
+        return;
+    }
+    for (int i = 0; i < g->numNodes(); i++)
+    {
+        if(!used[i])
+        {
+            used[i] = true;
+            combination.push_back(nodes[i]);
+            // cut down on simetric motif
+            if(!optimizedCombinationOrbitRules()){
+                combination.pop_back();
+                used[i] = false;
+                continue;
+            } 
+            bool newEdgesCheck = edgesCheck, newCommunitiesCheck = communitiesCheck;
+            if(edgesCheck)
+                newEdgesCheck = optimizedCombinationHasMotifEdges(); 
+            if(communitiesCheck)
+                newCommunitiesCheck = optimizedCombinationHasMotifCommunities();
+
+            CLI::optimizedNodeCombination(offset + 1, newEdgesCheck, newCommunitiesCheck);
+            combination.pop_back();
+            used[i] = false;
+        }
+    } 
+}
+
+bool CLI::optimizedCombinationOrbitRules()
+{
+    vector< vector<int> > orbitRules = motif.getOrbitRulesSize(combination.size()-1);
+    for(int i = 0; i < orbitRules.size(); i++)
+    {
+        if(combination.at(orbitRules[i][0]) >= combination.at(orbitRules[i][1])){
+            return false;
+        }
+    } 
+    return true;
+}
+
+// the new node added complies with the motif edges?
+bool CLI::optimizedCombinationHasMotifEdges()
+{
+    vector< vector<int> > adjacencyList = motif.getAdjacencyListSize(combination.size()-1);
+    for(int i = 0; i < adjacencyList.size(); i++)
+    {
+        if(!g->hasEdge(combination[adjacencyList[i][0]], combination[adjacencyList[i][1]])){
+            return false;
+        }
+    } 
+    return true;
+}
+
+// new node maintains the communities of the motif?
+bool CLI::optimizedCombinationHasMotifCommunities()
+{
+    vector<int> communities = motif.getCommunities();
+    int addedNodePos = combination.size()-1;
+    for(int i = 0; i < addedNodePos; i++)
+    {
+        // If the added node can be in any community, its all good
+        if(communities[addedNodePos] == -1) return true;
+
+        // If one of the nodes can be in any community we continue
+        if (communities[i] == -1) continue;
+
+        // If the communities are different in the motif, they have
+        // to be different in the partition
+        if (communities[i] != communities[addedNodePos]){
+            if(CLI::kronecker(combination[i], combination[addedNodePos]))
+                return false;
+        }
+        // If the communities are the same on the motif for the pair,
+        // they have to be the same on the partition
+        else 
+            if(!CLI::kronecker(combination[i], combination[addedNodePos]))
+                return false;
+    }
+    return true;
+}
+
+double CLI::motifModularity()
 {
     n1 = n2 = n3 = n4 = 0;
     CLI::setNodes();
@@ -486,7 +593,7 @@ void CLI::nodeCombination(int offset)
         CLI::countCombinationMotifs();
         return;
     }
-    for (int i = offset; i < g->numNodes(); i++)
+    for (int i = 0; i < g->numNodes(); i++)
     {
         if(!used[i])
         {
@@ -709,7 +816,7 @@ double CLI::singleNodeGreedyAlgorithm()
     // std::vector<double> motifValues = CLI::constantMotifValues();
     // currentModularity = CLI::triangleModularityPreCalculated(motifValues);
 
-    currentModularity = CLI::motifModularity();
+    currentModularity = CLI::optimizedMotifModularity();
     // currentModularity = CLI::triangleModularity();
     // cout << "Current Modularity " << currentModularity << endl;
     // std::vector<double> bestPartitionValues;
@@ -746,7 +853,7 @@ double CLI::singleNodeGreedyAlgorithm()
                 networkPartition.setNodeCommunity(chosenNode, i);
                 // double currentPartitionModularity = CLI::triangleModularity();
                 // double currentPartitionModularity = CLI::trianangleModularityPreCalculated(motifValues);
-                double currentPartitionModularity = CLI::motifModularity();
+                double currentPartitionModularity = CLI::optimizedMotifModularity();
                 // cout << "pnmp2 " << values[0] << endl;
                 // vector<double> currentPartitionValues = CLI::changingNodeTriangleModularity(values, chosenNode, chosenNodePartition);
                 // currentPartitionModularity = currentPartitionValues[4];
