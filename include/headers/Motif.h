@@ -14,11 +14,11 @@ class Motif
         void print();
         int getSize();
         bool isDirected();
-        std::vector< std::vector<int> > getAdjacencyList();
-        std::vector< std::vector<int> > getAdjacencyListSize(int size);
-        std::vector<int> getCommunities();
-        std::vector< std::vector<int> > getOrbitRules();
-        std::vector< std::vector<int> > getOrbitRulesSize(int size);
+        const std::vector< std::vector<int> > &getAdjacencyList();
+        const std::vector< std::vector<int> > &getAdjacencyListSize(int size);
+        const std::vector<int> &getCommunities();
+        const std::vector< std::vector<int> > &getOrbitRules();
+        const std::vector< std::vector<int> > &getOrbitRulesSize(int size);
 
     private:
         bool directed;

@@ -68,7 +68,8 @@ void Motif::readFromFile(std::string path)
 /**
  * Returns the edges for motif nodes until indice size
  */
-std::vector< std::vector<int> > Motif::getAdjacencyListSize(int size)
+const std::vector< std::vector<int> > &Motif::getAdjacencyListSize(int size)
+
 {
     return adjacencyListSizes.at(size);
 }
@@ -101,7 +102,7 @@ void Motif::print()
     }
 }
 
-std::vector<std::vector<int> > Motif::getAdjacencyList()
+const std::vector<std::vector<int> > &Motif::getAdjacencyList()
 {
     return adjacencyList;
 }
@@ -111,7 +112,7 @@ bool Motif::isDirected()
     return directed;
 }
 
-vector<int> Motif::getCommunities()
+const vector<int> &Motif::getCommunities()
 {
     return communities;
 }
@@ -197,7 +198,7 @@ void Motif::go(int pos)
     }
 }
 
-std::vector< std::vector<int> > Motif::getOrbitRulesSize(int size)
+const std::vector< std::vector<int> > &Motif::getOrbitRulesSize(int size)
 {
     return orbitRulesSize.at(size);
 }
@@ -254,7 +255,7 @@ void Motif::setOrbitRules()
     }
 }
 
-std::vector< std::vector<int> > Motif::getOrbitRules()
+const std::vector< std::vector<int> > &Motif::getOrbitRules()
 {
     return orbitRules;
 }
