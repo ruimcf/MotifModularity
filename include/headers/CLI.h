@@ -71,6 +71,7 @@ private:
   static std::vector<double> changingNodeTriangleModularity(std::vector<double> previousValues, int changedNode, int previousCommunity);
 
   static double singleNodeGreedyAlgorithm();
+  static double singleNodeTestAllGreedyAlgorithm();
 
   static void openResultsFile();
   static void writeLineToFile(string line);
