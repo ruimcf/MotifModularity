@@ -138,6 +138,11 @@ void Motif::setAdjacencyMatrix()
     }
 }
 
+const std::vector< std::vector<int> > &Motif::getAdjacencyMatrix()
+{
+    return adjacencyMatrix;
+}
+
 void Motif::calculateOrbits()
 {
     setAdjacencyMatrix();

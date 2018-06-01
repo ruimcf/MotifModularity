@@ -540,13 +540,36 @@ bool CLI::optimizedCombinationOrbitRules()
 // the new node added complies with the motif edges?
 bool CLI::optimizedCombinationHasMotifEdges()
 {
-    const vector< vector<int> >& adjacencyList = motif.getAdjacencyListSize(combination.size()-1);
-    for(int i = 0; i < adjacencyList.size(); i++)
+    const vector< vector<int> >& adjacencyMatrix = motif.getAdjacencyMatrix();
+    int addedNodePos = combination.size() -1;
+    for(int i = 0; i < addedNodePos; i++)
     {
-        if(!g->hasEdge(combination[adjacencyList[i][0]], combination[adjacencyList[i][1]])){
-            return false;
+        //if has edge in motif, it needs to have edge on the graph
+        if(adjacencyMatrix[addedNodePos][i]) {
+            if(!g->hasEdge(combination[addedNodePos], combination[i])){
+                return false;
+            }
+        } else {
+            // otherwise, it needs to not have the edge
+            if(g->hasEdge(combination[addedNodePos], combination[i])){
+                return false;
+            }
         }
     } 
+    if (motif.isDirected()){
+        for(int i = 0; i < addedNodePos; i++)
+        {
+            if(adjacencyMatrix[i][addedNodePos]) {
+                if(!g->hasEdge(combination[i], combination[addedNodePos])){
+                    return false;
+                }
+            } else {
+                if(g->hasEdge(combination[i], combination[addedNodePos])){
+                    return false;
+                }
+            }
+        } 
+    }
     return true;
 }
 
