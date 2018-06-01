@@ -1,0 +1,21 @@
+SEED: 18
+Current modularity: 0.261681
+Times failed: 4
+Partition: 3330331111
+Current modularity: 0.277658
+Times failed: 0
+Partition: 3300331111
+Current modularity: 0.321222
+Times failed: 3
+Partition: 3300031111
+Current modularity: 0.392372
+Times failed: 3
+Partition: 0300031111
+Current modularity: 0.530912
+Times failed: 1
+Partition: 0000031111
+Current modularity: 0.72073
+Times failed: 4
+Partition: 0000011111
+Best modularity: 0.72073
+Partition: 0000011111
