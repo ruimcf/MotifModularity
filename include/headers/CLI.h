@@ -10,6 +10,11 @@
 #include <fstream>
 #include <sstream>
 
+struct MotifConstantValues {
+  int numberMotifsInGraph;
+  int degreeMotifsRandomGraph;
+};
+
 class CLI
 {
 private:
@@ -35,6 +40,9 @@ private:
   static bool optimizedCombinationHasMotifEdges();
   static bool optimizedCombinationHasMotifCommunities();
   static bool optimizedCombinationOrbitRules();
+
+  static MotifConstantValues getMotifConstantValues();
+  static void motifConstantValuesIteration(int offset, MotifConstantValues *ptr);
 
   static void setNodes();
 

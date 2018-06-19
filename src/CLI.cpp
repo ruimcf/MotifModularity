@@ -158,6 +158,9 @@ void CLI::start(int argc, char **argv)
         total = 0;
         double optimizedMotifModularity = CLI::optimizedMotifModularity();
         printf("Optimized Motif modularity: %f\nTotal: %d\n", optimizedMotifModularity, total);
+        total = 0;
+        CLI::getMotifConstantValues();
+        cout << "Total " << total << endl;
     }
     else
     {
@@ -203,6 +206,7 @@ double CLI::triangleModularity()
 
     double motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
 
+    cout << "n2: " << numberMotifsGraph << " n4: " << numberMotifsRandomGraph << endl;
     return motifModularity;
 }
 
@@ -245,11 +249,59 @@ void CLI::iterateCombinations(int offset, int k)
     }
 }
 
+MotifConstantValues CLI::getMotifConstantValues()
+{
+    cout << "Motif Contant values" << endl;
+    MotifConstantValues *ptr, values;
+    ptr = &values;
+    ptr->numberMotifsInGraph = 0;
+    ptr->degreeMotifsRandomGraph = 0;
+    CLI::setNodes();
+    CLI::motifConstantValuesIteration(0, ptr);
+    cout << "n2: " << ptr->numberMotifsInGraph << " n4: " << ptr->degreeMotifsRandomGraph << endl;
+    return values;
+}
+
+void CLI::motifConstantValuesIteration(int offset, MotifConstantValues *ptr)
+{
+    if(offset == motif.getSize())
+    {
+        int combinationWeights = CLI::combinationNullcaseWeights();
+        bool edgesCheck = CLI::combinationHasMotifEdges(); 
+
+        if(edgesCheck)
+            ptr->numberMotifsInGraph += 1;
+
+        ptr->degreeMotifsRandomGraph += combinationWeights;
+        total++;
+        return;
+    }
+    for (int i = 0; i < g->numNodes(); i++)
+    {
+        if(!used[i])
+        {
+            used[i] = true;
+            combination.push_back(nodes[i]);
+            // cut down on simetric motif
+            if(!optimizedCombinationOrbitRules()){
+                combination.pop_back();
+                used[i] = false;
+                continue;
+            } 
+            CLI::motifConstantValuesIteration(offset + 1, ptr);
+            combination.pop_back();
+            used[i] = false;
+        }
+    } 
+
+}
+
 double CLI::optimizedMotifModularity()
 {
     n1 = n2 = n3 = n4 = 0;
     CLI::setNodes();
     CLI::optimizedNodeCombination(0, true, true);
+    cout << "n2: " << n2 << " n4: " << n4 << endl;
     return n1 / n2 - n3 / n4;
 }
 
@@ -376,6 +428,7 @@ double CLI::motifModularity()
     n1 = n2 = n3 = n4 = 0;
     CLI::setNodes();
     CLI::nodeCombination(0);
+    cout << "n2: " << n2 << " n4: " << n4 << endl;
     return n1 / n2 - n3 / n4;
 }
 
