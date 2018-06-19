@@ -11,8 +11,8 @@
 #include <sstream>
 
 struct MotifConstantValues {
-  int numberMotifsInGraph;
-  int degreeMotifsRandomGraph;
+  long numberMotifsInGraph;
+  long degreeMotifsRandomGraph;
 };
 
 class CLI
@@ -54,10 +54,10 @@ private:
   static vector<int> nodes;
   static vector<int> combination;
   static vector<bool> used;
-  static double n1;
-  static double n2;
-  static double n3;
-  static double n4;
+  static long n1;
+  static long n2;
+  static long n3;
+  static long n4;
   static int kronecker(int a, int b);
   static int maskedWeight(int a, int b);
   static int nullcaseWeight(int a, int b);

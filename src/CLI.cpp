@@ -18,7 +18,7 @@ int CLI::seed;
 ArrayPartition CLI::networkPartition;
 Motif CLI::motif;
 int total = 0;
-double CLI::n1 = 0, CLI::n2 = 0, CLI::n3 = 0, CLI::n4 = 0;
+long CLI::n1 = 0, CLI::n2 = 0, CLI::n3 = 0, CLI::n4 = 0;
 double bestModularity;
 int *bestPartition;
 
@@ -206,7 +206,7 @@ double CLI::triangleModularity()
 
     double motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
 
-    cout << "n2: " << numberMotifsGraph << " n4: " << numberMotifsRandomGraph << endl;
+    cout << "n2: " << numberMotifsGraph << " n4: " << static_cast<long>(numberMotifsRandomGraph) << endl;
     return motifModularity;
 }
 
@@ -231,7 +231,7 @@ double CLI::cicleModularity(int size)
     n1 = n2 = n3 = n4 = 0;
     combination.clear();
     CLI::iterateCombinations(0, size);
-    return n1 / n2 - n3 / n4;
+    return static_cast<double>(n1) / n2 - static_cast<double>(n3) / n4;
 }
 
 void CLI::iterateCombinations(int offset, int k)
@@ -258,7 +258,6 @@ MotifConstantValues CLI::getMotifConstantValues()
     ptr->degreeMotifsRandomGraph = 0;
     CLI::setNodes();
     CLI::motifConstantValuesIteration(0, ptr);
-    cout << "n2: " << ptr->numberMotifsInGraph << " n4: " << ptr->degreeMotifsRandomGraph << endl;
     return values;
 }
 
@@ -301,8 +300,7 @@ double CLI::optimizedMotifModularity()
     n1 = n2 = n3 = n4 = 0;
     CLI::setNodes();
     CLI::optimizedNodeCombination(0, true, true);
-    cout << "n2: " << n2 << " n4: " << n4 << endl;
-    return n1 / n2 - n3 / n4;
+    return static_cast<double>(n1) / n2 - static_cast<double>(n3) / n4;
 }
 
 void CLI::optimizedNodeCombination(int offset, bool edgesCheck, bool communitiesCheck)
@@ -429,7 +427,7 @@ double CLI::motifModularity()
     CLI::setNodes();
     CLI::nodeCombination(0);
     cout << "n2: " << n2 << " n4: " << n4 << endl;
-    return n1 / n2 - n3 / n4;
+    return static_cast<double>(n1) / n2 - static_cast<double>(n3) / n4;
 }
 
 void CLI::nodeCombination(int offset)
