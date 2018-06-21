@@ -43,6 +43,8 @@ private:
 
   static MotifConstantValues getMotifConstantValues();
   static void motifConstantValuesIteration(int offset, MotifConstantValues *ptr);
+  static double optimizedMotifModularityWithConstantValues(MotifConstantValues motifConstantValues);
+  static void optimizedNodeCombinationWithConstantValues(int offset, bool edgesCheck, bool communitiesCheck);
 
   static void setNodes();
 
