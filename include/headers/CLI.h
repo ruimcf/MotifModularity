@@ -15,6 +15,18 @@ struct MotifConstantValues {
   long degreeMotifsRandomGraph;
 };
 
+struct MotifVariableValues {
+  long numberMotifsInCommunities;
+  long degreeMotifsInCommunities;
+};
+
+struct MotifValues {
+  long numberMotifsInCommunities;
+  long numberMotifsInGraph;
+  long degreeMotifsInCommunities; 
+  long degreeMotifsRandomGraph;  
+};
+
 class CLI
 {
 private:
@@ -45,6 +57,10 @@ private:
   static void motifConstantValuesIteration(int offset, MotifConstantValues *ptr);
   static double optimizedMotifModularityWithConstantValues(MotifConstantValues motifConstantValues);
   static void optimizedNodeCombinationWithConstantValues(int offset, bool edgesCheck, bool communitiesCheck);
+  static MotifVariableValues nodeVariableValues(int changingNode);
+  static void nodeVariableValuesIteration(int changingNode, int position, int offset, MotifVariableValues *changingNodeValues);
+  static MotifValues optimizedMotifModularityValues();
+  static double changedNodeModularityCalculation(MotifValues allPreviousValues, MotifVariableValues beforeChangeValues, MotifVariableValues afterChangeValues);
 
   static void setNodes();
 
