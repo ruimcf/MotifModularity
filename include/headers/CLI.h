@@ -60,7 +60,10 @@ private:
   static MotifVariableValues nodeVariableValues(int changingNode);
   static void nodeVariableValuesIteration(int changingNode, int position, int offset, MotifVariableValues *changingNodeValues);
   static MotifValues optimizedMotifModularityValues();
-  static double changedNodeModularityCalculation(MotifValues allPreviousValues, MotifVariableValues beforeChangeValues, MotifVariableValues afterChangeValues);
+  static MotifValues changedNodeModularityCalculation(MotifValues allPreviousValues, MotifVariableValues beforeChangeValues, MotifVariableValues afterChangeValues);
+  static double motifModularityFromValues(MotifValues values);
+  static double motifModularityFromValues(MotifConstantValues cValues, MotifVariableValues vValues);
+  static double motifModularityFromValues(long v1, long v2, long v3, long v4);
 
   static void setNodes();
 
