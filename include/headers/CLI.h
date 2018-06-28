@@ -10,6 +10,23 @@
 #include <fstream>
 #include <sstream>
 
+struct MotifConstantValues {
+  long numberMotifsInGraph;
+  long degreeMotifsRandomGraph;
+};
+
+struct MotifVariableValues {
+  long numberMotifsInCommunities;
+  long degreeMotifsInCommunities;
+};
+
+struct MotifValues {
+  long numberMotifsInCommunities;
+  long numberMotifsInGraph;
+  long degreeMotifsInCommunities; 
+  long degreeMotifsRandomGraph;  
+};
+
 class CLI
 {
 private:
@@ -36,6 +53,18 @@ private:
   static bool optimizedCombinationHasMotifCommunities();
   static bool optimizedCombinationOrbitRules();
 
+  static MotifConstantValues getMotifConstantValues();
+  static void motifConstantValuesIteration(int offset, MotifConstantValues *ptr);
+  static double optimizedMotifModularityWithConstantValues(MotifConstantValues motifConstantValues);
+  static void optimizedNodeCombinationWithConstantValues(int offset, bool edgesCheck, bool communitiesCheck);
+  static MotifVariableValues nodeVariableValues(int changingNode);
+  static void nodeVariableValuesIteration(int changingNode, int position, int offset, MotifVariableValues *changingNodeValues);
+  static MotifValues optimizedMotifModularityValues();
+  static MotifValues changingNodeMotifValues(MotifValues allPreviousValues, MotifVariableValues beforeChangeValues, MotifVariableValues afterChangeValues);
+  static double motifModularityFromValues(MotifValues values);
+  static double motifModularityFromValues(MotifConstantValues cValues, MotifVariableValues vValues);
+  static double motifModularityFromValues(long v1, long v2, long v3, long v4);
+
   static void setNodes();
 
   static ofstream resultsFile;
@@ -46,10 +75,10 @@ private:
   static vector<int> nodes;
   static vector<int> combination;
   static vector<bool> used;
-  static double n1;
-  static double n2;
-  static double n3;
-  static double n4;
+  static long n1;
+  static long n2;
+  static long n3;
+  static long n4;
   static int kronecker(int a, int b);
   static int maskedWeight(int a, int b);
   static int nullcaseWeight(int a, int b);

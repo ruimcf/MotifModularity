@@ -5,6 +5,7 @@
 using namespace std;
 
 int __number = 0;
+
 Graph *CLI::g;
 vector<int> CLI::nodes;
 vector<int> CLI::combination;
@@ -18,7 +19,7 @@ int CLI::seed;
 ArrayPartition CLI::networkPartition;
 Motif CLI::motif;
 int total = 0;
-double CLI::n1 = 0, CLI::n2 = 0, CLI::n3 = 0, CLI::n4 = 0;
+long CLI::n1 = 0, CLI::n2 = 0, CLI::n3 = 0, CLI::n4 = 0;
 double bestModularity;
 int *bestPartition;
 
@@ -158,10 +159,24 @@ void CLI::start(int argc, char **argv)
         total = 0;
         double optimizedMotifModularity = CLI::optimizedMotifModularity();
         printf("Optimized Motif modularity: %f\nTotal: %d\n", optimizedMotifModularity, total);
-    }
-    else
-    {
-        networkPartition.randomPartition(2);
+        total = 0;
+        MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
+        double optimizedMotifModularityConstantValues = CLI::optimizedMotifModularityWithConstantValues(motifConstantValues);
+        printf("Optimized Motif modularity constant values: %f\nTotal: %d\n", optimizedMotifModularityConstantValues, total);
+        total = 0;
+        MotifValues values = CLI::optimizedMotifModularityValues();
+        cout << "Modularity: " << CLI::motifModularityFromValues(values) << endl;
+        int changingNode = 0;
+        MotifVariableValues toChangeNodeValues = CLI::nodeVariableValues(changingNode);
+        networkPartition.setNodeCommunity(changingNode, 1);
+        cout << "CHANGED" << endl;
+        total = 0;
+        MotifValues newValues = CLI::optimizedMotifModularityValues();
+        cout << "Modularity: " << motifModularityFromValues(newValues) << endl;
+        MotifVariableValues changedNodeValues = CLI::nodeVariableValues(changingNode);
+        MotifValues changingNodeMotifValuesValues = changingNodeMotifValues(values, toChangeNodeValues, changedNodeValues);
+        cout << "Calculated Changing Node modularity: " << CLI::motifModularityFromValues(changingNodeMotifValuesValues) << endl;
+ 
     }
 
     getchar();
@@ -171,16 +186,36 @@ void CLI::start(int argc, char **argv)
     }
 
     clock_t begin = clock();
-    CLI::singleNodeTestAllGreedyAlgorithm();
+    CLI::singleNodeGreedyAlgorithm();
     clock_t end = clock();
     double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
     cout << "Elapsed seconds: " << elapsedSecs << endl;
     CLI::closeResultsFile();
+}
 
-    // total = 0;
-    // CLI::createAllPartitions();
-    //double _motifModularity = CLI::cicleModularity(3);
-    //printf("Circle modularity: %f\nTotal: %d\n", _motifModularity, total);
+MotifValues CLI::changingNodeMotifValues(MotifValues allPreviousValues, MotifVariableValues beforeChangeValues, MotifVariableValues afterChangeValues)
+{
+    MotifValues values;
+    values.numberMotifsInCommunities = allPreviousValues.numberMotifsInCommunities + afterChangeValues.numberMotifsInCommunities - beforeChangeValues.numberMotifsInCommunities;
+    values.numberMotifsInGraph = allPreviousValues.numberMotifsInGraph;
+    values.degreeMotifsInCommunities = allPreviousValues.degreeMotifsInCommunities + afterChangeValues.degreeMotifsInCommunities - beforeChangeValues.degreeMotifsInCommunities;
+    values.degreeMotifsRandomGraph = allPreviousValues.degreeMotifsRandomGraph;
+   return values;
+}
+
+double CLI::motifModularityFromValues(MotifValues values)
+{
+    return static_cast<double>(values.numberMotifsInCommunities) / values.numberMotifsInGraph - static_cast<double>(values.degreeMotifsInCommunities) / values.degreeMotifsRandomGraph; 
+}
+
+double CLI::motifModularityFromValues(MotifConstantValues constantValues, MotifVariableValues variableValues)
+{
+    return static_cast<double>(variableValues.numberMotifsInCommunities) / constantValues.numberMotifsInGraph - static_cast<double>(variableValues.numberMotifsInCommunities) / constantValues.degreeMotifsRandomGraph; 
+}
+
+double CLI::motifModularityFromValues(long v1, long v2, long v3, long v4)
+{
+    return static_cast<double>(v1) / v2 - static_cast<double>(v3) / v4; 
 }
 
 double CLI::triangleModularity()
@@ -208,9 +243,7 @@ double CLI::triangleModularity()
 
     double motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
 
-    // cout << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
-    // cout << "#" << __number++ << " Triangular Motularity: " << motifModularity << "\t\t" << numberMotifsInPartitions << "\t\t" << numberMotifsGraph << "\t\t" << numberMotifsRandomGraphPartitions << "\t\t" << numberMotifsRandomGraph << endl; 
-
+    // cout << "n2: " << numberMotifsGraph << " n4: " << static_cast<long>(numberMotifsRandomGraph) << endl;
     return motifModularity;
 }
 
@@ -229,235 +262,13 @@ void CLI::setNodes()
     }
 }
 
-vector<double> CLI::firstIterationTriangleModularity()
-{
-    int n = g->numNodes();
-    double numberMotifsInPartitions = 0;
-    double numberMotifsGraph = 0;
-    double numberMotifsRandomGraphPartitions = 0;
-    double numberMotifsRandomGraph = 0;
-
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = i + 1; j < n; j++)
-        {
-            for (int k = j + 1; k < n; k++)
-            {
-                total++;
-                numberMotifsInPartitions += CLI::maskedWeight(i, j) * CLI::maskedWeight(j, k) * CLI::maskedWeight(i, k);
-                numberMotifsGraph += g->hasEdge(i, j) * g->hasEdge(j, k) * g->hasEdge(i, k);
-                numberMotifsRandomGraphPartitions += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
-                numberMotifsRandomGraph += CLI::nullcaseWeight(i, j) * CLI::nullcaseWeight(j, k) * CLI::nullcaseWeight(i, k);
-            }
-        }
-    }
-
-    double motifModularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
-    vector<double> values;
-    values.push_back(numberMotifsInPartitions);
-    values.push_back(numberMotifsGraph); 
-    values.push_back(numberMotifsRandomGraphPartitions);
-    values.push_back(numberMotifsRandomGraph);
-    values.push_back(motifModularity);
-
-    cout << "First Iteration Modularity" << motifModularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
-    return values;
-}
-
-double CLI::triangleModularityPreCalculated(std::vector<double> motifValues)
-{
-    int n = g->numNodes();
-
-    double numberMotifsInPartitions = 0;
-    double numberMotifsRandomGraphPartitions = 0;
-    
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = i + 1; j < n; j++)
-        {
-            if(CLI::kronecker(i,j)) 
-            {
-                for (int k = j + 1; k < n; k++)
-                {
-                    if(CLI::kronecker(j,k) && CLI::kronecker(i, k))
-                    {
-                        numberMotifsInPartitions += g->hasEdge(j, k) * g->hasEdge(i, k) * g->hasEdge(i, j);
-                        numberMotifsRandomGraphPartitions += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
-                    }
-                }
-            }
-        }
-    }
-
-    
-    // for (int i = 0; i < n; i++)
-    // {
-    //     for (int j = i + 1; j < n; j++)
-    //     {
-    //         if(CLI::kronecker(i,j)) 
-    //         {
-    //             for (int k = j + 1; k < n; k++)
-    //             {
-    //                 if(CLI::kronecker(j,k))
-    //                 {
-    //                     numberMotifsRandomGraphPartitions += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
-    // for (int i = 0; i < n; i++)
-    // {
-    //     for (int j = i + 1; j < n; j++)
-    //     {
-    //         if (g->hasEdge(i, j) && CLI::kronecker(i,j))
-    //         {
-    //             for (int k = j + 1; k < n; k++)
-    //             {
-    //                 if (g->hasEdge(j, k) && g->hasEdge(i, k) && CLI::kronecker(i,k) && CLI::kronecker(j,k))
-    //                 {
-    //                     numberMotifsInPartitions += 1;
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-    double motifModularity = numberMotifsInPartitions / motifValues.at(0) - numberMotifsRandomGraphPartitions / motifValues.at(1);
-
-    // cout << motifModularity << "\t" << numberMotifsInPartitions << "\t" << motifValues.at(0) << "\t" << numberMotifsRandomGraphPartitions << "\t" <<  motifValues.at(1) << endl; 
-
-    return motifModularity;
-}
-
-/**
- * Calculate the modularity when one node has changed from a previous computation
- * previousValues content:
- * 0 - previousNumberMotifsInPartitions
- * 1 - numberMotifsGraph (constant)
- * 2 - previousNumberMotifsRandomGraphPartitions
- * 3 - numberMotifsRandomGraph (constant)
- * 
- * return content:
- * 0 - numberMotifsInPartitions
- * 1 - numberMotifsGraph
- * 2 - numberMotifsRandomGraphPartitions
- * 3 - numberMotifsRandomGraph
- * 4 - triangleModularity
- */
-  
-vector<double> CLI::changingNodeTriangleModularity(vector<double> previousValues, int changedNode, int previousCommunity)
-{
-    double previousNumberMotifsInPartitions = previousValues[0];
-    double numberMotifsGraph = previousValues[1];
-    double previousNumberMotifsRandomGraphPartitions = previousValues[2];
-    double numberMotifsRandomGraph = previousValues[3];
-    double newMotifs = 0;
-    double previousMotifs = 0;
-    double newRandomMotifs = 0;
-    double previousRandomMotifs = 0;
-    double numberMotifsInPartitions, numberMotifsRandomGraphPartitions, modularity;
-    int newCommunity = networkPartition.getNodeCommunity(changedNode);
-    cout << "pnmp2 " << previousNumberMotifsInPartitions << endl;
-
-    vector<int> neighbours;
-    for(int i=0; i < g->numNodes(); i++)
-    {
-        if(g->hasEdge(changedNode, i))
-        {
-            if(changedNode == i){
-                cout << "ERROR: THIS SHOULDNT HAVE A CONNECTION TO THE SAME NODE" << endl;
-            }
-            neighbours.push_back(i);
-        }
-    }
-
-    vector<int> neighboursInPreviousCommunity;
-    vector<int> neighboursInNewCommunity;
-    for(int i = 0; i < neighbours.size(); i++)
-    {
-        if(networkPartition.getNodeCommunity(neighbours[i]) == previousCommunity)
-        {
-            neighboursInPreviousCommunity.push_back(neighbours[i]);
-        }
-        else if(networkPartition.getNodeCommunity(neighbours[i]) == newCommunity)
-        {
-            neighboursInPreviousCommunity.push_back(neighbours[i]);
-        }
-    }
-
-    for(int i = 0; i < neighboursInPreviousCommunity.size(); i++)
-    {
-        for(int j = i + 1; j < neighboursInPreviousCommunity.size(); j++)
-        {
-            int nodeA = neighboursInPreviousCommunity[i];
-            int nodeB = neighboursInPreviousCommunity[j];
-            if(g->hasEdge(nodeA, nodeB))
-            {
-                previousMotifs += 1;
-            }
-            previousRandomMotifs += CLI::nullcaseWeight(nodeA, nodeB) * CLI::nullcaseWeight(nodeB, changedNode) * CLI::nullcaseWeight(nodeA, changedNode);
-        }
-    }
-
-    for(int i = 0; i < neighboursInNewCommunity.size(); i++)
-    {
-        for(int j = i + 1; j < neighboursInNewCommunity.size(); j++)
-        {
-            int nodeA = neighboursInNewCommunity[i];
-            int nodeB = neighboursInNewCommunity[j];
-            if(g->hasEdge(nodeA, nodeB))
-            {
-                newMotifs += 1;
-            }
-            newRandomMotifs += CLI::nullcaseWeight(nodeA, nodeB) * CLI::nullcaseWeight(nodeB, changedNode) * CLI::nullcaseWeight(nodeA, changedNode);
-        }
-    }
-
-    numberMotifsInPartitions = previousNumberMotifsInPartitions + newMotifs - previousMotifs;
-    numberMotifsRandomGraphPartitions = previousNumberMotifsRandomGraphPartitions + newRandomMotifs - previousRandomMotifs;
-    modularity = numberMotifsInPartitions / numberMotifsGraph - numberMotifsRandomGraphPartitions / numberMotifsRandomGraph;
-    cout << "numberMotifs in partitions: " << previousNumberMotifsInPartitions << " + " << newMotifs << " - " << previousMotifs << " = " << numberMotifsInPartitions << endl;
-    cout << "numberMotifs RandomGraph Partitions: " << previousNumberMotifsRandomGraphPartitions << " + " << newRandomMotifs << " - " << previousRandomMotifs << " = " << numberMotifsRandomGraphPartitions << endl;
-
-    cout << "#" << __number++ << "ChangedNode Modularity:" << modularity << "\t" << numberMotifsInPartitions << "\t" << numberMotifsGraph << "\t" << numberMotifsRandomGraphPartitions << "\t" << numberMotifsRandomGraph << endl; 
-    std::vector<double> values;
-    values.push_back(numberMotifsInPartitions);
-    values.push_back(numberMotifsGraph); 
-    values.push_back(numberMotifsRandomGraphPartitions);
-    values.push_back(numberMotifsRandomGraph);
-    values.push_back(modularity);
-    return values;
-}
-
-vector<double> CLI::constantMotifValues()
-{
-    vector<double> values;
-    int n = g->numNodes();
-    double numberMotifsGraph = 0;
-    double numberMotifsRandomGraph = 0;
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = i + 1; j < n; j++)
-        {
-            for (int k = j + 1; k < n; k++)
-            {
-                numberMotifsGraph += g->hasEdge(i, j) * g->hasEdge(j, k) * g->hasEdge(i, k);
-                numberMotifsRandomGraph += CLI::nullcaseWeight(i, j) * CLI::nullcaseWeight(j, k) * CLI::nullcaseWeight(i, k);
-            }
-        }
-    }
-    values.push_back(numberMotifsGraph);
-    values.push_back(numberMotifsRandomGraph);
-    return values;
-}
 
 double CLI::cicleModularity(int size)
 {
     n1 = n2 = n3 = n4 = 0;
     combination.clear();
     CLI::iterateCombinations(0, size);
-    return n1 / n2 - n3 / n4;
+    return static_cast<double>(n1) / n2 - static_cast<double>(n3) / n4;
 }
 
 void CLI::iterateCombinations(int offset, int k)
@@ -475,12 +286,201 @@ void CLI::iterateCombinations(int offset, int k)
     }
 }
 
+MotifConstantValues CLI::getMotifConstantValues()
+{
+    cout << "Motif Contant values" << endl;
+    MotifConstantValues *ptr, values;
+    ptr = &values;
+    ptr->numberMotifsInGraph = 0;
+    ptr->degreeMotifsRandomGraph = 0;
+    CLI::setNodes();
+    CLI::motifConstantValuesIteration(0, ptr);
+    return values;
+}
+
+void CLI::motifConstantValuesIteration(int offset, MotifConstantValues *ptr)
+{
+    if(offset == motif.getSize())
+    {
+        int combinationWeights = CLI::combinationNullcaseWeights();
+        bool edgesCheck = CLI::combinationHasMotifEdges(); 
+
+        if(edgesCheck)
+            ptr->numberMotifsInGraph += 1;
+
+        ptr->degreeMotifsRandomGraph += combinationWeights;
+        return;
+    }
+    for (int i = 0; i < g->numNodes(); i++)
+    {
+        if(!used[i])
+        {
+            used[i] = true;
+            combination.push_back(nodes[i]);
+            // cut down on simetric motif
+            if(!optimizedCombinationOrbitRules()){
+                combination.pop_back();
+                used[i] = false;
+                continue;
+            } 
+            CLI::motifConstantValuesIteration(offset + 1, ptr);
+            combination.pop_back();
+            used[i] = false;
+        }
+    } 
+
+}
+
+double CLI::optimizedMotifModularityWithConstantValues(MotifConstantValues motifConstantValues)
+{
+    n1 = n2 = n3 = n4 = 0;
+    CLI::setNodes();
+    CLI::optimizedNodeCombinationWithConstantValues(0, true, true);
+    return static_cast<double>(n1) / motifConstantValues.numberMotifsInGraph - static_cast<double>(n3) / motifConstantValues.degreeMotifsRandomGraph;
+}
+
+void CLI::optimizedNodeCombinationWithConstantValues(int offset, bool edgesCheck, bool communitiesCheck)
+{
+    if(offset == motif.getSize())
+    {
+        int combinationWeights = CLI::combinationNullcaseWeights();
+
+        if(edgesCheck && communitiesCheck)
+            n1 += 1;
+        if(communitiesCheck)
+            n3 += combinationWeights;
+
+        total++;
+        return;
+    }
+    for (int i = 0; i < g->numNodes(); i++)
+    {
+        if(!used[i])
+        {
+            used[i] = true;
+            combination.push_back(nodes[i]);
+            // cut down on simetric motif
+            if(!optimizedCombinationOrbitRules()){
+                combination.pop_back();
+                used[i] = false;
+                continue;
+            } 
+            bool newEdgesCheck = edgesCheck, newCommunitiesCheck = communitiesCheck;
+            if(edgesCheck)
+                newEdgesCheck = optimizedCombinationHasMotifEdges(); 
+            if(communitiesCheck)
+                newCommunitiesCheck = optimizedCombinationHasMotifCommunities();
+            
+            if(!newCommunitiesCheck){
+                cout << "YEYOH" << endl;
+                combination.pop_back();
+                used[i] = false;
+                continue;
+            }
+
+            CLI::optimizedNodeCombination(offset + 1, newEdgesCheck, newCommunitiesCheck);
+            combination.pop_back();
+            used[i] = false;
+        }
+    } 
+}
+
+MotifVariableValues CLI::nodeVariableValues(int changingNode)
+{
+    MotifVariableValues changingNodeValues;
+    changingNodeValues.degreeMotifsInCommunities = 0;
+    changingNodeValues.numberMotifsInCommunities = 0;
+    used[changingNode] = true;
+    for(int i = 0; i < motif.getSize(); i++)
+    {
+        CLI::nodeVariableValuesIteration(changingNode, i, 0, &changingNodeValues);
+    }
+    used[changingNode] = false;
+    return changingNodeValues;
+}
+
+void CLI::nodeVariableValuesIteration(int changingNode, int position, int offset, MotifVariableValues *changingNodeValues)
+{
+    if(offset == motif.getSize())
+    {
+        int combinationWeights = CLI::combinationNullcaseWeights();
+
+        bool edgesCheck = combinationHasMotifEdges(); 
+        if(edgesCheck)
+            changingNodeValues->numberMotifsInCommunities += 1;
+        
+        changingNodeValues->degreeMotifsInCommunities += combinationWeights;
+
+        total++;
+        return;
+    }
+    if(offset == position)
+    {
+        combination.push_back(changingNode);
+        // cut down on simetric motif
+        if(!optimizedCombinationOrbitRules()){
+            combination.pop_back();
+            return;
+        };
+        bool communitiesCheck = optimizedCombinationHasMotifCommunities();
+        if(!communitiesCheck)
+        {
+            combination.pop_back();
+            return;
+        }
+
+        CLI::nodeVariableValuesIteration(changingNode, position, offset+1, changingNodeValues);
+        combination.pop_back();
+    }
+    else
+    {
+        for (int i = 0; i < g->numNodes(); i++)
+        {
+            if(!used[i])
+            {
+                used[i] = true;
+                combination.push_back(nodes[i]);
+                // cut down on simetric motif
+                if(!optimizedCombinationOrbitRules())
+                {
+                    combination.pop_back();
+                    used[i] = false;
+                    continue;
+                } 
+                bool communitiesCheck = optimizedCombinationHasMotifCommunities();
+                if(!communitiesCheck)
+                {
+                    combination.pop_back();
+                    used[i] = false;
+                    continue;
+                }
+                CLI::nodeVariableValuesIteration(changingNode, position, offset + 1, changingNodeValues);
+                combination.pop_back();
+                used[i] = false;
+            }
+        } 
+    }
+}
+
 double CLI::optimizedMotifModularity()
 {
     n1 = n2 = n3 = n4 = 0;
     CLI::setNodes();
     CLI::optimizedNodeCombination(0, true, true);
-    return n1 / n2 - n3 / n4;
+    return static_cast<double>(n1) / n2 - static_cast<double>(n3) / n4;
+}
+
+MotifValues CLI::optimizedMotifModularityValues()
+{
+    n1 = n2 = n3 = n4 = 0;
+    CLI::setNodes();
+    CLI::optimizedNodeCombination(0, true, true); 
+    MotifValues values;
+    values.numberMotifsInCommunities = n1;
+    values.numberMotifsInGraph = n2;
+    values.degreeMotifsInCommunities = n3;
+    values.degreeMotifsRandomGraph = n4;
+    return values;
 }
 
 void CLI::optimizedNodeCombination(int offset, bool edgesCheck, bool communitiesCheck)
@@ -491,8 +491,10 @@ void CLI::optimizedNodeCombination(int offset, bool edgesCheck, bool communities
 
         if(edgesCheck && communitiesCheck)
             n1 += 1;
+
         if(edgesCheck)
             n2 += 1;
+
         if(communitiesCheck)
             n3 += combinationWeights;
 
@@ -606,7 +608,8 @@ double CLI::motifModularity()
     n1 = n2 = n3 = n4 = 0;
     CLI::setNodes();
     CLI::nodeCombination(0);
-    return n1 / n2 - n3 / n4;
+    cout << "n2: " << n2 << " n4: " << n4 << endl;
+    return static_cast<double>(n1) / n2 - static_cast<double>(n3) / n4;
 }
 
 void CLI::nodeCombination(int offset)
@@ -743,17 +746,6 @@ void CLI::combinationCicleModularity()
     n4 += g4;
 }
 
-void pretty_print(const vector<int> &v)
-{
-    static int count = 0;
-    cout << "combination no " << (++count) << ": [ ";
-    for (int i = 0; i < v.size(); ++i)
-    {
-        cout << v[i] << " ";
-    }
-    cout << "] " << endl;
-}
-
 int CLI::nullcaseWeight(int a, int b)
 {
     return g->nodeOutEdges(a) * g->nodeInEdges(b);
@@ -824,33 +816,18 @@ double CLI::singleNodeGreedyAlgorithm()
 {
     cout << "--- Starting greedy ---" << endl;
     int chosenNode, chosenIndex, chosenNodePartition, betterPartition, numPartitions;
+    MotifValues betterValues;
     double bestModularity, currentModularity;
     vector<int> allNodes;
 
     numPartitions = 4;
     // numPartitions = numberForEvenPartitions(g->numNodes());
     networkPartition.randomPartition(numPartitions);
+    MotifValues currentValues = CLI::optimizedMotifModularityValues();
+    currentModularity = CLI::motifModularityFromValues(currentValues);
 
-    // currentModularity = CLI::cicleModularity(3);
-    // cout << "Current Modularity 1 " << currentModularity << endl;
-    // currentModularity = CLI::cicleModularity(3);
-    // cout << "Current Modularity 2 " << currentModularity << endl;
-
-    // std::vector<double> motifValues = CLI::constantMotifValues();
-    // currentModularity = CLI::triangleModularityPreCalculated(motifValues);
-
-    currentModularity = CLI::optimizedMotifModularity();
-    // currentModularity = CLI::triangleModularity();
-    // cout << "Current Modularity " << currentModularity << endl;
-    // std::vector<double> bestPartitionValues;
-    // std::vector<double> values = CLI::firstIterationTriangleModularity();
-    // cout << "values " << values[0] << endl;
-    // double previousNumberMotifsInPartitions = values[0];
-    // double numberMotifsGraph = values[1];
-    // double previousNumberMotifsRandomGraphPartitions = values[2];
-    // double numberMotifsRandomGraph = values[3];
-    // currentModularity = values[4];
-
+    // currentModularity = CLI::optimizedMotifModularity();
+    // currentModularity = CLI::optimizedMotifModularityWithConstantValues(motifConstantValues);
     
     cout << "Current Modularity " << currentModularity << endl;
 
@@ -869,22 +846,21 @@ double CLI::singleNodeGreedyAlgorithm()
 
         chosenNodePartition = networkPartition.getNodeCommunity(chosenNode);
         betterPartition = -1;
+        //before change get values
+        MotifVariableValues beforeChangeNodeValues = CLI::nodeVariableValues(chosenNode); 
         for (int i = 0; i < numPartitions; i++)
         {
             if (i != chosenNodePartition)
             {
                 networkPartition.setNodeCommunity(chosenNode, i);
-                // double currentPartitionModularity = CLI::triangleModularity();
-                // double currentPartitionModularity = CLI::trianangleModularityPreCalculated(motifValues);
-                double currentPartitionModularity = CLI::optimizedMotifModularity();
-                // cout << "pnmp2 " << values[0] << endl;
-                // vector<double> currentPartitionValues = CLI::changingNodeTriangleModularity(values, chosenNode, chosenNodePartition);
-                // currentPartitionModularity = currentPartitionValues[4];
+                MotifVariableValues afterChangeNodeValues = CLI::nodeVariableValues(chosenNode);
+                MotifValues currentPartitionModularityValues = CLI::changingNodeMotifValues(currentValues, beforeChangeNodeValues, afterChangeNodeValues);
+                double currentPartitionModularity = CLI::motifModularityFromValues(currentPartitionModularityValues);
                 if (currentPartitionModularity > currentModularity)
                 {
                     currentModularity = currentPartitionModularity;
+                    betterValues = currentPartitionModularityValues;
                     betterPartition = i;
-                    // bestPartitionValues = currentPartitionValues;
                 }
             }
         }
@@ -897,8 +873,7 @@ double CLI::singleNodeGreedyAlgorithm()
         else
         {
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
-            // values = bestPartitionValues;
-
+            currentValues = betterValues;
             stringstream ss;
             ss << "Current modularity: " << currentModularity << endl;
             ss << "Times failed: " << failObject.getConsecutiveTimesFailed() << endl;
@@ -930,11 +905,13 @@ double CLI::singleNodeTestAllGreedyAlgorithm()
     int chosenNode, chosenIndex, chosenNodePartition, numPartitions;
     double bestModularity, currentModularity;
     vector<int> allNodes;
+    MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
 
     numPartitions = 4;
     networkPartition.randomPartition(numPartitions);
 
-    currentModularity = CLI::optimizedMotifModularity();
+    // currentModularity = CLI::optimizedMotifModularity();
+    currentModularity = CLI::optimizedMotifModularityWithConstantValues(motifConstantValues);
     cout << "Current Modularity " << currentModularity << endl;
 
     allNodes.reserve(g->numNodes());
@@ -959,7 +936,8 @@ double CLI::singleNodeTestAllGreedyAlgorithm()
                 if (i != chosenNodePartition)
                 {
                     networkPartition.setNodeCommunity(chosenNode, i);
-                    double currentPartitionModularity = CLI::optimizedMotifModularity();
+                    // double currentPartitionModularity = CLI::optimizedMotifModularity();
+                    double currentPartitionModularity = CLI::optimizedMotifModularityWithConstantValues(motifConstantValues);
                     if (currentPartitionModularity > currentModularity)
                     {
                         currentModularity = currentPartitionModularity;
