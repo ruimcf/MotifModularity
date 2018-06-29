@@ -22,10 +22,14 @@ class Motif
         const std::vector< std::vector<int> > &getOrbitRulesSize(int size);
 
     private:
+        std::vector<int> nodesOrder;
         bool directed;
         int size;
         std::vector<int> communities;
         std::vector< std::vector<int> > adjacencyMatrix;
+        bool hasEdge(int nodeA, int nodeB);
+        int getNodeDegree(int node);
+        void createNodesOrder();
         std::vector< std::vector<int> > adjacencyList;
         //at each pos, the edges that connect to node pos and pos is > than the other node
         std::vector< std::vector< std::vector<int> > > adjacencyListSizes;

@@ -63,6 +63,14 @@ void Motif::readFromFile(std::string path)
     }
 
     calculateOrbits();
+    //relying on calculate orbits to compute the adjacency matrix
+    createNodesOrder();
+    cout << "Motif nodes order:";
+    for(int i = 0; i < nodesOrder.size(); ++i)
+    {
+        cout << " " << nodesOrder[i];
+    }
+    cout << endl;
 }
 
 /**
@@ -263,4 +271,89 @@ void Motif::setOrbitRules()
 const std::vector< std::vector<int> > &Motif::getOrbitRules()
 {
     return orbitRules;
+}
+
+void Motif::createNodesOrder()
+{
+    nodesOrder.clear();
+    nodesOrder.reserve(size);
+    std::vector<bool> availableNodes;
+    availableNodes.reserve(size);
+    for(int i = 0; i < size; i++)
+    {
+        availableNodes.push_back(true);
+    }
+    int nodeWithMostDegree, bestDegree = 0;
+    for(int i = 0; i < size; ++i)
+    {
+        int nodeDegree = getNodeDegree(i);
+        if(nodeDegree > bestDegree)
+        {
+            bestDegree = nodeDegree;
+            nodeWithMostDegree = i;
+        }
+    }
+
+    availableNodes.at(nodeWithMostDegree) = false;
+    nodesOrder.push_back(nodeWithMostDegree);
+
+    for(int i = 0; i < size-1; i++)
+    {
+        int nextBestNode;
+        int nextBestNodeDegreeWithCurrentNodes = 0;
+        for(int j = 0; j < size; j++)
+        {
+            if(availableNodes.at(j))
+            {
+                // how many edjes this node has with all the nodes already selected?
+                int edgesOfNodeWithCurrentNodes = 0;
+                for(int k = 0; k<nodesOrder.size(); ++k)
+                {
+                    int node = nodesOrder.at(k);
+                    // support self loops??
+                    if(node != j)
+                        if(hasEdge(node, j))
+                            edgesOfNodeWithCurrentNodes += 1;
+                }
+
+                if(edgesOfNodeWithCurrentNodes > nextBestNodeDegreeWithCurrentNodes)
+                {
+                    nextBestNode = j;
+                    nextBestNodeDegreeWithCurrentNodes = edgesOfNodeWithCurrentNodes;
+                }
+                else if (edgesOfNodeWithCurrentNodes == nextBestNodeDegreeWithCurrentNodes)
+                {
+                    if(getNodeDegree(j) > getNodeDegree(nextBestNode))
+                    {
+                        nextBestNode = j;
+                        nextBestNodeDegreeWithCurrentNodes = edgesOfNodeWithCurrentNodes;
+                    }
+                }
+            }
+        }
+        availableNodes.at(nextBestNode) = false;
+        nodesOrder.push_back(nextBestNode);
+    }
+
+}
+
+int Motif::getNodeDegree(int node)
+{
+    int degree = 0;
+    for(int i = 0; i < size; ++i)
+    {
+        if(node != i)
+        {
+            if(adjacencyMatrix[node][i])
+            {
+                degree += 1;
+            }
+        }
+    }
+    return degree;
+}
+
+bool Motif::hasEdge(int nodeA, int nodeB)
+{
+    return adjacencyMatrix[nodeA][nodeB] == 1 ? true : false;
 }
