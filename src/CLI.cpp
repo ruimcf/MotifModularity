@@ -403,11 +403,22 @@ void CLI::countCombinationMotifs(MotifValues *values)
 // i.e. check if the combination is an occurence of the motif
 bool CLI::combinationHasMotifEdges()
 {
-    const vector< vector<int> > & adjacencyList = motif.getAdjacencyList();
-    for(int i = 0; i < adjacencyList.size(); i++)
+    const vector< vector<int> > & adjacencyMatrix = motif.getAdjacencyMatrix();
+    for(int i = 0; i < combination.size(); i++)
     {
-        if(!g->hasEdge(combination[adjacencyList[i][0]], combination[adjacencyList[i][1]])){
-            return false;
+        for(int j = 0; j < combination.size(); ++j)
+        {
+            if(adjacencyMatrix[i][j])
+            {
+                 //if has edge in motif, it needs to have edge on the graph
+                if(!g->hasEdge(combination[i], combination[j]))
+                    return false;
+            } 
+            else {
+                // otherwise, it needs to not have the edge
+                if(g->hasEdge(combination[i], combination[j]))
+                    return false;
+            }
         }
     } 
     return true;
