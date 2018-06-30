@@ -462,7 +462,7 @@ bool CLI::combinationHasMotifCommunities()
 // For each motif edges, calculate the nullcaseWeight and return the product of them
 int CLI::combinationNullcaseWeights()
 {
-    const vector< vector<int> > & adjacencyList = motif.getAdjacencyList();
+    const vector< vector<int> > & adjacencyList = motif.getAdjacencyListWithOrder();
     int product = 1;
     for(int i = 0; i < adjacencyList.size(); i++)
     {

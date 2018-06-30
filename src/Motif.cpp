@@ -65,15 +65,61 @@ void Motif::readFromFile(std::string path)
     }
 
     calculateOrbits();
+    setAdjacencyListWithOrder();
+}
+
+void Motif::setAdjacencyListWithOrder()
+{
+    adjacencyListWithOrder.clear();
+    adjacencyListSizesWithOrder.clear();
+    for (int i = 0; i < size; i++)
+    {
+        vector< vector<int> > adjList;
+        adjacencyListSizesWithOrder.push_back(adjList);
+    } 
+
+    for(int i = 0; i < adjacencyList.size(); ++i)
+    {
+        vector<int> pair;
+        int firstNode = adjacencyList[i][0];
+        int firstNodeOrdered;
+        int secondNode = adjacencyList[i][1];
+        int secondNodeOrdered;
+        for(int j = 0; j < nodesOrder.size(); ++j)
+            if(nodesOrder[j] == firstNode)
+            {
+                firstNodeOrdered = j;
+                break;
+            }
+        
+        for(int j = 0; j < nodesOrder.size(); ++j)
+            if(nodesOrder[j] == secondNode)
+            {
+                secondNodeOrdered = j;
+                break;
+            };
+
+        pair.push_back(firstNodeOrdered);
+        pair.push_back(secondNodeOrdered);
+        adjacencyListWithOrder.push_back(pair);
+        if(firstNodeOrdered < secondNodeOrdered)
+            adjacencyListSizesWithOrder[secondNodeOrdered].push_back(pair);
+        else
+            adjacencyListSizesWithOrder[firstNodeOrdered].push_back(pair);
+    }
 }
 
 /**
  * Returns the edges for motif nodes until indice size
  */
 const std::vector< std::vector<int> > &Motif::getAdjacencyListSize(int size)
-
 {
     return adjacencyListSizes.at(size);
+}
+
+const std::vector< std::vector<int> > &Motif::getAdjacencyListSizeWithOrder(int size)
+{
+    return adjacencyListSizesWithOrder.at(size);
 }
 
 void Motif::print()
@@ -90,13 +136,18 @@ void Motif::print()
     {
         cout << adjacencyList.at(i).at(0) << "\t" << adjacencyList.at(i).at(1) << endl;
     }
-    cout << "Adjacency List Sizes:" << endl;
-    for (int i = 0; i < adjacencyListSizes.size(); i++)
+    cout << "Adjacency List With Order:" << endl;
+    for (int i = 0; i < adjacencyListWithOrder.size(); i++)
     {
-        cout << "Size " << i << endl;
-        for (int j = 0; j < adjacencyListSizes.at(i).size(); j++)
-        cout << adjacencyListSizes.at(i).at(j).at(0) << "\t" << adjacencyListSizes.at(i).at(j).at(1) << endl;
+        cout << adjacencyListWithOrder.at(i).at(0) << "\t" << adjacencyListWithOrder.at(i).at(1) << endl;
     }
+    // cout << "Adjacency List Sizes:" << endl;
+    // for (int i = 0; i < adjacencyListSizes.size(); i++)
+    // {
+    //     cout << "Size " << i << endl;
+    //     for (int j = 0; j < adjacencyListSizes.at(i).size(); j++)
+    //     cout << adjacencyListSizes.at(i).at(j).at(0) << "\t" << adjacencyListSizes.at(i).at(j).at(1) << endl;
+    // }
     std::cout << "Orbit rules: ";
     for(int i = 0; i < orbitRules.size(); i++)
     {
@@ -141,6 +192,11 @@ void Motif::print()
 const std::vector<std::vector<int> > &Motif::getAdjacencyList()
 {
     return adjacencyList;
+}
+
+const std::vector<std::vector<int> > &Motif::getAdjacencyListWithOrder()
+{
+    return adjacencyListWithOrder;
 }
 
 bool Motif::isDirected()
