@@ -218,13 +218,13 @@ void CLI::start(int argc, char **argv)
 
         total = 0;
         MotifValues values = CLI::optimizedMotifModularityValues();
-        cout << "Optimized motif Modularity: " << CLI::motifModularityFromValues(values) << endl;
+        cout << "Optimized motif Modularity values: " << CLI::motifModularityFromValues(values) << endl << "Total: " << total << endl;
 
         total = 0;
         MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
         MotifVariableValues motifVariableValues = CLI::getMotifVariableValues();
         double constantValuesMotifModularity = CLI::motifModularityFromValues(motifConstantValues, motifVariableValues);
-        printf("Optimized Motif modularity with constant values: %f\nTotal: %d\n", constantValuesMotifModularity, total);
+        printf("Optimized Motif modularity with constant values: %f\n", constantValuesMotifModularity);
 
         int changingNode = 0;
 
@@ -233,7 +233,7 @@ void CLI::start(int argc, char **argv)
         cout << "CHANGED" << endl;
         total = 0;
         MotifValues newValues = CLI::optimizedMotifModularityValues();
-        cout << "Modularity: " << motifModularityFromValues(newValues) << endl;
+        cout << "Modularity: " << motifModularityFromValues(newValues) << endl << " Total: " << total << endl;
         MotifVariableValues changedNodeValues = CLI::nodeVariableValues(changingNode);
         MotifValues changingNodeMotifValuesValues = changingNodeMotifValues(values, toChangeNodeValues, changedNodeValues);
         cout << "Calculated Changing Node modularity: " << CLI::motifModularityFromValues(changingNodeMotifValuesValues) << endl;
@@ -369,17 +369,8 @@ void CLI::nodeCombination(int offset, MotifValues *values)
 
 void CLI::countCombinationMotifs(MotifValues *values)
 {
-    //I need to check different permutations of this set of nodes
-    //But for now I will use only the given one
-    const vector<vector<int> > & orbitRules = motif.getOrbitRules();
-    for(int i = 0; i < orbitRules.size(); i++)
-    {
-        if(combination.at(orbitRules[i][0]) >= combination.at(orbitRules[i][1])){
-            return;
-        }
-    }
-    total++;
 
+    if(!CLI::combinationObeysOrbitRules()) return;
     bool motifEdgesCheck = CLI::combinationHasMotifEdges();
     bool motifCommunitiesCheck = CLI::combinationHasMotifCommunities();
     int combinationWeights = CLI::combinationNullcaseWeights();
@@ -397,18 +388,30 @@ void CLI::countCombinationMotifs(MotifValues *values)
         values->degreeMotifsInCommunities += combinationWeights;
 
     values->degreeMotifsRandomGraph += combinationWeights;
+    total++;
+}
+
+bool CLI::combinationObeysOrbitRules()
+{
+    const vector<vector<int> > & orbitRules = motif.getOrbitRulesWithOrder();
+    for(int i = 0; i < orbitRules.size(); i++)
+    {
+        if(combination.at(orbitRules[i][0]) >= combination.at(orbitRules[i][1])){
+            return false;
+        }
+    }
+    return true;
 }
 
 // Check if the combination edges are according the motif
 // i.e. check if the combination is an occurence of the motif
 bool CLI::combinationHasMotifEdges()
 {
-    const vector< vector<int> > & adjacencyMatrix = motif.getAdjacencyMatrix();
     for(int i = 0; i < combination.size(); i++)
     {
         for(int j = 0; j < combination.size(); ++j)
         {
-            if(adjacencyMatrix[i][j])
+            if(motif.hasEdgeWithOrder(i, j))
             {
                  //if has edge in motif, it needs to have edge on the graph
                 if(!g->hasEdge(combination[i], combination[j]))
@@ -427,19 +430,18 @@ bool CLI::combinationHasMotifEdges()
 // Check if the combination communities are in accordance with the motif communities
 bool CLI::combinationHasMotifCommunities()
 {
-    vector<int> communities = motif.getCommunities();
-    for(int i = 0; i < communities.size(); i++)
+    for(int nodeA = 0; nodeA < combination.size(); ++nodeA)
     {
-        for(int j = i + 1; j < communities.size(); j++)
+        for(int nodeB = nodeA + 1; nodeB < combination.size(); ++nodeB)
         {
             // If one of the nodes can be in any community we continue
-            if(communities[i] == -1 || communities[j] == -1){
+            if(motif.getCommunityWithOrder(nodeA) == -1 || motif.getCommunityWithOrder(nodeB) == -1){
                 continue;
             }
             // If the communities are different in the motif, they have
             // to be different in the partition
-            else if (communities[i] != communities[j]){
-                if(CLI::kronecker(combination[i], combination[j]))
+            else if (motif.getCommunityWithOrder(nodeA) != motif.getCommunityWithOrder(nodeB)){
+                if(CLI::kronecker(combination[nodeA], combination[nodeB]))
                 {
                     return false;
                 }
@@ -447,7 +449,7 @@ bool CLI::combinationHasMotifCommunities()
             // If the communities are the same on the motif for the pair,
             // they have to be the same on the partition
             else {
-                if(!CLI::kronecker(combination[i], combination[j]))
+                if(!CLI::kronecker(combination[nodeA], combination[nodeB]))
                 {
                     return false;
                 }
@@ -460,7 +462,7 @@ bool CLI::combinationHasMotifCommunities()
 // For each motif edges, calculate the nullcaseWeight and return the product of them
 int CLI::combinationNullcaseWeights()
 {
-    const vector< vector<int> > & adjacencyList = motif.getAdjacencyList();
+    const vector< vector<int> > & adjacencyList = motif.getAdjacencyListWithOrder();
     int product = 1;
     for(int i = 0; i < adjacencyList.size(); i++)
     {
@@ -536,7 +538,7 @@ void CLI::optimizedMotifModularityValuesIteration(int offset, bool edgesCheck, b
 
 bool CLI::optimizedCombinationOrbitRules()
 {
-    const vector< vector<int> >& orbitRules = motif.getOrbitRulesSize(combination.size()-1);
+    const vector< vector<int> >& orbitRules = motif.getOrbitRulesSizeWithOrder(combination.size()-1);
     for(int i = 0; i < orbitRules.size(); i++)
     {
         if(combination.at(orbitRules[i][0]) >= combination.at(orbitRules[i][1])){
@@ -549,12 +551,11 @@ bool CLI::optimizedCombinationOrbitRules()
 // the new node added complies with the motif edges?
 bool CLI::optimizedCombinationHasMotifEdges()
 {
-    const vector< vector<int> >& adjacencyMatrix = motif.getAdjacencyMatrix();
-    int addedNodePos = combination.size() -1;
-    for(int i = 0; i < addedNodePos; i++)
+    int addedNodePos = combination.size() - 1;
+    for(int i = 0; i < addedNodePos; ++i)
     {
         //if has edge in motif, it needs to have edge on the graph
-        if(adjacencyMatrix[addedNodePos][i]) {
+        if(motif.hasEdgeWithOrder(addedNodePos, i)) {
             if(!g->hasEdge(combination[addedNodePos], combination[i])){
                 return false;
             }
@@ -565,39 +566,26 @@ bool CLI::optimizedCombinationHasMotifEdges()
             }
         }
     } 
-    if (motif.isDirected()){
-        for(int i = 0; i < addedNodePos; i++)
-        {
-            if(adjacencyMatrix[i][addedNodePos]) {
-                if(!g->hasEdge(combination[i], combination[addedNodePos])){
-                    return false;
-                }
-            } else {
-                if(g->hasEdge(combination[i], combination[addedNodePos])){
-                    return false;
-                }
-            }
-        } 
-    }
     return true;
 }
 
 // new node maintains the communities of the motif?
 bool CLI::optimizedCombinationHasMotifCommunities()
 {
-    vector<int> communities = motif.getCommunities();
     int addedNodePos = combination.size()-1;
+    
+    // If the added node can be in any community, its all good
+    if(motif.getCommunityWithOrder(addedNodePos) == -1)
+        return true;
+    
     for(int i = 0; i < addedNodePos; i++)
     {
-        // If the added node can be in any community, its all good
-        if(communities[addedNodePos] == -1) return true;
-
-        // If one of the nodes can be in any community we continue
-        if (communities[i] == -1) continue;
+        // If the node can be in any community we continue
+        if (motif.getCommunityWithOrder(i) == -1) continue;
 
         // If the communities are different in the motif, they have
         // to be different in the partition
-        if (communities[i] != communities[addedNodePos]){
+        if (motif.getCommunityWithOrder(i) != motif.getCommunityWithOrder(addedNodePos)){
             if(CLI::kronecker(combination[i], combination[addedNodePos]))
                 return false;
         }
@@ -679,7 +667,6 @@ void CLI::getMotifVariableValuesIteration(int offset, bool edgesCheck, MotifVari
         int combinationWeights = CLI::combinationNullcaseWeights();
         values->degreeMotifsInCommunities += combinationWeights;
 
-        total++;
         return;
     }
     for (int i = 0; i < g->numNodes(); i++)
@@ -743,7 +730,6 @@ void CLI::nodeVariableValuesIteration(int changingNode, int position, int offset
         
         changingNodeValues->degreeMotifsInCommunities += combinationWeights;
 
-        total++;
         return;
     }
     if(offset == position)
