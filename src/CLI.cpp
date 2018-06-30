@@ -403,12 +403,11 @@ void CLI::countCombinationMotifs(MotifValues *values)
 // i.e. check if the combination is an occurence of the motif
 bool CLI::combinationHasMotifEdges()
 {
-    const vector< vector<int> > & adjacencyMatrix = motif.getAdjacencyMatrix();
     for(int i = 0; i < combination.size(); i++)
     {
         for(int j = 0; j < combination.size(); ++j)
         {
-            if(adjacencyMatrix[i][j])
+            if(motif.hasEdge(i, j, true))
             {
                  //if has edge in motif, it needs to have edge on the graph
                 if(!g->hasEdge(combination[i], combination[j]))
@@ -427,19 +426,18 @@ bool CLI::combinationHasMotifEdges()
 // Check if the combination communities are in accordance with the motif communities
 bool CLI::combinationHasMotifCommunities()
 {
-    vector<int> communities = motif.getCommunities();
-    for(int i = 0; i < communities.size(); i++)
+    for(int nodeA = 0; nodeA < combination.size(); ++nodeA)
     {
-        for(int j = i + 1; j < communities.size(); j++)
+        for(int nodeB = nodeA + 1; nodeB < combination.size(); ++nodeB)
         {
             // If one of the nodes can be in any community we continue
-            if(communities[i] == -1 || communities[j] == -1){
+            if(motif.getCommunity(nodeA, true) == -1 || motif.getCommunity(nodeB, true) == -1){
                 continue;
             }
             // If the communities are different in the motif, they have
             // to be different in the partition
-            else if (communities[i] != communities[j]){
-                if(CLI::kronecker(combination[i], combination[j]))
+            else if (motif.getCommunity(nodeA, true) != motif.getCommunity(nodeB, true)){
+                if(CLI::kronecker(combination[nodeA], combination[nodeB]))
                 {
                     return false;
                 }
@@ -447,7 +445,7 @@ bool CLI::combinationHasMotifCommunities()
             // If the communities are the same on the motif for the pair,
             // they have to be the same on the partition
             else {
-                if(!CLI::kronecker(combination[i], combination[j]))
+                if(!CLI::kronecker(combination[nodeA], combination[nodeB]))
                 {
                     return false;
                 }
@@ -549,12 +547,11 @@ bool CLI::optimizedCombinationOrbitRules()
 // the new node added complies with the motif edges?
 bool CLI::optimizedCombinationHasMotifEdges()
 {
-    const vector< vector<int> >& adjacencyMatrix = motif.getAdjacencyMatrix();
-    int addedNodePos = combination.size() -1;
-    for(int i = 0; i < addedNodePos; i++)
+    int addedNodePos = combination.size() - 1;
+    for(int i = 0; i < addedNodePos; ++i)
     {
         //if has edge in motif, it needs to have edge on the graph
-        if(adjacencyMatrix[addedNodePos][i]) {
+        if(motif.hasEdge(addedNodePos, i, true)) {
             if(!g->hasEdge(combination[addedNodePos], combination[i])){
                 return false;
             }
@@ -565,39 +562,40 @@ bool CLI::optimizedCombinationHasMotifEdges()
             }
         }
     } 
-    if (motif.isDirected()){
-        for(int i = 0; i < addedNodePos; i++)
-        {
-            if(adjacencyMatrix[i][addedNodePos]) {
-                if(!g->hasEdge(combination[i], combination[addedNodePos])){
-                    return false;
-                }
-            } else {
-                if(g->hasEdge(combination[i], combination[addedNodePos])){
-                    return false;
-                }
-            }
-        } 
-    }
+    // if (motif.isDirected()){
+    //     for(int i = 0; i < addedNodePos; i++)
+    //     {
+    //         if(motif.hasEdge(i, addedNodePos)) {
+    //             if(!g->hasEdge(combination[i], combination[addedNodePos])){
+    //                 return false;
+    //             }
+    //         } else {
+    //             if(g->hasEdge(combination[i], combination[addedNodePos])){
+    //                 return false;
+    //             }
+    //         }
+    //     } 
+    // }
     return true;
 }
 
 // new node maintains the communities of the motif?
 bool CLI::optimizedCombinationHasMotifCommunities()
 {
-    vector<int> communities = motif.getCommunities();
     int addedNodePos = combination.size()-1;
+    
+    // If the added node can be in any community, its all good
+    if(motif.getCommunity(addedNodePos, true) == -1)
+        return true;
+    
     for(int i = 0; i < addedNodePos; i++)
     {
-        // If the added node can be in any community, its all good
-        if(communities[addedNodePos] == -1) return true;
-
-        // If one of the nodes can be in any community we continue
-        if (communities[i] == -1) continue;
+        // If the node can be in any community we continue
+        if (motif.getCommunity(i, true) == -1) continue;
 
         // If the communities are different in the motif, they have
         // to be different in the partition
-        if (communities[i] != communities[addedNodePos]){
+        if (motif.getCommunity(i, true) != motif.getCommunity(addedNodePos, true)){
             if(CLI::kronecker(combination[i], combination[addedNodePos]))
                 return false;
         }

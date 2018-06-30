@@ -11,6 +11,7 @@ class Motif
         Motif();
         void readFromFile(std::string path);
         int getCommunity(int nodeId);
+        int getCommunity(int nodeId, bool withNodeOrder);
         void print();
         int getSize();
         bool isDirected();
@@ -20,6 +21,8 @@ class Motif
         const std::vector<int> &getCommunities();
         const std::vector< std::vector<int> > &getOrbitRules();
         const std::vector< std::vector<int> > &getOrbitRulesSize(int size);
+        bool hasEdge(int nodeA, int nodeB);
+        bool hasEdge(int nodeA, int nodeB, bool withNodeOrder);
 
     private:
         std::vector<int> nodesOrder;
@@ -27,7 +30,6 @@ class Motif
         int size;
         std::vector<int> communities;
         std::vector< std::vector<int> > adjacencyMatrix;
-        bool hasEdge(int nodeA, int nodeB);
         int getNodeDegree(int node);
         void createNodesOrder();
         std::vector< std::vector<int> > adjacencyList;

@@ -8,7 +8,7 @@ using namespace std;
 
 Motif::Motif()
 {
-    cout << "motif init" << endl;
+    // cout << "motif init" << endl;
 }
 
 int Motif::getSize()
@@ -31,6 +31,8 @@ void Motif::readFromFile(std::string path)
     if (directedOrUndirected == "directed")
         directed = true;
     else if (directedOrUndirected == "undirected")
+        directed = false;
+    else
         directed = false;
 
     communities.clear();
@@ -123,6 +125,21 @@ bool Motif::isDirected()
 const vector<int> &Motif::getCommunities()
 {
     return communities;
+}
+
+int Motif::getCommunity(int nodePos)
+{
+    return communities[nodePos];
+}
+
+int Motif::getCommunity(int nodePos, bool withNodeOrder)
+{
+    if(withNodeOrder)
+    {
+        int orderedNodePos = nodesOrder[nodePos];
+        return communities[orderedNodePos];
+    }
+    return communities[nodePos];
 }
 
 void Motif::setAdjacencyMatrix()
@@ -355,5 +372,17 @@ int Motif::getNodeDegree(int node)
 
 bool Motif::hasEdge(int nodeA, int nodeB)
 {
+    return adjacencyMatrix[nodeA][nodeB] == 1 ? true : false;
+}
+
+bool Motif::hasEdge(int nodeA, int nodeB, bool withNodeOrder)
+{
+    if(withNodeOrder)
+    {
+        int orderedNodeA = nodesOrder[nodeA];
+        int orderedNodeB = nodesOrder[nodeB];
+        return adjacencyMatrix[orderedNodeA][orderedNodeB] == 1 ? true : false;
+    }
+
     return adjacencyMatrix[nodeA][nodeB] == 1 ? true : false;
 }
