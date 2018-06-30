@@ -65,14 +65,6 @@ void Motif::readFromFile(std::string path)
     }
 
     calculateOrbits();
-    //relying on calculate orbits to compute the adjacency matrix
-    createNodesOrder();
-    cout << "Motif nodes order:";
-    for(int i = 0; i < nodesOrder.size(); ++i)
-    {
-        cout << " " << nodesOrder[i];
-    }
-    cout << endl;
 }
 
 /**
@@ -105,11 +97,45 @@ void Motif::print()
         for (int j = 0; j < adjacencyListSizes.at(i).size(); j++)
         cout << adjacencyListSizes.at(i).at(j).at(0) << "\t" << adjacencyListSizes.at(i).at(j).at(1) << endl;
     }
-    std::cout << "Orbit rules:" << std::endl;
+    std::cout << "Orbit rules: ";
     for(int i = 0; i < orbitRules.size(); i++)
     {
-        std::cout << orbitRules[i][0] << "\t" << orbitRules[i][1] << std::endl;
+        std::cout << orbitRules[i][0] << "<" << orbitRules[i][1] << "\t";
     }
+    cout << std::endl;
+
+    std::cout << "Orbit rules size: " << std::endl;
+    for(int i = 0; i < orbitRulesSize.size(); i++)
+    {
+        cout << i << ": ";
+        if(orbitRulesSize[i].empty())
+            cout << "No rules.";
+        else
+            for(int j = 0; j < orbitRulesSize[i].size(); ++j)
+                std::cout << orbitRulesSize[i][j][0] << "<" << orbitRulesSize[i][j][1] << "\t";
+        cout << endl;
+    }
+
+    std::cout << "Orbit rules with order: ";
+    for(int i = 0; i < orbitRulesWithOrder.size(); i++)
+    {
+        std::cout << orbitRulesWithOrder[i][0] << "<" << orbitRulesWithOrder[i][1] << " ";
+    }
+    cout << endl;
+
+    std::cout << "Orbit rules size with order: " << std::endl;
+    for(int i = 0; i < orbitRulesSizeWithOrder.size(); i++)
+    {
+        cout << i << ": ";
+        if(orbitRulesSizeWithOrder[i].empty())
+            cout << "No rules.";
+        else
+            for(int j = 0; j < orbitRulesSizeWithOrder[i].size(); ++j)
+                std::cout << orbitRulesSizeWithOrder[i][j][0] << "<" << orbitRulesSizeWithOrder[i][j][1] << "\t";
+        cout << endl;
+    }
+    cout << "------------------" << endl;
+
 }
 
 const std::vector<std::vector<int> > &Motif::getAdjacencyList()
@@ -132,14 +158,10 @@ int Motif::getCommunity(int nodePos)
     return communities[nodePos];
 }
 
-int Motif::getCommunity(int nodePos, bool withNodeOrder)
+int Motif::getCommunityWithOrder(int nodePos)
 {
-    if(withNodeOrder)
-    {
-        int orderedNodePos = nodesOrder[nodePos];
-        return communities[orderedNodePos];
-    }
-    return communities[nodePos];
+    int orderedNodePos = nodesOrder[nodePos];
+    return communities[orderedNodePos];
 }
 
 void Motif::setAdjacencyMatrix()
@@ -186,6 +208,15 @@ void Motif::calculateOrbits()
 
     go(0);
     setOrbitRules();
+    //relying on calculate orbits to compute the adjacency matrix
+    createNodesOrder();
+    cout << "Motif nodes order:";
+    for(int i = 0; i < nodesOrder.size(); ++i)
+    {
+        cout << " " << nodesOrder[i];
+    }
+    cout << endl;
+    setOrbitRulesWithOrder();
 }
 
 void Motif::go(int pos)
@@ -233,6 +264,10 @@ const std::vector< std::vector<int> > &Motif::getOrbitRulesSize(int size)
     return orbitRulesSize.at(size);
 }
 
+const std::vector< std::vector<int> > &Motif::getOrbitRulesSizeWithOrder(int size)
+{
+    return orbitRulesSizeWithOrder.at(size);
+}
 
 void Motif::setOrbitRules()
 {
@@ -285,9 +320,52 @@ void Motif::setOrbitRules()
     }
 }
 
+void Motif::setOrbitRulesWithOrder()
+{
+    orbitRulesWithOrder.clear();
+    orbitRulesSizeWithOrder.clear();
+    for(int i = 0; i < size; ++i)
+    {
+        std::vector< std::vector<int> > pairsForSize;
+        orbitRulesSizeWithOrder.push_back(pairsForSize);
+    }
+
+    for(int i = 0; i < orbitRules.size(); i++)
+    {
+        int firstNode = orbitRules[i][0];
+        int firstNodeOrdered;
+        int secondNode = orbitRules[i][1];
+        int secondNodeOrdered;
+        for(int j = 0; j < nodesOrder.size(); ++j)
+            if(nodesOrder[j] == firstNode)
+            {
+                firstNodeOrdered = j;
+                break;
+            }
+        
+        for(int j = 0; j < nodesOrder.size(); ++j)
+            if(nodesOrder[j] == secondNode)
+            {
+                secondNodeOrdered = j;
+                break;
+            }
+        
+        vector<int> rulePair;
+        rulePair.push_back(firstNodeOrdered);
+        rulePair.push_back(secondNodeOrdered);
+        orbitRulesWithOrder.push_back(rulePair);
+        orbitRulesSizeWithOrder.at(secondNodeOrdered).push_back(rulePair);
+    }
+}
+
 const std::vector< std::vector<int> > &Motif::getOrbitRules()
 {
     return orbitRules;
+}
+
+const std::vector< std::vector<int> > &Motif::getOrbitRulesWithOrder()
+{
+    return orbitRulesWithOrder;
 }
 
 void Motif::createNodesOrder()
@@ -375,14 +453,9 @@ bool Motif::hasEdge(int nodeA, int nodeB)
     return adjacencyMatrix[nodeA][nodeB] == 1 ? true : false;
 }
 
-bool Motif::hasEdge(int nodeA, int nodeB, bool withNodeOrder)
+bool Motif::hasEdgeWithOrder(int nodeA, int nodeB)
 {
-    if(withNodeOrder)
-    {
-        int orderedNodeA = nodesOrder[nodeA];
-        int orderedNodeB = nodesOrder[nodeB];
-        return adjacencyMatrix[orderedNodeA][orderedNodeB] == 1 ? true : false;
-    }
-
-    return adjacencyMatrix[nodeA][nodeB] == 1 ? true : false;
+    int orderedNodeA = nodesOrder[nodeA];
+    int orderedNodeB = nodesOrder[nodeB];
+    return adjacencyMatrix[orderedNodeA][orderedNodeB] == 1 ? true : false;
 }

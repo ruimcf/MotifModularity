@@ -67,6 +67,7 @@ private:
   static double motifModularity();
   static void nodeCombination(int offset, MotifValues *values);
   static void countCombinationMotifs(MotifValues *values);
+  static bool combinationObeysOrbitRules();
   static bool combinationHasMotifEdges();
   static bool combinationHasMotifCommunities();
   static int combinationNullcaseWeights();
