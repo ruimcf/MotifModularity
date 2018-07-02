@@ -15,6 +15,19 @@ int Motif::getSize()
 {
     return size;
 }
+
+/**
+ * Format of a motif file to be read
+ * <int> - motif size
+ * <string> - "directed" or "undirected"
+ * #size <int> - community for each node, -1 means the node can be in any
+ *               community, same number means the nodes will be in the same
+ *               community, different numbers means those nodes will be in
+ *               different communities
+ * List of <int> <int> - each pair of int represents a edge on the motif where
+ *                       each int is the node ID
+ *                       node ID MUST BE from 1 to SIZE inclusive
+ */
 void Motif::readFromFile(std::string path)
 {
     ifstream ifs;
@@ -262,7 +275,7 @@ void Motif::calculateOrbits()
         used.push_back(false);
     }
 
-    go(0);
+    calculateOrbitsIteration(0);
     setOrbitRules();
     //relying on calculate orbits to compute the adjacency matrix
     createNodesOrder();
@@ -275,7 +288,7 @@ void Motif::calculateOrbits()
     setOrbitRulesWithOrder();
 }
 
-void Motif::go(int pos)
+void Motif::calculateOrbitsIteration(int pos)
 {
     bool ok;
 
@@ -307,7 +320,7 @@ void Motif::go(int pos)
                 if (ok)
                 {
                     used[i] = true;
-                    go(pos + 1);
+                    calculateOrbitsIteration(pos + 1);
                     used[i] = false;
                 }
             }
@@ -342,33 +355,34 @@ void Motif::setOrbitRules()
         {
             if(orbits[i][j])
             {
+                // The first node will need to wait to be in a rule with another node
                 if(lastNode != -1)
                 {
                     bool rulesAlreadyExists = false;
                     for(int k = 0; k < orbitRules.size(); k++)
                         if (orbitRules[k][0] == lastNode && orbitRules[k][1] == j)
+                        {
                             rulesAlreadyExists = true;
+                            break;
+                        }
 
                     bool sizeRulesAlreadyExists = false;
-                    for(int k = 0; k < orbitRulesSize[j].size(); k++){
+                    for(int k = 0; k < orbitRulesSize[j].size(); k++)
                         if(orbitRulesSize[j][k][0] == lastNode)
+                        {
                             sizeRulesAlreadyExists = true;
-                    } 
+                            break;
+                        } 
 
-                    if(!sizeRulesAlreadyExists) {
-                        std::vector<int> pair;
-                        pair.push_back(lastNode);
-                        pair.push_back(j);
-                        orbitRulesSize[j].push_back(pair);
-                        // cout << "Orbit Rule added size " << j << ": " << lastNode << " - " << j << endl;
-                    }
+                    std::vector<int> orbitRule;
+                    orbitRule.push_back(lastNode);
+                    orbitRule.push_back(j);
 
-                    if(!rulesAlreadyExists) {
-                        std::vector<int> pair;
-                        pair.push_back(lastNode);
-                        pair.push_back(j);
-                        orbitRules.push_back(pair);
-                    }
+                    if(!sizeRulesAlreadyExists)
+                        orbitRulesSize[j].push_back(orbitRule);
+
+                    if(!rulesAlreadyExists)
+                        orbitRules.push_back(orbitRule);
                 } 
                 lastNode = j;
             }

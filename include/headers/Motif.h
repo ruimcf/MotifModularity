@@ -43,7 +43,7 @@ class Motif
         std::vector< std::vector< std::vector<int> > > adjacencyListSizesWithOrder;
         void setAdjacencyMatrix();
         void calculateOrbits();
-        void go(int pos);
+        void calculateOrbitsIteration(int pos);
         std::vector< std::vector<bool> > orbits;
         std::vector<bool> used;
         std::vector<int> perm;

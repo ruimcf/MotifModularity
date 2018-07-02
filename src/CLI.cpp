@@ -191,9 +191,11 @@ void CLI::start(int argc, char **argv)
     int n = g->numNodes();
     networkPartition.setNumberNodes(n);
 
-    if (readMotif){
-        motif.readFromFile(motifFile);
-        motif.print();
+    motif.readFromFile(motifFile);
+    motif.print();
+    if (!readMotif){
+        cout << "please provide a motif file" << endl;
+        return;
     }
 
 
