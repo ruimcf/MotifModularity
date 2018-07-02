@@ -444,7 +444,7 @@ void Motif::createNodesOrder()
                     int node = nodesOrder.at(k);
                     if(hasEdge(currentNode, node))
                         nodeDegree += 1;
-                    if(Motif::isDirected)
+                    if(isDirected())
                         if(hasEdge(node, currentNode))
                             nodeDegree += 1;
                 }
@@ -480,7 +480,7 @@ int Motif::getNodeDegree(int node)
             if(hasEdge(node, i))
                 degree += 1;
 
-            if(Motif::isDirected)
+            if(isDirected())
                 if(hasEdge(i, node))
                     degree += 1;
         }

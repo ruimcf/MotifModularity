@@ -131,15 +131,13 @@ void CLI::closeResultsFile()
 void CLI::setNodes()
 {
     combination.clear();
-    used.clear();
+    combination.reserve(g->numNodes());
+    used.assign(g->numNodes(), false);
     nodes.clear();
     nodes.reserve(g->numNodes());
-    used.reserve(g->numNodes());
-    combination.reserve(g->numNodes());
-    for (int i = 0; i < g->numNodes(); i++)
+    for (int i = 0; i < g->numNodes(); ++i)
     {
         nodes.push_back(i);
-        used.push_back(false);
     }
 }
 
@@ -361,7 +359,6 @@ void CLI::nodeCombination(int offset, MotifValues *values)
         {
             used[i] = true;
             combination.push_back(nodes[i]);
-            //Aqui posso verificar: as edges criadas são validas para a motif? os nodes estão de acordo as regras da motif?
             CLI::nodeCombination(offset + 1, values);
             combination.pop_back();
             used[i] = false;
@@ -409,20 +406,32 @@ bool CLI::combinationObeysOrbitRules()
 // i.e. check if the combination is an occurence of the motif
 bool CLI::combinationHasMotifEdges()
 {
-    for(int i = 0; i < combination.size(); i++)
+    for(int i = 0; i < combination.size(); ++i)
     {
-        for(int j = 0; j < combination.size(); ++j)
+        for(int j = i+1; j < combination.size(); ++j)
         {
+            // if has edge in motif, it needs to have edge on the graph
             if(motif.hasEdgeWithOrder(i, j))
             {
-                 //if has edge in motif, it needs to have edge on the graph
                 if(!g->hasEdge(combination[i], combination[j]))
                     return false;
             } 
-            else {
-                // otherwise, it needs to not have the edge
+            // otherwise, it needs to not have the edge
+            else 
                 if(g->hasEdge(combination[i], combination[j]))
                     return false;
+
+            // also check the opposite orientation if the motif is directed
+            if(motif.isDirected())
+            {
+                if(motif.hasEdgeWithOrder(j, i))
+                {
+                    if(!g->hasEdge(combination[j], combination[i]))
+                        return false;
+                } 
+                else
+                    if(g->hasEdge(combination[j], combination[i]))
+                        return false;
             }
         }
     } 
@@ -437,25 +446,22 @@ bool CLI::combinationHasMotifCommunities()
         for(int nodeB = nodeA + 1; nodeB < combination.size(); ++nodeB)
         {
             // If one of the nodes can be in any community we continue
-            if(motif.getCommunityWithOrder(nodeA) == -1 || motif.getCommunityWithOrder(nodeB) == -1){
+            if(motif.getCommunityWithOrder(nodeA) == -1 || motif.getCommunityWithOrder(nodeB) == -1)
                 continue;
-            }
+
             // If the communities are different in the motif, they have
             // to be different in the partition
-            else if (motif.getCommunityWithOrder(nodeA) != motif.getCommunityWithOrder(nodeB)){
+            else if (motif.getCommunityWithOrder(nodeA) != motif.getCommunityWithOrder(nodeB))
+            {
                 if(CLI::kronecker(combination[nodeA], combination[nodeB]))
-                {
                     return false;
-                }
             }
+
             // If the communities are the same on the motif for the pair,
             // they have to be the same on the partition
-            else {
+            else 
                 if(!CLI::kronecker(combination[nodeA], combination[nodeB]))
-                {
                     return false;
-                }
-            }
         }
     }
     return true;
@@ -466,7 +472,7 @@ int CLI::combinationNullcaseWeights()
 {
     const vector< vector<int> > & adjacencyList = motif.getAdjacencyListWithOrder();
     int product = 1;
-    for(int i = 0; i < adjacencyList.size(); i++)
+    for(int i = 0; i < adjacencyList.size(); ++i)
     {
         product *= CLI::nullcaseWeight(combination[adjacencyList[i][0]], combination[adjacencyList[i][1]]);
     }
@@ -558,14 +564,25 @@ bool CLI::optimizedCombinationHasMotifEdges()
     {
         //if has edge in motif, it needs to have edge on the graph
         if(motif.hasEdgeWithOrder(addedNodePos, i)) {
-            if(!g->hasEdge(combination[addedNodePos], combination[i])){
+            if(!g->hasEdge(combination[addedNodePos], combination[i]))
                 return false;
-            }
-        } else {
-            // otherwise, it needs to not have the edge
-            if(g->hasEdge(combination[addedNodePos], combination[i])){
+        }
+        // otherwise, it needs to not have the edge
+        else
+            if(g->hasEdge(combination[addedNodePos], combination[i]))
                 return false;
-            }
+        
+        // also check the opposite orientation if the motif is directed
+        if(motif.isDirected())
+        {
+            if(motif.hasEdgeWithOrder(addedNodePos, i)) 
+            {
+                if(!g->hasEdge(combination[addedNodePos], combination[i]))
+                    return false;
+            } 
+            else 
+                if(g->hasEdge(combination[addedNodePos], combination[i]))
+                    return false;
         }
     } 
     return true;
@@ -580,7 +597,7 @@ bool CLI::optimizedCombinationHasMotifCommunities()
     if(motif.getCommunityWithOrder(addedNodePos) == -1)
         return true;
     
-    for(int i = 0; i < addedNodePos; i++)
+    for(int i = 0; i < addedNodePos; ++i)
     {
         // If the node can be in any community we continue
         if (motif.getCommunityWithOrder(i) == -1) continue;
@@ -591,6 +608,7 @@ bool CLI::optimizedCombinationHasMotifCommunities()
             if(CLI::kronecker(combination[i], combination[addedNodePos]))
                 return false;
         }
+
         // If the communities are the same on the motif for the pair,
         // they have to be the same on the partition
         else 
