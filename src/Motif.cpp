@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -93,25 +94,19 @@ void Motif::setAdjacencyListWithOrder()
 
     for(int i = 0; i < adjacencyList.size(); ++i)
     {
-        vector<int> pair;
         int firstNode = adjacencyList[i][0];
-        int firstNodeOrdered;
-        int secondNode = adjacencyList[i][1];
-        int secondNodeOrdered;
-        for(int j = 0; j < nodesOrder.size(); ++j)
-            if(nodesOrder[j] == firstNode)
-            {
-                firstNodeOrdered = j;
-                break;
-            }
-        
-        for(int j = 0; j < nodesOrder.size(); ++j)
-            if(nodesOrder[j] == secondNode)
-            {
-                secondNodeOrdered = j;
-                break;
-            };
+        int firstNodeOrdered = distance(nodesOrder.begin(), find(nodesOrder.begin(), nodesOrder.end(), firstNode));
 
+        int secondNode = adjacencyList[i][1];
+        int secondNodeOrdered = distance(nodesOrder.begin(), find(nodesOrder.begin(), nodesOrder.end(), secondNode));
+
+        if(firstNode >= size || secondNode >= size)
+        {
+            cout << "Error finding node" << endl;
+            throw;
+        }
+
+        vector<int> pair;
         pair.push_back(firstNodeOrdered);
         pair.push_back(secondNodeOrdered);
         adjacencyListWithOrder.push_back(pair);
@@ -385,22 +380,16 @@ void Motif::setOrbitRulesWithOrder()
     for(int i = 0; i < orbitRules.size(); i++)
     {
         int firstNode = orbitRules[i][0];
-        int firstNodeOrdered;
-        for(int j = 0; j < nodesOrder.size(); ++j)
-            if(nodesOrder[j] == firstNode)
-            {
-                firstNodeOrdered = j;
-                break;
-            }
-        
+        int firstNodeOrdered = distance(nodesOrder.begin(), find(nodesOrder.begin(), nodesOrder.end(), firstNode));
+
         int secondNode = orbitRules[i][1];
-        int secondNodeOrdered;
-        for(int j = 0; j < nodesOrder.size(); ++j)
-            if(nodesOrder[j] == secondNode)
-            {
-                secondNodeOrdered = j;
-                break;
-            }
+        int secondNodeOrdered = distance(nodesOrder.begin(), find(nodesOrder.begin(), nodesOrder.end(), secondNode));
+
+        if(firstNode >= size || secondNode >= size)
+        {
+            cout << "Error finding node" << endl;
+            throw;
+        }
         
         vector<int> rulePair;
         rulePair.push_back(firstNodeOrdered);
