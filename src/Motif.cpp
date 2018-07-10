@@ -100,7 +100,7 @@ void Motif::setAdjacencyListWithOrder()
         int secondNode = adjacencyList[i][1];
         int secondNodeOrdered = distance(nodesOrder.begin(), find(nodesOrder.begin(), nodesOrder.end(), secondNode));
 
-        if(firstNode >= size || secondNode >= size)
+        if(firstNodeOrdered >= size || secondNodeOrdered >= size)
         {
             cout << "Error finding node" << endl;
             throw;
@@ -281,7 +281,6 @@ void Motif::calculateOrbits()
         }
         calculateOrbitsIteration(0);
         fixedOneNode = fixOneNode();
-        cout << "fixed one node " << fixedOneNode << endl; 
     }
     //relying on calculate orbits to compute the adjacency matrix
     createNodesOrder();
@@ -355,14 +354,12 @@ bool Motif::fixOneNode()
                 {
                     firstNode = j;
                     isFirstNodeDefined = true;
-                    cout << "defined first node " << firstNode << endl;
                 }
                 else
                 {
                     vector<int> newRule;
                     newRule.push_back(firstNode);
                     newRule.push_back(j);
-                    cout << "new rule " << firstNode << " " << j << endl; 
 
                     orbitRules.push_back(newRule);
                     orbitRulesSize[j].push_back(newRule);
@@ -397,7 +394,7 @@ void Motif::setOrbitRulesWithOrder()
         orbitRulesSizeWithOrder.push_back(pairs);
     }
 
-    for(int i = 0; i < orbitRules.size(); i++)
+    for(int i = 0; i < orbitRules.size(); ++i)
     {
         int firstNode = orbitRules[i][0];
         int firstNodeOrdered = distance(nodesOrder.begin(), find(nodesOrder.begin(), nodesOrder.end(), firstNode));
@@ -405,7 +402,7 @@ void Motif::setOrbitRulesWithOrder()
         int secondNode = orbitRules[i][1];
         int secondNodeOrdered = distance(nodesOrder.begin(), find(nodesOrder.begin(), nodesOrder.end(), secondNode));
 
-        if(firstNode >= size || secondNode >= size)
+        if(firstNodeOrdered >= size || secondNodeOrdered >= size)
         {
             cout << "Error finding node" << endl;
             throw;
