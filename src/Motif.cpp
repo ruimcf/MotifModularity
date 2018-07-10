@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -15,6 +16,19 @@ int Motif::getSize()
 {
     return size;
 }
+
+/**
+ * Format of a motif file to be read
+ * <int> - motif size
+ * <string> - "directed" or "undirected"
+ * #size <int> - community for each node, -1 means the node can be in any
+ *               community, same number means the nodes will be in the same
+ *               community, different numbers means those nodes will be in
+ *               different communities
+ * List of <int> <int> - each pair of int represents a edge on the motif where
+ *                       each int is the node ID
+ *                       node ID MUST BE from 1 to SIZE inclusive
+ */
 void Motif::readFromFile(std::string path)
 {
     ifstream ifs;
@@ -80,25 +94,19 @@ void Motif::setAdjacencyListWithOrder()
 
     for(int i = 0; i < adjacencyList.size(); ++i)
     {
-        vector<int> pair;
         int firstNode = adjacencyList[i][0];
-        int firstNodeOrdered;
-        int secondNode = adjacencyList[i][1];
-        int secondNodeOrdered;
-        for(int j = 0; j < nodesOrder.size(); ++j)
-            if(nodesOrder[j] == firstNode)
-            {
-                firstNodeOrdered = j;
-                break;
-            }
-        
-        for(int j = 0; j < nodesOrder.size(); ++j)
-            if(nodesOrder[j] == secondNode)
-            {
-                secondNodeOrdered = j;
-                break;
-            };
+        int firstNodeOrdered = distance(nodesOrder.begin(), find(nodesOrder.begin(), nodesOrder.end(), firstNode));
 
+        int secondNode = adjacencyList[i][1];
+        int secondNodeOrdered = distance(nodesOrder.begin(), find(nodesOrder.begin(), nodesOrder.end(), secondNode));
+
+        if(firstNodeOrdered >= size || secondNodeOrdered >= size)
+        {
+            cout << "Error finding node" << endl;
+            throw;
+        }
+
+        vector<int> pair;
         pair.push_back(firstNodeOrdered);
         pair.push_back(secondNodeOrdered);
         adjacencyListWithOrder.push_back(pair);
@@ -141,13 +149,6 @@ void Motif::print()
     {
         cout << adjacencyListWithOrder.at(i).at(0) << "\t" << adjacencyListWithOrder.at(i).at(1) << endl;
     }
-    // cout << "Adjacency List Sizes:" << endl;
-    // for (int i = 0; i < adjacencyListSizes.size(); i++)
-    // {
-    //     cout << "Size " << i << endl;
-    //     for (int j = 0; j < adjacencyListSizes.at(i).size(); j++)
-    //     cout << adjacencyListSizes.at(i).at(j).at(0) << "\t" << adjacencyListSizes.at(i).at(j).at(1) << endl;
-    // }
     std::cout << "Orbit rules: ";
     for(int i = 0; i < orbitRules.size(); i++)
     {
@@ -185,6 +186,12 @@ void Motif::print()
                 std::cout << orbitRulesSizeWithOrder[i][j][0] << "<" << orbitRulesSizeWithOrder[i][j][1] << "\t";
         cout << endl;
     }
+    cout << "Motif nodes order:";
+    for(int i = 0; i < nodesOrder.size(); ++i)
+    {
+        cout << " " << nodesOrder[i];
+    }
+    cout << endl;
     cout << "------------------" << endl;
 
 }
@@ -249,70 +256,122 @@ const std::vector< std::vector<int> > &Motif::getAdjacencyMatrix()
 void Motif::calculateOrbits()
 {
     setAdjacencyMatrix();
-    orbits.clear();
-    orbits.reserve(size);
-    used.clear();
-    used.reserve(size);
-    perm.clear();
-    perm.reserve(size);
-    for (int i = 0; i < size; i++)
+
+    orbitRules.clear();
+    orbitRulesSize.clear();
+    for(int i = 0; i < size; ++i)
     {
-        std::vector<bool> line(size, false);
-        orbits.push_back(line);
-        used.push_back(false);
+        std::vector< std::vector<int> > pairsForSize;
+        orbitRulesSize.push_back(pairsForSize);
     }
 
-    go(0);
-    setOrbitRules();
+    bool fixedOneNode = true;
+
+    while(fixedOneNode)
+    {
+        used.assign(size, false);
+        perm.clear();
+        perm.reserve(size);
+        orbits.clear();
+        orbits.reserve(size);
+        for (int i = 0; i < size; i++)
+        {
+            std::vector<bool> line(size, false);
+            orbits.push_back(line);
+        }
+        calculateOrbitsIteration(0);
+        fixedOneNode = fixOneNode();
+    }
     //relying on calculate orbits to compute the adjacency matrix
     createNodesOrder();
-    cout << "Motif nodes order:";
-    for(int i = 0; i < nodesOrder.size(); ++i)
-    {
-        cout << " " << nodesOrder[i];
-    }
-    cout << endl;
     setOrbitRulesWithOrder();
 }
 
-void Motif::go(int pos)
+void Motif::calculateOrbitsIteration(int pos)
 {
-    bool ok;
 
     if (pos == size)
-    {
-        // for (int i = 0; i < size; i++)
-        //     printf("%d", perm[i]);
-        // putchar('\n');
-
-        for (int i = 0; i < size; i++)
+        for (int i = 0; i < size; ++i)
             orbits[i][perm[i]] = true;
-    }
     else
-    {
-        for (int i = 0; i < size; i++)
-        {
+        for (int i = 0; i < size; ++i)
             if (!used[i])
             {
                 perm[pos] = i;
+                bool ok = true;
 
-                ok = true;
-                for (int j = 0; j < pos; j++)
-                    if (adjacencyMatrix[perm[pos]][perm[j]] != adjacencyMatrix[pos][j])
+                // check edges
+                if (ok)
+                    for (int j = 0; j < pos; ++j)
                     {
-                        ok = false;
-                        break;
+                        if (adjacencyMatrix[perm[pos]][perm[j]] != adjacencyMatrix[pos][j])
+                        {
+                            ok = false;
+                            break;
+                        }
+                        if (adjacencyMatrix[perm[j]][perm[pos]] != adjacencyMatrix[j][pos])
+                        {
+                            ok = false;
+                            break;
+                        }
+                    }
+
+                // check the orbit rules up to now
+                if (ok)
+                    for (int j = 0; j < orbitRulesSize[pos].size(); ++j)
+                    {
+                        vector<int> rule = orbitRulesSize[pos][j];
+                        int firstNode = rule[0];
+                        int secondNode = rule[1];
+                        if(perm[firstNode] >= perm[secondNode])
+                        {
+                            ok = false;
+                            break;
+                        }
                     }
 
                 if (ok)
                 {
                     used[i] = true;
-                    go(pos + 1);
+                    calculateOrbitsIteration(pos + 1);
                     used[i] = false;
                 }
             }
-        }
+}
+
+bool Motif::fixOneNode()
+{
+    for(int i = 0; i < size; ++i)
+    {
+        bool hasFixedOneNode = false;
+        int firstNode;
+        bool isFirstNodeDefined = false;
+
+        for(int j = 0; j < size; ++j)
+            if(orbits[i][j])
+            {
+                if(!isFirstNodeDefined)
+                {
+                    firstNode = j;
+                    isFirstNodeDefined = true;
+                }
+                else
+                {
+                    vector<int> newRule;
+                    newRule.push_back(firstNode);
+                    newRule.push_back(j);
+
+                    orbitRules.push_back(newRule);
+                    orbitRulesSize[j].push_back(newRule);
+                    
+                    hasFixedOneNode = true;
+                }
+            }
+        
+        if (hasFixedOneNode)
+            return true;
     }
+    return false;
 }
 
 const std::vector< std::vector<int> > &Motif::getOrbitRulesSize(int size)
@@ -325,86 +384,29 @@ const std::vector< std::vector<int> > &Motif::getOrbitRulesSizeWithOrder(int siz
     return orbitRulesSizeWithOrder.at(size);
 }
 
-void Motif::setOrbitRules()
-{
-    orbitRules.clear();
-    orbitRulesSize.clear();
-    for(int i = 0; i < size; ++i)
-    {
-        std::vector< std::vector<int> > pairsForSize;
-        orbitRulesSize.push_back(pairsForSize);
-    }
-
-    for(int i = 0; i < size; i++)
-    {
-        int lastNode = -1;
-        for(int j = 0; j < size; j++)
-        {
-            if(orbits[i][j])
-            {
-                if(lastNode != -1)
-                {
-                    bool rulesAlreadyExists = false;
-                    for(int k = 0; k < orbitRules.size(); k++)
-                        if (orbitRules[k][0] == lastNode && orbitRules[k][1] == j)
-                            rulesAlreadyExists = true;
-
-                    bool sizeRulesAlreadyExists = false;
-                    for(int k = 0; k < orbitRulesSize[j].size(); k++){
-                        if(orbitRulesSize[j][k][0] == lastNode)
-                            sizeRulesAlreadyExists = true;
-                    } 
-
-                    if(!sizeRulesAlreadyExists) {
-                        std::vector<int> pair;
-                        pair.push_back(lastNode);
-                        pair.push_back(j);
-                        orbitRulesSize[j].push_back(pair);
-                        // cout << "Orbit Rule added size " << j << ": " << lastNode << " - " << j << endl;
-                    }
-
-                    if(!rulesAlreadyExists) {
-                        std::vector<int> pair;
-                        pair.push_back(lastNode);
-                        pair.push_back(j);
-                        orbitRules.push_back(pair);
-                    }
-                } 
-                lastNode = j;
-            }
-        }
-    }
-}
-
 void Motif::setOrbitRulesWithOrder()
 {
     orbitRulesWithOrder.clear();
     orbitRulesSizeWithOrder.clear();
     for(int i = 0; i < size; ++i)
     {
-        std::vector< std::vector<int> > pairsForSize;
-        orbitRulesSizeWithOrder.push_back(pairsForSize);
+        std::vector< std::vector<int> > pairs;
+        orbitRulesSizeWithOrder.push_back(pairs);
     }
 
-    for(int i = 0; i < orbitRules.size(); i++)
+    for(int i = 0; i < orbitRules.size(); ++i)
     {
         int firstNode = orbitRules[i][0];
-        int firstNodeOrdered;
+        int firstNodeOrdered = distance(nodesOrder.begin(), find(nodesOrder.begin(), nodesOrder.end(), firstNode));
+
         int secondNode = orbitRules[i][1];
-        int secondNodeOrdered;
-        for(int j = 0; j < nodesOrder.size(); ++j)
-            if(nodesOrder[j] == firstNode)
-            {
-                firstNodeOrdered = j;
-                break;
-            }
-        
-        for(int j = 0; j < nodesOrder.size(); ++j)
-            if(nodesOrder[j] == secondNode)
-            {
-                secondNodeOrdered = j;
-                break;
-            }
+        int secondNodeOrdered = distance(nodesOrder.begin(), find(nodesOrder.begin(), nodesOrder.end(), secondNode));
+
+        if(firstNodeOrdered >= size || secondNodeOrdered >= size)
+        {
+            cout << "Error finding node" << endl;
+            throw;
+        }
         
         vector<int> rulePair;
         rulePair.push_back(firstNodeOrdered);
@@ -424,16 +426,18 @@ const std::vector< std::vector<int> > &Motif::getOrbitRulesWithOrder()
     return orbitRulesWithOrder;
 }
 
+/**
+ * Creates an order to fill the motif sequentially so that the next node is the one that needs more connections
+ * 
+ * 1st add the node with the most degree to the CHOSEN_LIST 
+ * 2nd add the node with the most connections with the nodes on CHOSEN_LIST to the list
+ *  - If two or more nodes have the same number of connections, choose the one with most degree
+ *    - If still can't decide, choose the first one
+ */
 void Motif::createNodesOrder()
 {
     nodesOrder.clear();
     nodesOrder.reserve(size);
-    std::vector<bool> availableNodes;
-    availableNodes.reserve(size);
-    for(int i = 0; i < size; i++)
-    {
-        availableNodes.push_back(true);
-    }
     int nodeWithMostDegree, bestDegree = 0;
     for(int i = 0; i < size; ++i)
     {
@@ -444,40 +448,43 @@ void Motif::createNodesOrder()
             nodeWithMostDegree = i;
         }
     }
-
-    availableNodes.at(nodeWithMostDegree) = false;
     nodesOrder.push_back(nodeWithMostDegree);
+
+    std::vector<bool> availableNodes;
+    availableNodes.assign(size, true);
+    availableNodes[nodeWithMostDegree] = false;
 
     for(int i = 0; i < size-1; i++)
     {
         int nextBestNode;
-        int nextBestNodeDegreeWithCurrentNodes = 0;
-        for(int j = 0; j < size; j++)
+        int nextBestNodeDegree = 0;
+        for(int currentNode = 0; currentNode < size; ++currentNode)
         {
-            if(availableNodes.at(j))
+            if(availableNodes.at(currentNode))
             {
-                // how many edjes this node has with all the nodes already selected?
-                int edgesOfNodeWithCurrentNodes = 0;
-                for(int k = 0; k<nodesOrder.size(); ++k)
+                // how many edges this node has with all the nodes already selected?
+                int nodeDegree = 0;
+                for(int k = 0; k < nodesOrder.size(); ++k)
                 {
                     int node = nodesOrder.at(k);
-                    // support self loops??
-                    if(node != j)
-                        if(hasEdge(node, j))
-                            edgesOfNodeWithCurrentNodes += 1;
+                    if(hasEdge(currentNode, node))
+                        nodeDegree += 1;
+                    if(isDirected())
+                        if(hasEdge(node, currentNode))
+                            nodeDegree += 1;
                 }
 
-                if(edgesOfNodeWithCurrentNodes > nextBestNodeDegreeWithCurrentNodes)
+                if(nodeDegree > nextBestNodeDegree)
                 {
-                    nextBestNode = j;
-                    nextBestNodeDegreeWithCurrentNodes = edgesOfNodeWithCurrentNodes;
+                    nextBestNode = currentNode;
+                    nextBestNodeDegree = nodeDegree;
                 }
-                else if (edgesOfNodeWithCurrentNodes == nextBestNodeDegreeWithCurrentNodes)
+                else if (nodeDegree == nextBestNodeDegree)
                 {
-                    if(getNodeDegree(j) > getNodeDegree(nextBestNode))
+                    if(getNodeDegree(currentNode) > getNodeDegree(nextBestNode))
                     {
-                        nextBestNode = j;
-                        nextBestNodeDegreeWithCurrentNodes = edgesOfNodeWithCurrentNodes;
+                        nextBestNode = currentNode;
+                        nextBestNodeDegree = nodeDegree;
                     }
                 }
             }
@@ -495,10 +502,12 @@ int Motif::getNodeDegree(int node)
     {
         if(node != i)
         {
-            if(adjacencyMatrix[node][i])
-            {
+            if(hasEdge(node, i))
                 degree += 1;
-            }
+
+            if(isDirected())
+                if(hasEdge(i, node))
+                    degree += 1;
         }
     }
     return degree;
