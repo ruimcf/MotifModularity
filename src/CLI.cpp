@@ -147,6 +147,16 @@ void CLI::setNodes()
  * ------------
  */
 
+void printVector(vector<int> v, string name)
+{
+    cout << "Vector " + name +":";
+    for(int i = 0; i < v.size(); ++i)
+    {
+        cout << " " << v[i];
+    }
+    cout << endl;
+}
+
 void printMotifValues(MotifValues values)
 {
     cout << "Motif Values: " << values.numberMotifsInCommunities << " " << values.numberMotifsInGraph << " " <<  values.degreeMotifsInCommunities << " " << values.degreeMotifsRandomGraph << endl;
@@ -197,50 +207,55 @@ void CLI::start(int argc, char **argv)
     }
 
 
+    printf("Num nodes: %d\n", g->numNodes());
     if (readPartition)
     {
         networkPartition.readPartition(partitionFile.c_str());
         cout << "Partition read: " << networkPartition.toStringPartitionByNode() << endl;
-        printf("Num nodes: %d\n", g->numNodes());
-        networkPartition.writePartitionFile(networkFile);
-
-        total = 0;
-        double modularity = CLI::triangleModularity();
-        printf("Triangle modularity: %f\nTotal: %d\n", modularity, total);
-
-        total = 0;
-        double motifModularity = CLI::motifModularity();
-        printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
-
-        total = 0;
-        double optimizedMotifModularity = CLI::optimizedMotifModularity();
-        printf("Optimized Motif modularity: %f\nTotal: %d\n", optimizedMotifModularity, total);
-
-        total = 0;
-        MotifValues values = CLI::optimizedMotifModularityValues();
-        cout << "Optimized motif Modularity values: " << CLI::motifModularityFromValues(values) << endl << "Total: " << total << endl;
-
-        total = 0;
-        MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
-        MotifVariableValues motifVariableValues = CLI::getMotifVariableValues();
-        double constantValuesMotifModularity = CLI::motifModularityFromValues(motifConstantValues, motifVariableValues);
-        printf("Optimized Motif modularity with constant values: %f\n", constantValuesMotifModularity);
-
-        int changingNode = 0;
-
-        MotifVariableValues toChangeNodeValues = CLI::nodeVariableValues(changingNode);
-        networkPartition.setNodeCommunity(changingNode, 1);
-        cout << "CHANGED" << endl;
-        total = 0;
-        MotifValues newValues = CLI::optimizedMotifModularityValues();
-        cout << "Modularity: " << motifModularityFromValues(newValues) << endl << " Total: " << total << endl;
-        MotifVariableValues changedNodeValues = CLI::nodeVariableValues(changingNode);
-        MotifValues changingNodeMotifValuesValues = changingNodeMotifValues(values, toChangeNodeValues, changedNodeValues);
-        cout << "Calculated Changing Node modularity: " << CLI::motifModularityFromValues(changingNodeMotifValuesValues) << endl;
- 
+        // networkPartition.writePartitionFile(networkFile);
+    }
+    else {
+        networkPartition.randomPartition(2);
+        cout << "Partition created: " << networkPartition.toStringPartitionByNode() << endl;
     }
 
+    // total = 0;
+    // double modularity = CLI::triangleModularity();
+    // printf("Triangle modularity: %f\nTotal: %d\n", modularity, total);
+
+    total = 0;
+    double motifModularity = CLI::motifModularity();
+    printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
+
+    total = 0;
+    double optimizedMotifModularity = CLI::optimizedMotifModularity();
+    printf("Optimized Motif modularity: %f\nTotal: %d\n", optimizedMotifModularity, total);
+
+    total = 0;
+    MotifValues values = CLI::optimizedMotifModularityValues();
+    cout << "Optimized motif Modularity values: " << CLI::motifModularityFromValues(values) << endl << "Total: " << total << endl;
+    printMotifValues(values);
+
+    total = 0;
+    MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
+    MotifVariableValues motifVariableValues = CLI::getMotifVariableValues();
+    double constantValuesMotifModularity = CLI::motifModularityFromValues(motifConstantValues, motifVariableValues);
+    printf("Optimized Motif modularity with constant values: %f\n", constantValuesMotifModularity);
+
+    int changingNode = 1;
+
+    MotifVariableValues toChangeNodeValues = CLI::nodeVariableValues(changingNode);
+    networkPartition.setNodeCommunity(changingNode, 1);
+    cout << "CHANGED" << endl;
+    total = 0;
+    MotifValues newValues = CLI::optimizedMotifModularityValues();
+    cout << "Modularity: " << motifModularityFromValues(newValues) << endl << " Total: " << total << endl;
+    MotifVariableValues changedNodeValues = CLI::nodeVariableValues(changingNode);
+    MotifValues changingNodeMotifValuesValues = changingNodeMotifValues(values, toChangeNodeValues, changedNodeValues);
+    cout << "Calculated Changing Node modularity: " << CLI::motifModularityFromValues(changingNodeMotifValuesValues) << endl;
+ 
     getchar();
+
     for (int i = 0; i < g->numNodes(); i++)
     {
         nodes.push_back(i);
