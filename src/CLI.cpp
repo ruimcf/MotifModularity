@@ -826,7 +826,24 @@ MotifValues CLI::changingNodeMotifValues(MotifValues allPreviousValues, MotifVar
    return values;
 }
 
+/**
+ * ---------------------------
+ * --- USE NEIGHBOURS LIST ---
+ * ---------------------------
+ */
 
+double CLI::optimizedMotifModularityNeighbours()
+{
+    MotifValues values = optimizedMotifModularityNeighboursValues();
+    return motifModularityFromValues(values);
+}
+
+MotifValues CLI::optimizedMotifModularityNeighboursValues()
+{
+    MotifValues values;
+    // which node to choose first?
+    // do I need to choose all?    
+}
 
 /**
  * -------------------------

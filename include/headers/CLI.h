@@ -94,6 +94,13 @@ private:
   static void getMotifVariableValuesIteration(int offset, bool edgesCheck, MotifVariableValues *values);
 
   /**
+   * Use neighbours list instead of going through all nodes and then check edges
+   */
+  static double optimizedMotifModularityNeighbours();
+  static MotifValues optimizedMotifModularityNeighboursValues();
+
+
+  /**
    *  The same as above, but we know that only one of the nodes changed
    */
   static MotifVariableValues nodeVariableValues(int changingNode);
