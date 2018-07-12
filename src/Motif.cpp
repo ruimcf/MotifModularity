@@ -522,5 +522,64 @@ bool Motif::hasEdgeWithOrder(int nodeA, int nodeB)
 {
     int orderedNodeA = nodesOrder[nodeA];
     int orderedNodeB = nodesOrder[nodeB];
-    return adjacencyMatrix[orderedNodeA][orderedNodeB] == 1 ? true : false;
+    return Motif::hasEdge(orderedNodeA, orderedNodeB);
+}
+
+vector<int> Motif::getNeighbours(int node)
+{
+    vector<int> neighbours;
+    for(int i = 0; i < size; ++i)
+        if(hasEdge(node, i) || hasEdge(i, node))
+            neighbours.push_back(i);
+
+    return neighbours;
+}
+
+vector<int> Motif::getNeighboursWithOrder(int node)
+{
+    vector<int> neighbours;
+    for(int i = 0; i < size; ++i)
+        if(hasEdgeWithOrder(node, i) || hasEdgeWithOrder(i, node))
+            neighbours.push_back(i);
+
+    return neighbours;
+}
+
+vector<int> Motif::getInNeighbours(int node)
+{
+    vector<int> neighbours;
+    for(int i = 0; i < size; ++i)
+        if(hasEdge(i, node))
+            neighbours.push_back(i);
+
+    return neighbours;
+}
+
+vector<int> Motif::getInNeighboursWithOrder(int node)
+{
+    vector<int> neighbours;
+    for(int i = 0; i < size; ++i)
+        if(hasEdgeWithOrder(i, node))
+            neighbours.push_back(i);
+
+    return neighbours;
+}
+vector<int> Motif::getOutNeighbours(int node)
+{
+    vector<int> neighbours;
+    for(int i = 0; i < size; ++i)
+        if(hasEdge(node, i))
+            neighbours.push_back(i);
+
+    return neighbours;
+}
+
+vector<int> Motif::getOutNeighboursWithOrder(int node)
+{
+    vector<int> neighbours;
+    for(int i = 0; i < size; ++i)
+        if(hasEdgeWithOrder(node, i))
+            neighbours.push_back(i);
+
+    return neighbours;
 }

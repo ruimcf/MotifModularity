@@ -98,7 +98,7 @@ private:
    */
   static double optimizedMotifModularityNeighbours();
   static MotifValues optimizedMotifModularityNeighboursValues();
-
+  static void optimizedMotifModularityNeighboursValuesIteration(MotifValues *values);
 
   /**
    *  The same as above, but we know that only one of the nodes changed

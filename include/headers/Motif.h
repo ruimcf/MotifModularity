@@ -27,6 +27,12 @@ class Motif
         const std::vector< std::vector<int> > &getOrbitRulesSizeWithOrder(int size);
         bool hasEdge(int nodeA, int nodeB);
         bool hasEdgeWithOrder(int nodeA, int nodeB);
+        vector<int> getNeighbours(int node);
+        vector<int> getNeighboursWithOrder(int node);
+        vector<int> getInNeighbours(int node);
+        vector<int> getInNeighboursWithOrder(int node);
+        vector<int> getOutNeighbours(int node);
+        vector<int> getOutNeighboursWithOrder(int node);
 
     private:
         std::vector<int> nodesOrder;

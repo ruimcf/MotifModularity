@@ -4,8 +4,6 @@
 
 using namespace std;
 
-int __number = 0;
-
 Graph *CLI::g;
 vector<int> CLI::nodes;
 vector<int> CLI::combination;
@@ -832,6 +830,7 @@ MotifValues CLI::changingNodeMotifValues(MotifValues allPreviousValues, MotifVar
  * ---------------------------
  */
 
+// WILL ONE WORK WITH CONNECTED MOTIFS
 double CLI::optimizedMotifModularityNeighbours()
 {
     MotifValues values = optimizedMotifModularityNeighboursValues();
@@ -843,7 +842,82 @@ MotifValues CLI::optimizedMotifModularityNeighboursValues()
     MotifValues values;
     // which node to choose first?
     // do I need to choose all?    
+    for(int i = 0; i < g->numNodes(); ++i)
+    {
+        used[i] = true;
+        combination.push_back(i);
+        CLI::optimizedMotifModularityNeighboursValuesIteration(&values);
+        combination.pop_back();
+        used[i] = false;
+    }
 }
+
+void CLI::optimizedMotifModularityNeighboursValuesIteration(MotifValues *values)
+{
+    if(combination.size() == motif.getSize())
+    {
+
+    }
+    else
+    {
+        if(motif.isDirected())
+        {
+            int bestInNode;
+            int bestInNodeNeighbours;
+            bool hasOneInNode = false
+            // check all nodes in the motif that are connected to the new node
+            vector<int> inNeighbours = motif.getInNeighboursWithOrder(combination.size());
+            // then with that list, check how many neighbours each has
+            for(int i = 0; i < inNeighbours.size(); ++i)
+            {
+                int neighbour = inNeighbours[i];
+                if(neighbour < combination.size())
+                {
+                    int neighboursCount = g->nodeOutEdges(combination[neighbour])
+                    if(!hasOneInNode)
+                    {
+                        bestInNodeNeighbours = neighboursCount;
+                        bestInNode = combination[neighbour];
+                        hasOneInNode = true;
+                    }
+                    else if(neighboursCount < bestInNodeNeighbours)
+                    {
+                        bestInNodeNeighbours = neighboursCount;
+                        bestInNode = combination[neighbour];
+                    }
+                }
+            }
+            int bestOutNode;
+            int bestOutNodeNeighbours;
+            bool hasOneOutNode = false
+            // check all nodes in the motif that are connected to the new node
+            vector<int> outNeighbours = motif.getOutNeighboursWithOrder(combination.size());
+            // then with that list, check how many neighbours each has
+            for(int i = 0; i < outNeighbours.size(); ++i)
+            {
+                int neighbour = outNeighbours[i];
+                if(neighbour < combination.size())
+                {
+                    int neighboursCount = g->nodeInEdges(combination[neighbour])
+                    if(!hasOneOutNode)
+                    {
+                        bestOutNodeNeighbours = neighboursCount;
+                        bestOutNode = combination[neighbour];
+                        hasOneOutNode = true;
+                    }
+                    else if(neighboursCount < bestOutNodeNeighbours)
+                    {
+                        bestOutNodeNeighbours = neighboursCount;
+                        bestOutNode = combination[neighbour];
+                    }
+                }
+            }
+            //need to test this
+        //what node to choose?
+        }
+    }
+}
+
 
 /**
  * -------------------------
