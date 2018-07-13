@@ -327,10 +327,10 @@ void CLI::cicleModularityIteration(int offset, int k, MotifValues *values)
 
 void CLI::combinationCicleModularity(MotifValues *values)
 {
-    long g1 = CLI::maskedWeight(combination.back(), combination.front());
-    long g2 = g->hasEdge(combination.back(), combination.front());
-    long g3 = CLI::maskedNullcaseWeight(combination.back(), combination.front());
-    long g4 = CLI::nullcaseWeight(combination.back(), combination.front());
+    long long g1 = CLI::maskedWeight(combination.back(), combination.front());
+    long long g2 = g->hasEdge(combination.back(), combination.front());
+    long long g3 = CLI::maskedNullcaseWeight(combination.back(), combination.front());
+    long long g4 = CLI::nullcaseWeight(combination.back(), combination.front());
 
     for (int i = 0; i < combination.size() - 1; i++)
     {
@@ -1022,7 +1022,7 @@ double CLI::motifModularityFromValues(MotifConstantValues constantValues, MotifV
     return static_cast<double>(variableValues.numberMotifsInCommunities) / constantValues.numberMotifsInGraph - static_cast<double>(variableValues.degreeMotifsInCommunities) / constantValues.degreeMotifsRandomGraph; 
 }
 
-double CLI::motifModularityFromValues(long v1, long v2, long v3, long v4)
+double CLI::motifModularityFromValues(long long v1, long long v2, long long v3, long long v4)
 {
     return static_cast<double>(v1) / v2 - static_cast<double>(v3) / v4; 
 }
