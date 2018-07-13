@@ -11,20 +11,20 @@
 #include <sstream>
 
 struct MotifConstantValues {
-  long numberMotifsInGraph;
-  long degreeMotifsRandomGraph;
+  long long numberMotifsInGraph;
+  long long degreeMotifsRandomGraph;
 };
 
 struct MotifVariableValues {
-  long numberMotifsInCommunities;
-  long degreeMotifsInCommunities;
+  long long numberMotifsInCommunities;
+  long long degreeMotifsInCommunities;
 };
 
 struct MotifValues {
-  long numberMotifsInCommunities;
-  long numberMotifsInGraph;
-  long degreeMotifsInCommunities; 
-  long degreeMotifsRandomGraph;  
+  long long numberMotifsInCommunities;
+  long long numberMotifsInGraph;
+  long long degreeMotifsInCommunities; 
+  long long degreeMotifsRandomGraph;  
 };
 
 class CLI
@@ -111,7 +111,7 @@ private:
    */
   static double motifModularityFromValues(MotifValues values);
   static double motifModularityFromValues(MotifConstantValues cValues, MotifVariableValues vValues);
-  static double motifModularityFromValues(long v1, long v2, long v3, long v4);
+  static double motifModularityFromValues(long long v1, long long v2, long long v3, long long v4);
 
   /**
    * Basic helper operation functions
