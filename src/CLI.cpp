@@ -233,12 +233,14 @@ void CLI::start(int argc, char **argv)
     MotifValues values = CLI::optimizedMotifModularityValues();
     cout << "Optimized motif Modularity values: " << CLI::motifModularityFromValues(values) << endl << "Total: " << total << endl;
     printMotifValues(values);
+    CLI::optimizedMotifModularityNeighboursValues();
 
     total = 0;
     MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
     MotifVariableValues motifVariableValues = CLI::getMotifVariableValues();
     double constantValuesMotifModularity = CLI::motifModularityFromValues(motifConstantValues, motifVariableValues);
     printf("Optimized Motif modularity with constant values: %f\n", constantValuesMotifModularity);
+
 
     int changingNode = 1;
 
@@ -830,7 +832,7 @@ MotifValues CLI::changingNodeMotifValues(MotifValues allPreviousValues, MotifVar
  * ---------------------------
  */
 
-// WILL ONE WORK WITH CONNECTED MOTIFS
+// WILL ONLY WORK WITH CONNECTED MOTIFS
 double CLI::optimizedMotifModularityNeighbours()
 {
     MotifValues values = optimizedMotifModularityNeighboursValues();
@@ -839,32 +841,39 @@ double CLI::optimizedMotifModularityNeighbours()
 
 MotifValues CLI::optimizedMotifModularityNeighboursValues()
 {
+    CLI::setNodes();
     MotifValues values;
+    values.numberMotifsInCommunities = 0;
     // which node to choose first?
     // do I need to choose all?    
     for(int i = 0; i < g->numNodes(); ++i)
     {
         used[i] = true;
         combination.push_back(i);
-        CLI::optimizedMotifModularityNeighboursValuesIteration(&values);
+        CLI::motifsInsidePartition(&values);
         combination.pop_back();
         used[i] = false;
     }
+    cout << "Motifs inside communities: " << values.numberMotifsInCommunities << endl;
+    return values;
 }
 
-void CLI::optimizedMotifModularityNeighboursValuesIteration(MotifValues *values)
+void CLI::motifsInsidePartition(MotifValues *values)
 {
     if(combination.size() == motif.getSize())
     {
-
+        values->numberMotifsInCommunities += 1;
     }
     else
     {
+        int nodeWithLeastNeighbours;
+        vector<int> neighbours;
+
         if(motif.isDirected())
         {
             int bestInNode;
             int bestInNodeNeighbours;
-            bool hasOneInNode = false
+            bool hasOneInNode = false;
             // check all nodes in the motif that are connected to the new node
             vector<int> inNeighbours = motif.getInNeighboursWithOrder(combination.size());
             // then with that list, check how many neighbours each has
@@ -873,7 +882,7 @@ void CLI::optimizedMotifModularityNeighboursValuesIteration(MotifValues *values)
                 int neighbour = inNeighbours[i];
                 if(neighbour < combination.size())
                 {
-                    int neighboursCount = g->nodeOutEdges(combination[neighbour])
+                    int neighboursCount = g->nodeOutEdges(combination[neighbour]);
                     if(!hasOneInNode)
                     {
                         bestInNodeNeighbours = neighboursCount;
@@ -889,7 +898,7 @@ void CLI::optimizedMotifModularityNeighboursValuesIteration(MotifValues *values)
             }
             int bestOutNode;
             int bestOutNodeNeighbours;
-            bool hasOneOutNode = false
+            bool hasOneOutNode = false;
             // check all nodes in the motif that are connected to the new node
             vector<int> outNeighbours = motif.getOutNeighboursWithOrder(combination.size());
             // then with that list, check how many neighbours each has
@@ -898,7 +907,7 @@ void CLI::optimizedMotifModularityNeighboursValuesIteration(MotifValues *values)
                 int neighbour = outNeighbours[i];
                 if(neighbour < combination.size())
                 {
-                    int neighboursCount = g->nodeInEdges(combination[neighbour])
+                    int neighboursCount = g->nodeInEdges(combination[neighbour]);
                     if(!hasOneOutNode)
                     {
                         bestOutNodeNeighbours = neighboursCount;
@@ -912,8 +921,92 @@ void CLI::optimizedMotifModularityNeighboursValuesIteration(MotifValues *values)
                     }
                 }
             }
-            //need to test this
-        //what node to choose?
+
+            if(hasOneInNode && hasOneOutNode)
+            {
+                if(bestOutNodeNeighbours < bestInNodeNeighbours)
+                {
+                    nodeWithLeastNeighbours = bestOutNode;
+                    neighbours = *(g->outEdges(bestOutNode));
+                }
+                else
+                {
+                    nodeWithLeastNeighbours = bestInNode;
+                    neighbours = *(g->inEdges(bestInNode));
+                }
+            }
+            else if (hasOneInNode)
+            {
+                nodeWithLeastNeighbours = bestInNode;
+                neighbours = *(g->inEdges(bestInNode));
+            }
+            else 
+            {
+                nodeWithLeastNeighbours = bestOutNode;
+                neighbours = *(g->outEdges(bestOutNode));
+            }
+        }
+        else
+        {
+            int bestNode;
+            int bestNodeNeighbours;
+            bool hasOneNode = false;
+            // check all nodes in the motif that are connected to the new node
+            vector<int> motifNeighbours = motif.getNeighboursWithOrder(combination.size());
+            // then with that list, check how many neighbours each has
+            for(int i = 0; i < motifNeighbours.size(); ++i)
+            {
+                int neighbour = motifNeighbours[i];
+                if(neighbour < combination.size())
+                {
+                    int neighboursCount = g->numNeighbours(combination[neighbour]);
+                    if(!hasOneNode || neighboursCount < bestNodeNeighbours)
+                    {
+                        bestNodeNeighbours = neighboursCount;
+                        bestNode = combination[neighbour];
+                        hasOneNode = true;
+                    }
+                }
+            }
+
+            nodeWithLeastNeighbours = bestNode;
+            neighbours = *(g->neighbours(nodeWithLeastNeighbours));
+        }
+
+        for(int i = 0; i < neighbours.size(); ++i)
+        {
+            int currentNode = neighbours[i];
+            if(!used[currentNode])
+            {
+                used[currentNode] = true;
+                combination.push_back(nodes[currentNode]);
+                // cut down on simetric motif
+                if(!optimizedCombinationOrbitRules()){
+                    combination.pop_back();
+                    used[currentNode] = false;
+                    continue;
+                } 
+
+                bool edgesCheck = optimizedCombinationHasMotifEdges();
+                if(!edgesCheck)
+                {
+                    combination.pop_back();
+                    used[currentNode] = false;
+                    continue; 
+                }
+
+                bool communitiesCheck = optimizedCombinationHasMotifCommunities();
+                if(!communitiesCheck)
+                {
+                    combination.pop_back();
+                    used[currentNode] = false;
+                    continue;
+                }
+
+                CLI::motifsInsidePartition(values);
+                combination.pop_back();
+                used[currentNode] = false;
+            }
         }
     }
 }

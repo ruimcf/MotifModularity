@@ -525,7 +525,7 @@ bool Motif::hasEdgeWithOrder(int nodeA, int nodeB)
     return Motif::hasEdge(orderedNodeA, orderedNodeB);
 }
 
-vector<int> Motif::getNeighbours(int node)
+std::vector<int> Motif::getNeighbours(int node)
 {
     vector<int> neighbours;
     for(int i = 0; i < size; ++i)
@@ -535,7 +535,7 @@ vector<int> Motif::getNeighbours(int node)
     return neighbours;
 }
 
-vector<int> Motif::getNeighboursWithOrder(int node)
+std::vector<int> Motif::getNeighboursWithOrder(int node)
 {
     vector<int> neighbours;
     for(int i = 0; i < size; ++i)
@@ -545,7 +545,7 @@ vector<int> Motif::getNeighboursWithOrder(int node)
     return neighbours;
 }
 
-vector<int> Motif::getInNeighbours(int node)
+std::vector<int> Motif::getInNeighbours(int node)
 {
     vector<int> neighbours;
     for(int i = 0; i < size; ++i)
@@ -555,7 +555,7 @@ vector<int> Motif::getInNeighbours(int node)
     return neighbours;
 }
 
-vector<int> Motif::getInNeighboursWithOrder(int node)
+std::vector<int> Motif::getInNeighboursWithOrder(int node)
 {
     vector<int> neighbours;
     for(int i = 0; i < size; ++i)
@@ -564,7 +564,7 @@ vector<int> Motif::getInNeighboursWithOrder(int node)
 
     return neighbours;
 }
-vector<int> Motif::getOutNeighbours(int node)
+std::vector<int> Motif::getOutNeighbours(int node)
 {
     vector<int> neighbours;
     for(int i = 0; i < size; ++i)
@@ -574,7 +574,7 @@ vector<int> Motif::getOutNeighbours(int node)
     return neighbours;
 }
 
-vector<int> Motif::getOutNeighboursWithOrder(int node)
+std::vector<int> Motif::getOutNeighboursWithOrder(int node)
 {
     vector<int> neighbours;
     for(int i = 0; i < size; ++i)
