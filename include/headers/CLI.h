@@ -99,6 +99,14 @@ private:
   static double optimizedMotifModularityNeighbours();
   static MotifValues optimizedMotifModularityNeighboursValues();
   static void motifsInsidePartition(MotifValues *values);
+  static void motifsInsideGraph(MotifValues *values);
+  static void degreeInsideGraph(int offset, MotifValues *ptr);
+  static void degreeInsidePartition(int offset, MotifValues *values);
+  static void motifsInside(bool communitiesCheck, MotifValues *values);
+  static void degreeInside(int offset, bool communitiesCheck, MotifValues *values);
+  static void motifsInsidePartitionNoNeighbours(int offset, MotifValues *values);
+  static void motifsInsideGraphNoNeighbours(int offset, MotifValues *values);
+  static void motifsInsideNoNeighbours(int offset, bool communitiesCheck, MotifValues *values);
 
   /**
    *  The same as above, but we know that only one of the nodes changed
