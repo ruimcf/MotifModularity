@@ -590,13 +590,13 @@ bool CLI::optimizedCombinationHasMotifEdges()
         // also check the opposite orientation if the motif is directed
         if(motif.isDirected())
         {
-            if(motif.hasEdgeWithOrder(addedNodePos, i)) 
+            if(motif.hasEdgeWithOrder(i, addedNodePos)) 
             {
-                if(!g->hasEdge(combination[addedNodePos], combination[i]))
+                if(!g->hasEdge(combination[i], combination[addedNodePos]))
                     return false;
             } 
             else 
-                if(g->hasEdge(combination[addedNodePos], combination[i]))
+                if(g->hasEdge(combination[i], combination[addedNodePos]))
                     return false;
         }
     } 
