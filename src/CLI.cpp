@@ -223,9 +223,9 @@ void CLI::start(int argc, char **argv)
     // double modularity = CLI::triangleModularity();
     // printf("Triangle modularity: %f\nTotal: %d\n", modularity, total);
 
-    total = 0;
-    double motifModularity = CLI::motifModularity();
-    printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
+    // total = 0;
+    // double motifModularity = CLI::motifModularity();
+    // printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
 
     total = 0;
     double optimizedMotifModularity = CLI::optimizedMotifModularity();
@@ -522,10 +522,15 @@ void CLI::optimizedMotifModularityValuesIteration(int offset, bool edgesCheck, b
         int combinationWeights = CLI::combinationNullcaseWeights();
 
         if(edgesCheck && communitiesCheck)
+        {
             values->numberMotifsInCommunities += 1;
+            printVector(combination, "Combination");
+        }
 
         if(edgesCheck)
+        {
             values->numberMotifsInGraph += 1;
+        }
 
         if(communitiesCheck)
             values->degreeMotifsInCommunities += combinationWeights;
@@ -619,7 +624,8 @@ bool CLI::optimizedCombinationHasMotifCommunities()
 
         // If the communities are different in the motif, they have
         // to be different in the partition
-        if (motif.getCommunityWithOrder(i) != motif.getCommunityWithOrder(addedNodePos)){
+        if (motif.getCommunityWithOrder(i) != motif.getCommunityWithOrder(addedNodePos))
+        {
             if(CLI::kronecker(combination[i], combination[addedNodePos]))
                 return false;
         }
@@ -857,7 +863,7 @@ double CLI::singleNodeGreedyAlgorithm()
     double bestModularity, currentModularity;
     vector<int> allNodes;
 
-    numPartitions = 4;
+    numPartitions = 3;
     // numPartitions = numberForEvenTrianglePartitions(g->numNodes());
     networkPartition.randomPartition(numPartitions);
     MotifValues currentValues = CLI::optimizedMotifModularityValues();
