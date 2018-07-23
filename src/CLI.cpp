@@ -863,7 +863,7 @@ double CLI::singleNodeGreedyAlgorithm()
     double bestModularity, currentModularity;
     vector<int> allNodes;
 
-    numPartitions = 3;
+    numPartitions = 2;
     // numPartitions = numberForEvenTrianglePartitions(g->numNodes());
     networkPartition.randomPartition(numPartitions);
     MotifValues currentValues = CLI::optimizedMotifModularityValues();
@@ -921,6 +921,8 @@ double CLI::singleNodeGreedyAlgorithm()
             ss << "Times failed: " << failObject.getConsecutiveTimesFailed() << endl;
             ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
             cout << ss.str();
+            printMotifValues(betterValues);
+            cout << "-----------" << endl;
             writeLineToFile(ss.str());
 
             failObject.recordSuccess();
@@ -932,6 +934,7 @@ double CLI::singleNodeGreedyAlgorithm()
     ss << "Best modularity: " << currentModularity << endl;
     ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
     cout << ss.str();
+    
     writeLineToFile(ss.str());
 
     return currentModularity;
