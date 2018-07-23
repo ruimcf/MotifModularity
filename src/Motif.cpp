@@ -458,6 +458,7 @@ void Motif::createNodesOrder()
     {
         int nextBestNode;
         int nextBestNodeDegree = 0;
+        bool hasNextBestNode = false;
         for(int currentNode = 0; currentNode < size; ++currentNode)
         {
             if(availableNodes.at(currentNode))
@@ -474,18 +475,27 @@ void Motif::createNodesOrder()
                             nodeDegree += 1;
                 }
 
-                if(nodeDegree > nextBestNodeDegree)
+                if(hasNextBestNode)
                 {
-                    nextBestNode = currentNode;
-                    nextBestNodeDegree = nodeDegree;
-                }
-                else if (nodeDegree == nextBestNodeDegree)
-                {
-                    if(getNodeDegree(currentNode) > getNodeDegree(nextBestNode))
+                    if(nodeDegree > nextBestNodeDegree)
                     {
                         nextBestNode = currentNode;
                         nextBestNodeDegree = nodeDegree;
                     }
+                    else if (nodeDegree == nextBestNodeDegree)
+                    {
+                        if(getNodeDegree(currentNode) > getNodeDegree(nextBestNode))
+                        {
+                            nextBestNode = currentNode;
+                            nextBestNodeDegree = nodeDegree;
+                        }
+                    }
+                }
+                else 
+                {
+                    nextBestNode = currentNode;
+                    nextBestNodeDegree = nodeDegree;
+                    hasNextBestNode = true;
                 }
             }
         }

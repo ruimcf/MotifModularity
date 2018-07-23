@@ -209,7 +209,7 @@ std::string CommunityPartition::toStringPartitionByNode()
 
     for(int i = 0; i < numberNodes; i++)
     {
-        ss << arrayPartition[i] << "\t";
+        ss << arrayPartition[i] << " ";
     }
 
     return ss.str();

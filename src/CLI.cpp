@@ -223,9 +223,9 @@ void CLI::start(int argc, char **argv)
     // double modularity = CLI::triangleModularity();
     // printf("Triangle modularity: %f\nTotal: %d\n", modularity, total);
 
-    total = 0;
-    double motifModularity = CLI::motifModularity();
-    printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
+    // total = 0;
+    // double motifModularity = CLI::motifModularity();
+    // printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
 
     total = 0;
     double optimizedMotifModularity = CLI::optimizedMotifModularity();
@@ -522,10 +522,15 @@ void CLI::optimizedMotifModularityValuesIteration(int offset, bool edgesCheck, b
         int combinationWeights = CLI::combinationNullcaseWeights();
 
         if(edgesCheck && communitiesCheck)
+        {
             values->numberMotifsInCommunities += 1;
+            printVector(combination, "Combination");
+        }
 
         if(edgesCheck)
+        {
             values->numberMotifsInGraph += 1;
+        }
 
         if(communitiesCheck)
             values->degreeMotifsInCommunities += combinationWeights;
@@ -590,13 +595,13 @@ bool CLI::optimizedCombinationHasMotifEdges()
         // also check the opposite orientation if the motif is directed
         if(motif.isDirected())
         {
-            if(motif.hasEdgeWithOrder(addedNodePos, i)) 
+            if(motif.hasEdgeWithOrder(i, addedNodePos)) 
             {
-                if(!g->hasEdge(combination[addedNodePos], combination[i]))
+                if(!g->hasEdge(combination[i], combination[addedNodePos]))
                     return false;
             } 
             else 
-                if(g->hasEdge(combination[addedNodePos], combination[i]))
+                if(g->hasEdge(combination[i], combination[addedNodePos]))
                     return false;
         }
     } 
@@ -619,7 +624,8 @@ bool CLI::optimizedCombinationHasMotifCommunities()
 
         // If the communities are different in the motif, they have
         // to be different in the partition
-        if (motif.getCommunityWithOrder(i) != motif.getCommunityWithOrder(addedNodePos)){
+        if (motif.getCommunityWithOrder(i) != motif.getCommunityWithOrder(addedNodePos))
+        {
             if(CLI::kronecker(combination[i], combination[addedNodePos]))
                 return false;
         }
@@ -857,7 +863,7 @@ double CLI::singleNodeGreedyAlgorithm()
     double bestModularity, currentModularity;
     vector<int> allNodes;
 
-    numPartitions = 4;
+    numPartitions = 2;
     // numPartitions = numberForEvenTrianglePartitions(g->numNodes());
     networkPartition.randomPartition(numPartitions);
     MotifValues currentValues = CLI::optimizedMotifModularityValues();
@@ -915,6 +921,8 @@ double CLI::singleNodeGreedyAlgorithm()
             ss << "Times failed: " << failObject.getConsecutiveTimesFailed() << endl;
             ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
             cout << ss.str();
+            printMotifValues(betterValues);
+            cout << "-----------" << endl;
             writeLineToFile(ss.str());
 
             failObject.recordSuccess();
@@ -926,6 +934,7 @@ double CLI::singleNodeGreedyAlgorithm()
     ss << "Best modularity: " << currentModularity << endl;
     ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
     cout << ss.str();
+    
     writeLineToFile(ss.str());
 
     return currentModularity;

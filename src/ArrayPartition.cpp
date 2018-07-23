@@ -89,7 +89,7 @@ std::string ArrayPartition::toStringPartitionByNode()
     std::stringstream ss;
     for(int i = 0; i < numberNodes; i++)
     {
-        ss << std::to_string(partition[i]);
+        ss << std::to_string(partition[i]) << " ";
     }
 
     return ss.str();
