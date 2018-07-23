@@ -21,14 +21,29 @@ Motif CLI::motif;
 int total = 0;
 double bestModularity;
 int *bestPartition;
+int CLI::numberOfCommunities;
+bool CLI::hasNumberOfCommunities;
 
 /**
  * -----------------------
  * --- PARSE ARGUMENTS ---
  * -----------------------
  */
-void CLI::parseArgs(int argc, char **argv)
+int CLI::parseArgs(int argc, char **argv)
 {
+    if (argc < 3)
+    {
+        printf("Use with more arg");
+        return -1;
+    }
+
+    readPartition = false;
+    readMotif = false;
+    directed = false;
+    weighted = false;
+    hasNumberOfCommunities = false;
+    seed = time(NULL);
+
     for (int i = 1; i < argc; ++i)
     {
         string arg = argv[i];
@@ -53,7 +68,7 @@ void CLI::parseArgs(int argc, char **argv)
             if (++i > argc)
             {
                 cout << "partition few args" << endl;
-                return;
+                return -1;
             }
             readPartition = true;
             partitionFile = argv[i];
@@ -63,7 +78,7 @@ void CLI::parseArgs(int argc, char **argv)
             if (++i > argc)
             {
                 cout << "network few args" << endl;
-                return;
+                return -1;
             }
             networkFile = argv[i];
         }
@@ -72,7 +87,7 @@ void CLI::parseArgs(int argc, char **argv)
             if (++i >= argc)
             {
                 cout << "seed few args" << endl;
-                return;
+                return -1;
             }
             cout << i << " " << argc << endl;
             seed = atoi(argv[i]);
@@ -83,12 +98,36 @@ void CLI::parseArgs(int argc, char **argv)
             if (++i > argc)
             {
                 cout << "motif few args" << endl;
-                return;
+                return -1;
             }
             readMotif = true;
             motifFile = argv[i];
         }
+        else if (arg == "--number-of-communities" || arg == "-nc")
+        {
+            if (++i > argc)
+            {
+                cout << "number of communities few args" << endl;
+                return -1;
+            }
+            hasNumberOfCommunities = true;
+            numberOfCommunities = stoi(argv[i]);
+        }
     }
+
+    if(!hasNumberOfCommunities)
+    {
+        cout << "Please provide number of communities, ex.: '--number-of-communities 3'" << endl;
+        return -1;
+    }
+
+    if (networkFile.empty())
+    {
+        cout << "no network given" << endl;
+        return -1;
+    }
+
+    return 1;
 }
 
 /**
@@ -174,27 +213,14 @@ void printMotifConstantValues(MotifConstantValues values)
 
 void CLI::start(int argc, char **argv)
 {
-    if (argc < 3)
-    {
-        printf("Use with more arg");
-        return;
-    }
-    readPartition = false;
-    readMotif = false;
-    directed = false;
-    weighted = false;
-    seed = time(NULL);
-    CLI::parseArgs(argc, argv);
+    int parseResult = CLI::parseArgs(argc, argv);
+    if(parseResult < 0) return;
+
     CLI::openResultsFile();
     cout << "SEED: " << seed << endl;
     CLI::writeLineToFile("SEED: " + to_string(seed) + "\n");
     Random::seed(seed);
     g = new GraphMatrix();
-    if (networkFile.empty())
-    {
-        cout << "no network given" << endl;
-        return;
-    }
     GraphUtils::readFileTxt(g, networkFile.c_str(), directed, weighted);
     int n = g->numNodes();
     networkPartition.setNumberNodes(n);
@@ -524,7 +550,6 @@ void CLI::optimizedMotifModularityValuesIteration(int offset, bool edgesCheck, b
         if(edgesCheck && communitiesCheck)
         {
             values->numberMotifsInCommunities += 1;
-            printVector(combination, "Combination");
         }
 
         if(edgesCheck)
@@ -858,14 +883,12 @@ int numberForEvenTrianglePartitions(int numNodes)
 double CLI::singleNodeGreedyAlgorithm()
 {
     cout << "--- Starting greedy ---" << endl;
-    int chosenNode, chosenIndex, chosenNodePartition, betterPartition, numPartitions;
+    int chosenNode, chosenIndex, chosenNodePartition, betterPartition;
     MotifValues betterValues;
     double bestModularity, currentModularity;
     vector<int> allNodes;
 
-    numPartitions = 2;
-    // numPartitions = numberForEvenTrianglePartitions(g->numNodes());
-    networkPartition.randomPartition(numPartitions);
+    networkPartition.randomPartition(numberOfCommunities);
     MotifValues currentValues = CLI::optimizedMotifModularityValues();
     currentModularity = CLI::motifModularityFromValues(currentValues);
 
@@ -890,7 +913,7 @@ double CLI::singleNodeGreedyAlgorithm()
         betterPartition = -1;
         //before change get values
         MotifVariableValues beforeChangeNodeValues = CLI::nodeVariableValues(chosenNode); 
-        for (int i = 0; i < numPartitions; i++)
+        for (int i = 0; i < numberOfCommunities; i++)
         {
             if (i != chosenNodePartition)
             {
@@ -947,13 +970,12 @@ double CLI::singleNodeGreedyAlgorithm()
 double CLI::singleNodeTestAllGreedyAlgorithm()
 {
     cout << "--- Starting greedy test all ---" << endl;
-    int chosenNode, chosenIndex, chosenNodePartition, numPartitions;
+    int chosenNode, chosenIndex, chosenNodePartition;
     double bestModularity, currentModularity;
     vector<int> allNodes;
     MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
 
-    numPartitions = 4;
-    networkPartition.randomPartition(numPartitions);
+    networkPartition.randomPartition(numberOfCommunities);
 
     currentModularity = CLI::optimizedMotifModularity();
     cout << "Current Modularity " << currentModularity << endl;
@@ -975,7 +997,7 @@ double CLI::singleNodeTestAllGreedyAlgorithm()
         {
             chosenNode = availableNodes[chosenIndex];
             chosenNodePartition = networkPartition.getNodeCommunity(chosenNode);
-            for (int i = 0; i < numPartitions; i++)
+            for (int i = 0; i < numberOfCommunities; i++)
             {
                 if (i != chosenNodePartition)
                 {

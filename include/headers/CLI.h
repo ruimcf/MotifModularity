@@ -46,7 +46,9 @@ private:
   static int seed;
   static Motif motif;
   static void setNodes();
-  static void parseArgs(int argc, char **argv);
+  static int parseArgs(int argc, char **argv);
+  static int numberOfCommunities;
+  static bool hasNumberOfCommunities;
 
   /**
    * Classic triangleModularity
