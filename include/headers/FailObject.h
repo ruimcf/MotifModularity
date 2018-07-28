@@ -9,6 +9,7 @@ public:
   void recordSuccess();
   bool finished();
   int getConsecutiveTimesFailed() { return consecutiveTimesFailed; };
+  int getTimesSuccess();
 
 protected:
   int totalTimesFailed;

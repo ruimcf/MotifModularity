@@ -27,6 +27,8 @@ public:
   std::vector<int> getPartitionByNode();
   std::string toStringPartitionByNode();
 
+  int getNumberOfDifferentPartitions();
+
   // std::string toStringPartitionByCommunity();
 
   void writePartitionFile(std::string name);

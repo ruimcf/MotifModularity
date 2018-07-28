@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 
 ArrayPartition::ArrayPartition(int a)
 {
@@ -109,4 +110,18 @@ void ArrayPartition::writePartitionFile(std::string name){
     }
 
     cout << "Wrote partition to file " << filePath << endl;
+}
+
+int ArrayPartition::getNumberOfDifferentPartitions()
+{
+    vector<int> differentPartitions;
+    differentPartitions.reserve(numberNodes);
+    for(int i = 0; i < numberNodes; ++i)
+    {
+        if(find(differentPartitions.begin(), differentPartitions.end(), partition[i]) == differentPartitions.end())
+        {
+            differentPartitions.push_back(partition[i]);
+        }
+    }
+    return differentPartitions.size();
 }

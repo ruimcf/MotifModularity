@@ -36,3 +36,8 @@ bool FailObject::finished()
         return false;
     }
 }
+
+int FailObject::getTimesSuccess()
+{
+    return totalTimesSuccess;
+}
