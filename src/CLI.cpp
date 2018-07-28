@@ -127,6 +127,11 @@ int CLI::parseArgs(int argc, char **argv)
         return -1;
     }
 
+    if (!readMotif){
+        cout << "please provide a motif file" << endl;
+        return -1;
+    }
+
     return 1;
 }
 
@@ -140,7 +145,7 @@ void CLI::openResultsFile()
 {
     //clear file if it exists
     string resultPath = "results/" + networkFile;
-    resultsFile.open(resultPath, ios::trunc);
+    resultsFile.open(resultPath, ios::out | ios::app);
     if (resultsFile.is_open())
     {
         cout << "Opened file for results " << resultPath << endl;
@@ -172,12 +177,12 @@ void CLI::setNodes()
     combination.clear();
     combination.reserve(g->numNodes());
     used.assign(g->numNodes(), false);
-    nodes.clear();
-    nodes.reserve(g->numNodes());
-    for (int i = 0; i < g->numNodes(); ++i)
-    {
-        nodes.push_back(i);
-    }
+    // nodes.clear();
+    // nodes.reserve(g->numNodes());
+    // for (int i = 0; i < g->numNodes(); ++i)
+    // {
+    //     nodes.push_back(i);
+    // }
 }
 
 /**
@@ -217,23 +222,20 @@ void CLI::start(int argc, char **argv)
     if(parseResult < 0) return;
 
     CLI::openResultsFile();
-    cout << "SEED: " << seed << endl;
-    CLI::writeLineToFile("SEED: " + to_string(seed) + "\n");
+    string argsInfo = "Number of Communities: " + to_string(numberOfCommunities) + " | Motif: " + motifFile + " | SEED: " + to_string(seed) + "\n";
+    CLI::writeLineToFile(argsInfo);
+
     Random::seed(seed);
+
     g = new GraphMatrix();
     GraphUtils::readFileTxt(g, networkFile.c_str(), directed, weighted);
-    int n = g->numNodes();
-    networkPartition.setNumberNodes(n);
+
+    networkPartition.setNumberNodes(g->numNodes());
 
     motif.readFromFile(motifFile);
     motif.print();
-    if (!readMotif){
-        cout << "please provide a motif file" << endl;
-        return;
-    }
 
-
-    printf("Num nodes: %d\n", g->numNodes());
+    /*
     if (readPartition)
     {
         networkPartition.readPartition(partitionFile.c_str());
@@ -279,9 +281,9 @@ void CLI::start(int argc, char **argv)
     MotifVariableValues changedNodeValues = CLI::nodeVariableValues(changingNode);
     MotifValues changingNodeMotifValuesValues = changingNodeMotifValues(values, toChangeNodeValues, changedNodeValues);
     cout << "Calculated Changing Node modularity: " << CLI::motifModularityFromValues(changingNodeMotifValuesValues) << endl;
- 
-    getchar();
-
+*/ 
+    nodes.clear();
+    nodes.reserve(g->numNodes());
     for (int i = 0; i < g->numNodes(); i++)
     {
         nodes.push_back(i);
@@ -291,7 +293,8 @@ void CLI::start(int argc, char **argv)
     CLI::singleNodeGreedyAlgorithm();
     clock_t end = clock();
     double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
-    cout << "Elapsed seconds: " << elapsedSecs << endl;
+    cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
+    CLI::writeLineToFile("Elapsed seconds: " + to_string(elapsedSecs) + "\n\n");
     CLI::closeResultsFile();
 }
 
@@ -883,6 +886,7 @@ int numberForEvenTrianglePartitions(int numNodes)
 double CLI::singleNodeGreedyAlgorithm()
 {
     cout << "--- Starting greedy ---" << endl;
+    writeLineToFile("-Single Node Greedy Algorithm-\n");
     int chosenNode, chosenIndex, chosenNodePartition, betterPartition;
     MotifValues betterValues;
     double bestModularity, currentModularity;
@@ -939,14 +943,14 @@ double CLI::singleNodeGreedyAlgorithm()
         {
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
             currentValues = betterValues;
-            stringstream ss;
-            ss << "Current modularity: " << currentModularity << endl;
-            ss << "Times failed: " << failObject.getConsecutiveTimesFailed() << endl;
-            ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
-            cout << ss.str();
-            printMotifValues(betterValues);
-            cout << "-----------" << endl;
-            writeLineToFile(ss.str());
+            // stringstream ss;
+            // ss << "Current modularity: " << currentModularity << endl;
+            // ss << "Times failed: " << failObject.getConsecutiveTimesFailed() << endl;
+            // ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
+            // cout << ss.str();
+            // printMotifValues(betterValues);
+            // cout << "-----------" << endl;
+            // writeLineToFile(ss.str());
 
             failObject.recordSuccess();
             availableNodes = allNodes;
@@ -954,8 +958,10 @@ double CLI::singleNodeGreedyAlgorithm()
     }
 
     stringstream ss;
+    ss << "Successfuly incremented modularity " << failObject.getTimesSuccess() << " times" << endl;
     ss << "Best modularity: " << currentModularity << endl;
     ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
+    ss << "Number of unique communities: " + to_string(networkPartition.getNumberOfDifferentPartitions()) << endl;
     cout << ss.str();
     
     writeLineToFile(ss.str());
@@ -1021,11 +1027,11 @@ double CLI::singleNodeTestAllGreedyAlgorithm()
         {
             networkPartition.setNodeCommunity(bestNodeToChange, bestCommunity);
 
-            stringstream ss;
-            ss << "Current modularity: " << currentModularity << endl;
-            ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
-            cout << ss.str();
-            writeLineToFile(ss.str());
+            // stringstream ss;
+            // ss << "Current modularity: " << currentModularity << endl;
+            // ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
+            // cout << ss.str();
+            // writeLineToFile(ss.str());
         }
     }
 
