@@ -316,6 +316,11 @@ void Motif::calculateOrbitsIteration(int pos)
                         }
                     }
 
+                // check communities
+                if (ok)
+                    if (communities[perm[pos]] != communities[pos])
+                        ok = false;
+
                 // check the orbit rules up to now
                 if (ok)
                     for (int j = 0; j < orbitRulesSize[pos].size(); ++j)
@@ -341,6 +346,7 @@ void Motif::calculateOrbitsIteration(int pos)
 
 bool Motif::fixOneNode()
 {
+    // On each column (this is, a motif node position), check if there is more than one more possible there 
     for(int i = 0; i < size; ++i)
     {
         bool hasFixedOneNode = false;

@@ -35,6 +35,7 @@ private:
   static ArrayPartition networkPartition;
   static vector<int> nodes;
   static vector<int> combination;
+  static vector<long> combinationWeightsArray;
   static vector<bool> used;
   static bool directed;
   static bool weighted;
@@ -85,6 +86,8 @@ private:
   static bool optimizedCombinationHasMotifEdges();
   static bool optimizedCombinationHasMotifCommunities();
   static bool optimizedCombinationOrbitRules();
+  static int getOrbitRulesNextValidNode();
+  static void nextCombinationNullcaseWeights();
 
   /**
    * For the same graph, different partitions have some constant values
