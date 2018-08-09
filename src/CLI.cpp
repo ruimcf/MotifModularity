@@ -9,6 +9,7 @@ int __number = 0;
 Graph *CLI::g;
 vector<int> CLI::nodes;
 vector<int> CLI::combination;
+vector<long> CLI::combinationWeightsArray;
 vector<bool> CLI::used;
 bool CLI::directed, CLI::weighted, CLI::readPartition, CLI::readMotif;
 string CLI::networkFile;
@@ -18,7 +19,7 @@ string CLI::motifFile;
 int CLI::seed;
 ArrayPartition CLI::networkPartition;
 Motif CLI::motif;
-int total = 0;
+long total = 0;
 double bestModularity;
 int *bestPartition;
 int CLI::numberOfCommunities;
@@ -176,6 +177,8 @@ void CLI::setNodes()
 {
     combination.clear();
     combination.reserve(g->numNodes());
+    combinationWeightsArray.clear();
+    combinationWeightsArray.reserve(g->numNodes());
     used.assign(g->numNodes(), false);
     // nodes.clear();
     // nodes.reserve(g->numNodes());
@@ -235,7 +238,7 @@ void CLI::start(int argc, char **argv)
     motif.readFromFile(motifFile);
     motif.print();
 
-    /*
+    
     if (readPartition)
     {
         networkPartition.readPartition(partitionFile.c_str());
@@ -243,51 +246,58 @@ void CLI::start(int argc, char **argv)
         // networkPartition.writePartitionFile(networkFile);
     }
     else {
-        networkPartition.randomPartition(2);
+        networkPartition.randomPartition(numberOfCommunities);
         cout << "Partition created: " << networkPartition.toStringPartitionByNode() << endl;
     }
-
-    // total = 0;
-    // double modularity = CLI::triangleModularity();
-    // printf("Triangle modularity: %f\nTotal: %d\n", modularity, total);
-
-    // total = 0;
-    // double motifModularity = CLI::motifModularity();
-    // printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
-
-    total = 0;
-    double optimizedMotifModularity = CLI::optimizedMotifModularity();
-    printf("Optimized Motif modularity: %f\nTotal: %d\n", optimizedMotifModularity, total);
-
-    total = 0;
-    MotifValues values = CLI::optimizedMotifModularityValues();
-    cout << "Optimized motif Modularity values: " << CLI::motifModularityFromValues(values) << endl << "Total: " << total << endl;
-    printMotifValues(values);
-
-    total = 0;
-    MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
-    MotifVariableValues motifVariableValues = CLI::getMotifVariableValues();
-    double constantValuesMotifModularity = CLI::motifModularityFromValues(motifConstantValues, motifVariableValues);
-    printf("Optimized Motif modularity with constant values: %f\n", constantValuesMotifModularity);
-
-    int changingNode = 1;
-
-    MotifVariableValues toChangeNodeValues = CLI::nodeVariableValues(changingNode);
-    networkPartition.setNodeCommunity(changingNode, 1);
-    cout << "CHANGED" << endl;
-    total = 0;
-    MotifValues newValues = CLI::optimizedMotifModularityValues();
-    cout << "Modularity: " << motifModularityFromValues(newValues) << endl << " Total: " << total << endl;
-    MotifVariableValues changedNodeValues = CLI::nodeVariableValues(changingNode);
-    MotifValues changingNodeMotifValuesValues = changingNodeMotifValues(values, toChangeNodeValues, changedNodeValues);
-    cout << "Calculated Changing Node modularity: " << CLI::motifModularityFromValues(changingNodeMotifValuesValues) << endl;
-*/ 
+ 
     nodes.clear();
     nodes.reserve(g->numNodes());
     for (int i = 0; i < g->numNodes(); i++)
     {
         nodes.push_back(i);
     }
+
+    // total = 0;
+    // double modularity = CLI::triangleModularity();
+    // printf("Triangle modularity: %f\nTotal: %ld\n", modularity, total);
+
+    // total = 0;
+    // double motifModularity = CLI::motifModularity();
+    // printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
+
+    // total = 0;
+    // double optimizedMotifModularity = CLI::optimizedMotifModularity();
+    // printf("Optimized Motif modularity: %f\nTotal: %ld\n", optimizedMotifModularity, total);
+
+    // for(int i = 0; i < 5; ++i)
+    // {
+    //     total = 0;
+    //     clock_t begin_ = clock();
+    //     MotifValues values = CLI::optimizedMotifModularityValues();
+    //     cout << "Optimized motif Modularity values: " << CLI::motifModularityFromValues(values) << endl << "Total: " << total << endl;
+    //     printMotifValues(values);
+    //     clock_t end_ = clock();
+    //     double elapsedSecs_ = double(end_ - begin_) / CLOCKS_PER_SEC;
+    //     cout << "Elapsed seconds: " << elapsedSecs_ << endl << endl;
+    // }
+
+    // total = 0;
+    // MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
+    // MotifVariableValues motifVariableValues = CLI::getMotifVariableValues();
+    // double constantValuesMotifModularity = CLI::motifModularityFromValues(motifConstantValues, motifVariableValues);
+    // printf("Optimized Motif modularity with constant values: %f\n", constantValuesMotifModularity);
+
+    // int changingNode = 1;
+
+    // MotifVariableValues toChangeNodeValues = CLI::nodeVariableValues(changingNode);
+    // networkPartition.setNodeCommunity(changingNode, 1);
+    // cout << "CHANGED" << endl;
+    // total = 0;
+    // MotifValues newValues = CLI::optimizedMotifModularityValues();
+    // cout << "Modularity: " << motifModularityFromValues(newValues) << endl << " Total: " << total << endl;
+    // MotifVariableValues changedNodeValues = CLI::nodeVariableValues(changingNode);
+    // MotifValues changingNodeMotifValuesValues = changingNodeMotifValues(values, toChangeNodeValues, changedNodeValues);
+    // cout << "Calculated Changing Node modularity: " << CLI::motifModularityFromValues(changingNodeMotifValuesValues) << endl;
 
     clock_t begin = clock();
     CLI::singleNodeGreedyAlgorithm();
@@ -319,6 +329,7 @@ double CLI::triangleModularity()
                 values.numberMotifsInGraph += g->hasEdge(i, j) * g->hasEdge(j, k) * g->hasEdge(i, k);
                 values.degreeMotifsInCommunities += CLI::maskedNullcaseWeight(i, j) * CLI::maskedNullcaseWeight(j, k) * CLI::maskedNullcaseWeight(i, k);
                 values.degreeMotifsRandomGraph += CLI::nullcaseWeight(i, j) * CLI::nullcaseWeight(j, k) * CLI::nullcaseWeight(i, k);
+                // cout << "combination " << i << " " << j << " " << k << endl;
             }
         }
     }
@@ -549,6 +560,7 @@ void CLI::optimizedMotifModularityValuesIteration(int offset, bool edgesCheck, b
     if(offset == motif.getSize())
     {
         int combinationWeights = CLI::combinationNullcaseWeights();
+        // int combinationWeights = combinationWeightsArray[combination.size() - 1];
 
         if(edgesCheck && communitiesCheck)
         {
@@ -567,6 +579,7 @@ void CLI::optimizedMotifModularityValuesIteration(int offset, bool edgesCheck, b
         total++;
         return;
     }
+    // for (int i = CLI::getOrbitRulesNextValidNode(); i < g->numNodes(); i++)
     for (int i = 0; i < g->numNodes(); i++)
     {
         if(!used[i])
@@ -585,6 +598,7 @@ void CLI::optimizedMotifModularityValuesIteration(int offset, bool edgesCheck, b
             if(communitiesCheck)
                 newCommunitiesCheck = optimizedCombinationHasMotifCommunities();
 
+            // nextCombinationNullcaseWeights();
             CLI::optimizedMotifModularityValuesIteration(offset + 1, newEdgesCheck, newCommunitiesCheck, values);
             combination.pop_back();
             used[i] = false;
@@ -602,6 +616,24 @@ bool CLI::optimizedCombinationOrbitRules()
         }
     } 
     return true;
+}
+
+// The next node that we can add to the combination needs to agree to the most strict orbit rule
+int CLI::getOrbitRulesNextValidNode()
+{
+    const vector< vector<int> >& orbitRules = motif.getOrbitRulesSizeWithOrder(combination.size());
+    int maxNode = -1;
+    for(int i = 0; i < orbitRules.size(); i++)
+    {
+        if(combination.at(orbitRules[i][0]) > maxNode){
+            maxNode = combination.at(orbitRules[i][0]);
+        }
+    } 
+    if (maxNode == -1)
+    {
+        return 0;
+    }
+    return maxNode + 1;
 }
 
 // the new node added complies with the motif edges?
@@ -665,6 +697,20 @@ bool CLI::optimizedCombinationHasMotifCommunities()
                 return false;
     }
     return true;
+}
+
+// When a new node is added to the combination, calculate the nullcase weights of that node with the others
+void CLI::nextCombinationNullcaseWeights()
+{
+    const vector< vector<int> > & adjacencyList = motif.getAdjacencyListSizeWithOrder(combination.size() - 1);
+    long product = (combination.size() == 1) ? 1 : combinationWeightsArray[combination.size() - 2];
+
+    for(int i = 0; i < adjacencyList.size(); ++i)
+    {
+        product *= CLI::nullcaseWeight(combination[adjacencyList[i][0]], combination[adjacencyList[i][1]]);
+    }
+
+    combinationWeightsArray[combination.size() - 1] = product;
 }
 
 /**
@@ -965,6 +1011,7 @@ double CLI::singleNodeGreedyAlgorithm()
     cout << ss.str();
     
     writeLineToFile(ss.str());
+    networkPartition.writePartitionFile(networkFile);
 
     return currentModularity;
 }

@@ -104,7 +104,7 @@ void ArrayPartition::writePartitionFile(std::string name){
         cout << "Error opening partition file for writing" << endl;
         return;
     }
-    file << "Id Community" << endl;
+    file << "Id\tCommunity" << endl;
     for(int i = 0; i < numberNodes; i++){
         file << i+1 << "\t" << partition[i] << endl;
     }
