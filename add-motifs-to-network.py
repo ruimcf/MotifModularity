@@ -100,12 +100,38 @@ def new_node_has_forbidden_community(networkCommunities, motifCommunities, chose
     new_node_pos = len(chosenNodes) - 1
     if motifCommunities[new_node_pos] == -1:
         return False
+
+    communitiesChanged = []
+    # some community was alreaddy attributed to this node
+    # changing it would break a previous motif occurence
+    # a node will always have the same community as said on the motif
+    if networkCommunities[new_node_pos] != -1:
+        if networkCommunities[new_node_pos] != motifCommunities[new_node_pos]:
+            return True
+    else:
+        networkCommunities[chosenNodes[new_node_pos]
+                           ] = motifCommunities[new_node_pos]
+        communitiesChanged.append(chosenNodes[new_node_pos])
+
     for i in range(new_node_pos):
         if motifCommunities[i] == -1:
             continue
+
+        if networkCommunities[chosenNodes[i]] == -1:
+            networkCommunities[chosenNodes[i]] = motifCommunities[i]
+            communitiesChanged.append(chosenNodes[i])
+
         if motifCommunities[i] == motifCommunities[new_node_pos]:
-            if networkCommunities[chosenNodes[i]] == -1 or networkCommunities[chosenNodes[new_node_pos]] == -1:
-                # redefine communities?
+            if networkCommunities[chosenNodes[i]] != motifCommunities[chosenNodes[new_node_pos]]:
+                for node in communitiesChanged:
+                    networkCommunities[node] = -1
+                return True
+
+        if motifCommunities[i] != motifCommunities[new_node_pos]:
+            if networkCommunities[chosenNodes[i]] == motifCommunities[chosenNodes[new_node_pos]]:
+                for node in communitiesChanged:
+                    networkCommunities[node] = -1
+                return True
 
 
 def main():
