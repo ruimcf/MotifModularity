@@ -31,7 +31,7 @@ public:
 
   // std::string toStringPartitionByCommunity();
 
-  void writePartitionFile(std::string name);
+  void writePartitionFile(std::string name, bool isRealCommunity = false);
 
 private:
   int numberNodes;

@@ -1,4 +1,6 @@
 import sys
+from random import randint, seed
+from shutil import copyfile
 
 
 def readMotifFile(motifFile):
@@ -134,45 +136,52 @@ def addMotifsToNetwork(networkFile, motifFile, numberOfMotifs, isNetworkDirected
     maxNumberOfNodes, nodesList, networkAdjMatrix, networkCommunities = readNetworkFile(
         networkFile, isNetworkDirected)
 
+    newFile = networkFile+".with_motifs"
+    copyfile(networkFile, newFile)
+
     # ADD MOTIFS TO NETWORK
-    with open(networkFile, "a") as fd:
+    with open(newFile, "a") as fd:
         for i in range(numberOfMotifs):
             nodes = []
             # choose nodes that obey the rules
             for j in range(numberOfNodes):
                 finished = False
                 while not finished:
-                    number = random.randint(0, len(nodesList) - 1)
+                    number = randint(0, len(nodesList) - 1)
                     if nodesList[number] not in nodes:
                         nodes.append(nodesList[number])
                         good_node = (not new_node_has_forbidden_edges(networkAdjMatrix, motifAdjMatrix, nodes)
-                                     and not new_node_has_forbidden_community(networkCommunities, motifCommunities, chosenNodes)):
+                                     and not new_node_has_forbidden_community(networkCommunities, motifCommunities, nodes))
                         if good_node:
                             finished = True
                         else:
                             nodes.pop()
+            print "New motif, nodes:", nodes
             for pair in motifAdjList:
                 firstNode = nodes[pair[0]]
                 secondNode = nodes[pair[1]]
                 # Only add edge if it did not exist yet
                 if networkAdjMatrix[firstNode][secondNode] != 1:
-                    fd.write(str(firstNode)+" "+str(secondNode)+"\n")
+                    print "Added an edge", firstNode+1, secondNode+1
+                    # add one because of the subtraction
+                    fd.write(str(firstNode+1)+" "+str(secondNode+1)+"\n")
                     networkAdjMatrix[firstNode][secondNode] = 1
 
-    with open(networkFile+".real_communities", "w") as fd:
+    with open(newFile+".real_communities", "w") as fd:
         for community in networkCommunities:
             fd.write(str(community)+"\n")
 
 
 def parseArgs():
     if len(sys.argv) <= 4:
-        print "usage: python add-motifs-to-network.py -m <motif-file> -n <network-file> -nm <number-of-motifs>"
+        print "usage: python add-motifs-to-network.py -m <motif-file> -n <network-file> -nm <number-of-motifs> -s 3"
 
     i = 0
     motifFile = ""
     networkFile = ""
     numberOfMotifs = 0
     isNetworkDirected = False
+    seedNumber = None
     while i < len(sys.argv):
         if(sys.argv[i] == "-m"):
             i += 1
@@ -187,6 +196,9 @@ def parseArgs():
             numberOfMotifs = int(sys.argv[i])
         elif sys.argv[i] == "-d" or sys.argv[i] == "--directed":
             isNetworkDirected = True
+        elif sys.argv[i] == "-s" or sys.argv[i] == "--seed":
+            i += 1
+            seedNumber = int(sys.argv[i])
         i += 1
 
     # print "Motif file", motifFile
@@ -194,14 +206,18 @@ def parseArgs():
     # print "Number of motifs", numberOfMotifs
     # print "Network is directed?", isNetworkDirected
 
-    return (motifFile, networkFile, numberOfMotifs, isNetworkDirected)
+    return (motifFile, networkFile, numberOfMotifs, isNetworkDirected, seedNumber)
 
 
 def main():
-    motifFile, networkFile, numberOfMotifs, isNetworkDirected = parseArgs()
-    # addMotifsToNetwork(networkFile, motifFile,
-    #                    numberOfMotifs, isNetworkDirected)
-    readNetworkFile(networkFile, isNetworkDirected)
+    motifFile, networkFile, numberOfMotifs, isNetworkDirected, seedNumber = parseArgs()
+    if seedNumber != None:
+        print "Using seed", seedNumber
+        seed(seedNumber)
+
+    addMotifsToNetwork(networkFile, motifFile,
+                       numberOfMotifs, isNetworkDirected)
+    # readNetworkFile(networkFile, isNetworkDirected)
 
 
 if __name__ == '__main__':

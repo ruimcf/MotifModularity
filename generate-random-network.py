@@ -4,19 +4,20 @@ import random
 
 def createNetwork(numberOfNodes, probabilityOfEdge, isDirected):
     with open("networks/generated_network.txt", 'w') as fd:
-        if not isDirected:
-            for i in range(1, numberOfNodes+1):
-                for j in range(i+1, numberOfNodes+1):
-                    randomNumber = random.random()
-                    if randomNumber <= probabilityOfEdge:
-                        fd.write(str(i)+"\t"+str(j)+"\n")
-        else:
+        # A directed network can have edges on both ways, on undirected we only try ask once for some two nodes
+        if isDirected:
             for i in range(1, numberOfNodes+1):
                 for j in range(1, numberOfNodes+1):
                     if i != j:
                         randomNumber = random.random()
                         if randomNumber <= probabilityOfEdge:
                             fd.write(str(i)+"\t"+str(j)+"\n")
+        else:
+            for i in range(1, numberOfNodes+1):
+                for j in range(i+1, numberOfNodes+1):
+                    randomNumber = random.random()
+                    if randomNumber <= probabilityOfEdge:
+                        fd.write(str(i)+"\t"+str(j)+"\n")
 
 
 def parseArgs():

@@ -243,6 +243,7 @@ void CLI::start(int argc, char **argv)
     {
         networkPartition.readPartition(partitionFile.c_str());
         cout << "Partition read: " << networkPartition.toStringPartitionByNode() << endl;
+        networkPartition.writePartitionFile(networkFile+".real-partition", true);
         // networkPartition.writePartitionFile(networkFile);
     }
     else {
@@ -265,9 +266,9 @@ void CLI::start(int argc, char **argv)
     // double motifModularity = CLI::motifModularity();
     // printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
 
-    // total = 0;
-    // double optimizedMotifModularity = CLI::optimizedMotifModularity();
-    // printf("Optimized Motif modularity: %f\nTotal: %ld\n", optimizedMotifModularity, total);
+    total = 0;
+    double optimizedMotifModularity = CLI::optimizedMotifModularity();
+    printf("Optimized Motif modularity: %f\nTotal: %ld\n", optimizedMotifModularity, total);
 
     // for(int i = 0; i < 5; ++i)
     // {

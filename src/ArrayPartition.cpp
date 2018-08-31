@@ -96,7 +96,7 @@ std::string ArrayPartition::toStringPartitionByNode()
     return ss.str();
 }
 
-void ArrayPartition::writePartitionFile(std::string name){
+void ArrayPartition::writePartitionFile(std::string name, bool isRealCommunity){
     ofstream file;
     std::string filePath = "results/partitions/"+name+".tsv";
     file.open(filePath, ios::trunc);
@@ -104,7 +104,11 @@ void ArrayPartition::writePartitionFile(std::string name){
         cout << "Error opening partition file for writing" << endl;
         return;
     }
-    file << "Id\tCommunity" << endl;
+    if(isRealCommunity)
+        file << "Id\tRealCommunity" << endl;
+    else
+        file << "Id\tCommunity" << endl;
+
     for(int i = 0; i < numberNodes; i++){
         file << i+1 << "\t" << partition[i] << endl;
     }
