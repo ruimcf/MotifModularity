@@ -27,10 +27,7 @@ def readMotifFile(motifFile):
             motifAdjMatrix[pair[0]][pair[1]] = 1
             if not isDirected:
                 motifAdjMatrix[pair[1]][pair[0]] = 1
-    # print "MotifAdjList", motifAdjList
-    # print "MotifAdjMatrix", motifAdjMatrix
-    # print "MotifCommunities", motifCommunities
-    # print "Number of nodes", numberOfNodes
+
     return (motifAdjList, motifAdjMatrix, motifCommunities, numberOfNodes)
 
 
@@ -70,11 +67,6 @@ def readNetworkFile(networkFile, isNetworkDirected):
 
     networkCommunities = [-1] * maxNumberOfNodes
 
-    # print "maxNumberOfNodes", maxNumberOfNodes
-    # print "numberOfNodes", numberOfNodes
-    # print "nodes list", nodesList
-    # print "networkAdjMatrix", networkAdjMatrix
-    # print "networkCommunities", networkCommunities
     return (maxNumberOfNodes, nodesList, networkAdjMatrix, networkCommunities)
 
 
@@ -94,42 +86,7 @@ def new_node_has_forbidden_edges(networkAdjMatrix, motifAdjMatrix, chosenNodes):
     return False
 
 
-def new_node_has_forbidden_community(networkCommunities, motifCommunities, chosenNodes):
-    new_node_pos = len(chosenNodes) - 1
-    new_node = chosenNodes[new_node_pos]
-    if motifCommunities[new_node_pos] == -1:
-        return False
-
-    communitiesChanged = []
-    # some community was alreaddy attributed to this node
-    # changing it would break a previous motif occurrence
-    # a node will always have the same community as specified on the motif
-    if networkCommunities[new_node] != -1:
-        if networkCommunities[new_node] != motifCommunities[new_node_pos]:
-            return True
-    else:
-        networkCommunities[new_node] = motifCommunities[new_node_pos]
-        communitiesChanged.append(new_node)
-
-    for i in range(new_node_pos):
-        current_node = chosenNodes[i]
-        if motifCommunities[i] == -1:
-            continue
-
-        if motifCommunities[i] == motifCommunities[new_node_pos]:
-            if networkCommunities[current_node] != networkCommunities[new_node]:
-                for node in communitiesChanged:
-                    networkCommunities[node] = -1
-                return True
-
-        if motifCommunities[i] != motifCommunities[new_node_pos]:
-            if networkCommunities[current_node] == networkCommunities[new_node]:
-                for node in communitiesChanged:
-                    networkCommunities[node] = -1
-                return True
-
-
-def addMotifsToNetwork(networkFile, motifFile, numberOfMotifs, isNetworkDirected):
+def applyPartitionMap(networkFile, motifFile, partitionMap, isNetworkDirected):
     motifAdjList, motifAdjMatrix, motifCommunities, numberOfNodes = readMotifFile(
         motifFile)
 
@@ -139,23 +96,48 @@ def addMotifsToNetwork(networkFile, motifFile, numberOfMotifs, isNetworkDirected
     newFile = networkFile+".with_motifs"
     copyfile(networkFile, newFile)
 
+    # check if number of nodes fit in network
+    count = 0
+    numberOfMotifs = 0
+    for partitionData in partitionMap:
+        count += partitionData.get("numberOfNodes")
+        numberOfMotifs += partitionData.get("numberOfMotifs")
+    print "number of motifs", numberOfMotifs
+    if count > len(nodesList):
+        print "Too many nodes in partitions for the network, ", str(count), ">", str(len(
+            nodesList))
+        return
+
+    # apply the partition communities to the network
+    nodesForEachCommunity = {}
+    remainingNodes = list(nodesList)
+    for partitionData in partitionMap:
+        partitionId = partitionData.get("partitionId")
+        nodesForEachCommunity[partitionId] = []
+        for node in range(partitionData.get("numberOfNodes")):
+            randomPos = randint(0, len(remainingNodes) - 1)
+            chosenNode = remainingNodes.pop(randomPos)
+            networkCommunities[chosenNode] = partitionId
+            nodesForEachCommunity[partitionId].append(chosenNode)
+
     # ADD MOTIFS TO NETWORK
     with open(newFile, "a") as fd:
         for i in range(numberOfMotifs):
             nodes = []
             # choose nodes that obey the rules
             for j in range(numberOfNodes):
+                community = motifCommunities[j]
                 finished = False
+                nodesInCommunity = nodesForEachCommunity[community]
                 while not finished:
-                    number = randint(0, len(nodesList) - 1)
-                    if nodesList[number] not in nodes:
-                        nodes.append(nodesList[number])
-                        good_node = (not new_node_has_forbidden_edges(networkAdjMatrix, motifAdjMatrix, nodes)
-                                     and not new_node_has_forbidden_community(networkCommunities, motifCommunities, nodes))
-                        if good_node:
+                    number = randint(0, len(nodesInCommunity) - 1)
+                    if nodesInCommunity[number] not in nodes:
+                        nodes.append(nodesInCommunity[number])
+                        if not new_node_has_forbidden_edges(networkAdjMatrix, motifAdjMatrix, nodes):
                             finished = True
                         else:
                             nodes.pop()
+            # might chose a motif that already exists, and might screw one that already exists!
             print "New motif, nodes:", nodes
             for pair in motifAdjList:
                 firstNode = nodes[pair[0]]
@@ -166,16 +148,29 @@ def addMotifsToNetwork(networkFile, motifFile, numberOfMotifs, isNetworkDirected
                     # add one because of the subtraction
                     fd.write(str(firstNode+1)+" "+str(secondNode+1)+"\n")
                     networkAdjMatrix[firstNode][secondNode] = 1
+                    if not isNetworkDirected:
+                        networkAdjMatrix[secondNode][firstNode] = 1
 
     with open(newFile+".real_communities", "w") as fd:
         print "Communities"
         a = ""
         i = 0
         for community in networkCommunities:
-            a += str(i)+"-"+str(community)+" "
+            a += str(i)+":"+str(community)+" "
             i += 1
             fd.write(str(community)+"\n")
         print a
+
+
+def readPartitionMap(partitionMapFile):
+    with open(partitionMapFile) as fd:
+        partitionMap = []
+        next(fd)  # Read header
+        for line in fd:
+            data = line.split()
+            partitionMap.append(
+                {"partitionId": int(data[0]), "numberOfNodes": int(data[1]), "numberOfMotifs": int(data[2])})
+        return partitionMap
 
 
 def parseArgs():
@@ -185,7 +180,7 @@ def parseArgs():
     i = 0
     motifFile = ""
     networkFile = ""
-    numberOfMotifs = 0
+    partitionMapFile = ""
     isNetworkDirected = False
     seedNumber = None
     while i < len(sys.argv):
@@ -197,9 +192,9 @@ def parseArgs():
             i += 1
             networkFile = sys.argv[i]
 
-        elif sys.argv[i] == "-nm":
+        elif sys.argv[i] == "-p":
             i += 1
-            numberOfMotifs = int(sys.argv[i])
+            partitionMapFile = sys.argv[i]
         elif sys.argv[i] == "-d" or sys.argv[i] == "--directed":
             isNetworkDirected = True
         elif sys.argv[i] == "-s" or sys.argv[i] == "--seed":
@@ -207,23 +202,19 @@ def parseArgs():
             seedNumber = int(sys.argv[i])
         i += 1
 
-    # print "Motif file", motifFile
-    # print "Network file", networkFile
-    # print "Number of motifs", numberOfMotifs
-    # print "Network is directed?", isNetworkDirected
-
-    return (motifFile, networkFile, numberOfMotifs, isNetworkDirected, seedNumber)
+    return (motifFile, networkFile, partitionMapFile, isNetworkDirected, seedNumber)
 
 
 def main():
-    motifFile, networkFile, numberOfMotifs, isNetworkDirected, seedNumber = parseArgs()
+    motifFile, networkFile, partitionMapFile, isNetworkDirected, seedNumber = parseArgs()
     if seedNumber != None:
         print "Using seed", seedNumber
         seed(seedNumber)
 
-    addMotifsToNetwork(networkFile, motifFile,
-                       numberOfMotifs, isNetworkDirected)
-    # readNetworkFile(networkFile, isNetworkDirected)
+    partitionMap = readPartitionMap(partitionMapFile)
+
+    applyPartitionMap(networkFile, motifFile,
+                      partitionMap, isNetworkDirected)
 
 
 if __name__ == '__main__':
