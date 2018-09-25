@@ -116,6 +116,23 @@ void ArrayPartition::writePartitionFile(std::string name, bool isRealCommunity){
     cout << "Wrote partition to file " << filePath << endl;
 }
 
+void ArrayPartition::writePartitionFile(std::string networkFileName, std::string communityName, int uniqueId){
+    ofstream file;
+    std::string filePath = "gephi-data/partitions/"+networkFileName+"_" + to_string(uniqueId) +"."+communityName+".tsv";
+    file.open(filePath);
+    if(!file.is_open()){
+        cout << "Error opening partition file for writing" << endl;
+        return;
+    }
+    file << "Id\t"<< communityName << endl;
+
+    for(int i = 0; i < numberNodes; i++){
+        file << i+1 << "\t" << partition[i] << endl;
+    }
+
+    cout << "Wrote partition to file " << filePath << endl;
+}
+
 int ArrayPartition::getNumberOfDifferentPartitions()
 {
     vector<int> differentPartitions;

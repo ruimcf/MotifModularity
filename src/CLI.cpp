@@ -13,6 +13,7 @@ vector<long> CLI::combinationWeightsArray;
 vector<bool> CLI::used;
 bool CLI::directed, CLI::weighted, CLI::readPartition, CLI::readMotif;
 string CLI::networkFile;
+string CLI::networkFileName;
 ofstream CLI::resultsFile;
 string CLI::partitionFile;
 string CLI::motifFile;
@@ -24,6 +25,9 @@ double bestModularity;
 int *bestPartition;
 int CLI::numberOfCommunities;
 bool CLI::hasNumberOfCommunities;
+
+//unique id to identify this run, random number between 1 and 1000000
+int uniqueIdentifier = rand() % (1000000 + 1);
 
 /**
  * -----------------------
@@ -82,6 +86,25 @@ int CLI::parseArgs(int argc, char **argv)
                 return -1;
             }
             networkFile = argv[i];
+
+            networkFileName = networkFile;
+
+            // Remove directory if present.
+            // Do this before extension removal incase directory has a period character.
+            const size_t last_slash_idx = networkFileName.find_last_of("\\/");
+            if (std::string::npos != last_slash_idx)
+            {
+                networkFileName.erase(0, last_slash_idx + 1);
+            }
+
+            // Remove extension if present.
+            const size_t period_idx = networkFileName.rfind('.');
+            if (std::string::npos != period_idx)
+            {
+                networkFileName.erase(period_idx);
+            }
+
+            cout << "FILENAME " << networkFileName << endl;
         }
         else if (arg == "--seed" || arg == "-s")
         {
@@ -144,8 +167,7 @@ int CLI::parseArgs(int argc, char **argv)
 
 void CLI::openResultsFile()
 {
-    //clear file if it exists
-    string resultPath = "results/" + networkFile;
+    string resultPath = "results/" + networkFileName + "_" + to_string(uniqueIdentifier);
     resultsFile.open(resultPath, ios::out | ios::app);
     if (resultsFile.is_open())
     {
@@ -167,6 +189,27 @@ void CLI::closeResultsFile()
     resultsFile.close();
 }
 
+void CLI::registerConfigs()
+{
+    
+    string configPath = "configMap.txt";
+    ofstream file;
+    file.open(configPath, ios::out | ios::app);
+    if (file.is_open())
+    {
+        file << "ID: " << uniqueIdentifier << "\tNetFile: " << networkFile <<
+        "\tMotFile: " << motifFile << "\tnc: " << numberOfCommunities <<
+        "\tPartition: " << partitionFile << "\tseed: " << seed << 
+        "\tdir: " << directed << "\t weight: " << weighted << endl;
+        cout << "Registered configs" << endl;
+    }
+    else
+    {
+        cout << "Failed to open configMap.txt" << endl;
+    }
+    file.close();
+}
+
 /**
  * -----------------
  * --- SET NODES ---
@@ -186,6 +229,23 @@ void CLI::setNodes()
     // {
     //     nodes.push_back(i);
     // }
+}
+
+
+void CLI::writeNetworkToGephiData() 
+{
+    ofstream file;
+    std::string filePath = "gephi-data/networks/"+networkFileName+"_" + to_string(uniqueIdentifier) + ".nodes.tsv";
+    file.open(filePath, ios::out);
+    if(!file.is_open()){
+        cout << "Error opening partition file for writing" << endl;
+        return;
+    }
+    for(int i = 0; i < g->numNodes(); i++){
+        file << i+1 << endl;
+    }
+
+    cout << "Wrote nodes file " << filePath << endl;
 }
 
 /**
@@ -230,8 +290,11 @@ void CLI::start(int argc, char **argv)
 
     Random::seed(seed);
 
+    CLI::registerConfigs();
     g = new GraphMatrix();
     GraphUtils::readFileTxt(g, networkFile.c_str(), directed, weighted);
+
+    writeNetworkToGephiData();
 
     networkPartition.setNumberNodes(g->numNodes());
 
@@ -243,11 +306,11 @@ void CLI::start(int argc, char **argv)
     {
         networkPartition.readPartition(partitionFile.c_str());
         cout << "Partition read: " << networkPartition.toStringPartitionByNode() << endl;
-        networkPartition.writePartitionFile(networkFile+".real-partition", true);
-        // networkPartition.writePartitionFile(networkFile);
+        networkPartition.writePartitionFile(networkFileName, "real-partition", uniqueIdentifier);
     }
     else {
         networkPartition.randomPartition(numberOfCommunities);
+        networkPartition.writePartitionFile(networkFileName, "random-partition", uniqueIdentifier);
         cout << "Partition created: " << networkPartition.toStringPartitionByNode() << endl;
     }
  
@@ -946,6 +1009,8 @@ double CLI::singleNodeGreedyAlgorithm()
     // currentModularity = CLI::optimizedMotifModularity();
     
     cout << "Current Modularity " << currentModularity << endl;
+    writeLineToFile("Current Modularity: "+to_string(currentModularity)+"\n");
+    networkPartition.writePartitionFile(networkFileName, "g-initial-partition", uniqueIdentifier);
 
     FailObject failObject;
     allNodes.reserve(g->numNodes());
@@ -1012,7 +1077,7 @@ double CLI::singleNodeGreedyAlgorithm()
     cout << ss.str();
     
     writeLineToFile(ss.str());
-    networkPartition.writePartitionFile(networkFile);
+    networkPartition.writePartitionFile(networkFileName, "g-computed-partition", uniqueIdentifier);
 
     return currentModularity;
 }

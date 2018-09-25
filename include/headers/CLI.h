@@ -41,6 +41,7 @@ private:
   static bool weighted;
   static string partitionFile;
   static string networkFile;
+  static string networkFileName;
   static string motifFile;
   static bool readMotif;
   static bool readPartition;
@@ -132,6 +133,8 @@ private:
   static void openResultsFile();
   static void writeLineToFile(string line);
   static void closeResultsFile();
+  static void writeNetworkToGephiData();
+  static void registerConfigs();
 
   /**
    * Create all partitions for a graph

@@ -32,6 +32,7 @@ public:
   // std::string toStringPartitionByCommunity();
 
   void writePartitionFile(std::string name, bool isRealCommunity = false);
+  void writePartitionFile(std::string networkName, std::string communityName, int uniqueId);
 
 private:
   int numberNodes;
