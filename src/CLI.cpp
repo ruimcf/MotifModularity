@@ -25,7 +25,7 @@ double bestModularity;
 int *bestPartition;
 int CLI::numberOfCommunities;
 bool CLI::hasNumberOfCommunities;
-bool CLI::noWriteFiles;
+bool CLI::notOptimized;
 
 //unique id to identify this run, random number between 1 and 1000000
 int uniqueIdentifier;
@@ -49,7 +49,7 @@ int CLI::parseArgs(int argc, char **argv)
     weighted = false;
     hasNumberOfCommunities = false;
     seed = time(NULL);
-    noWriteFiles = false;
+    notOptimized = false;
 
     for (int i = 1; i < argc; ++i)
     {
@@ -140,9 +140,9 @@ int CLI::parseArgs(int argc, char **argv)
             numberOfCommunities = stoi(argv[i]);
         }
 
-        else if (arg == "--no-write-files") 
+        else if (arg == "--not-optimized") 
         {
-            noWriteFiles = true;
+            notOptimized = true;
         }
     }
 
@@ -174,7 +174,7 @@ int CLI::parseArgs(int argc, char **argv)
 
 void CLI::openResultsFile()
 {
-    string resultPath = "results/" + networkFileName + "_" + to_string(uniqueIdentifier);
+    string resultPath = "results_"  + to_string(uniqueIdentifier) + "_" + networkFileName;
     resultsFile.open(resultPath, ios::out | ios::app);
     if (resultsFile.is_open())
     {
@@ -300,12 +300,12 @@ void CLI::start(int argc, char **argv)
 
     Random::seed(seed);
 
-    CLI::registerConfigs();
+    //CLI::registerConfigs();
     g = new GraphMatrix();
     GraphUtils::readFileTxt(g, networkFile.c_str(), directed, weighted);
 
-    if (!noWriteFiles)
-    writeNetworkToGephiData();
+    // if (!noWriteFiles)
+    // writeNetworkToGephiData();
 
     networkPartition.setNumberNodes(g->numNodes());
 
@@ -317,13 +317,13 @@ void CLI::start(int argc, char **argv)
     {
         networkPartition.readPartition(partitionFile.c_str());
         cout << "Partition read: " << networkPartition.toStringPartitionByNode() << endl;
-            if (!noWriteFiles)
-        networkPartition.writePartitionFile(networkFileName, "real-partition", uniqueIdentifier);
+        //     if (!noWriteFiles)
+        // networkPartition.writePartitionFile(networkFileName, "real-partition", uniqueIdentifier);
     }
     else {
         networkPartition.randomPartition(numberOfCommunities);
-            if (!noWriteFiles)
-        networkPartition.writePartitionFile(networkFileName, "random-partition", uniqueIdentifier);
+        //     if (!noWriteFiles)
+        // networkPartition.writePartitionFile(networkFileName, "random-partition", uniqueIdentifier);
         cout << "Partition created: " << networkPartition.toStringPartitionByNode() << endl;
     }
  
@@ -346,9 +346,29 @@ void CLI::start(int argc, char **argv)
     // double optimizedMotifModularity = CLI::optimizedMotifModularity();
     // printf("Optimized Motif modularity: %f\nTotal: %ld\n", optimizedMotifModularity, total);
 
-    MotifValues values = CLI::optimizedMotifModularityValues();
-    cout << "Optimized motif Modularity values: " << CLI::motifModularityFromValues(values) << endl << "Total: " << total << endl;
-    printMotifValues(values);
+    clock_t begin = clock();
+    double modularity;
+    if(notOptimized)
+    {
+        modularity = CLI::motifModularity();
+    }
+    else {
+        modularity = CLI::optimizedMotifModularity();
+    }
+    clock_t end = clock();
+    double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
+    cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
+    cout << "Optimized motif Modularity: " << modularity << endl << "Total: " << total << endl;
+    writeLineToFile("\nElapsed seconds: " + to_string(elapsedSecs) +"\n");
+    if(notOptimized)
+    {
+        writeLineToFile("NOT Optimized motif Modularity: " + to_string(modularity) + "\n");
+    }
+    else {
+        writeLineToFile("Optimized motif Modularity: " + to_string(modularity) + "\n");
+    } 
+
+    
     // for(int i = 0; i < 5; ++i)
     // {
     //     total = 0;
@@ -379,12 +399,12 @@ void CLI::start(int argc, char **argv)
     // MotifValues changingNodeMotifValuesValues = changingNodeMotifValues(values, toChangeNodeValues, changedNodeValues);
     // cout << "Calculated Changing Node modularity: " << CLI::motifModularityFromValues(changingNodeMotifValuesValues) << endl;
 
-    clock_t begin = clock();
-    CLI::singleNodeGreedyAlgorithm();
-    clock_t end = clock();
-    double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
-    cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
-    CLI::writeLineToFile("Elapsed seconds: " + to_string(elapsedSecs) + "\n\n");
+    // clock_t begin = clock();
+    // CLI::singleNodeGreedyAlgorithm();
+    // clock_t end = clock();
+    // double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
+    // cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
+    // CLI::writeLineToFile("Elapsed seconds: " + to_string(elapsedSecs) + "\n\n");
     CLI::closeResultsFile();
 }
 
