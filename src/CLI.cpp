@@ -1037,7 +1037,7 @@ double CLI::singleNodeGreedyAlgorithm()
     }
     vector<int> availableNodes(allNodes);
 
-    while (!failObject.finished() && !availableNodes.empty())
+    while (!availableNodes.empty())
     {
         chosenIndex = Random::getInteger(0, availableNodes.size() - 1);
         chosenNode = availableNodes[chosenIndex];
