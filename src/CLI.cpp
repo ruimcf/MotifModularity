@@ -174,7 +174,7 @@ int CLI::parseArgs(int argc, char **argv)
 
 void CLI::openResultsFile()
 {
-    string resultPath = "results_"  + to_string(uniqueIdentifier) + "_" + networkFileName;
+    string resultPath = "resultsCall/results_"  + to_string(uniqueIdentifier) + "_" + networkFileName;
     resultsFile.open(resultPath, ios::out | ios::app);
     if (resultsFile.is_open())
     {
@@ -1046,7 +1046,7 @@ double CLI::singleNodeGreedyAlgorithm()
     
     cout << "Initial Modularity " << currentModularity << endl;
     writeLineToFile("Initial Modularity: "+to_string(currentModularity)+"\n");
-    if (!noWriteFiles)
+    //if (!noWriteFiles)
     networkPartition.writePartitionFile(networkFileName, "g-initial-partition", uniqueIdentifier);
 
     FailObject failObject;
@@ -1114,7 +1114,7 @@ double CLI::singleNodeGreedyAlgorithm()
     cout << ss.str();
     
     writeLineToFile(ss.str());
-    if (!noWriteFiles)
+    //if (!noWriteFiles)
     networkPartition.writePartitionFile(networkFileName, "g-computed-partition", uniqueIdentifier);
 
     return currentModularity;
