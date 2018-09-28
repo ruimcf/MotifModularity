@@ -45,7 +45,7 @@ private:
   static string motifFile;
   static bool readMotif;
   static bool readPartition;
-  static bool noWriteFiles;
+  static bool notOptimized;
   static int seed;
   static Motif motif;
   static void setNodes();
