@@ -25,9 +25,10 @@ double bestModularity;
 int *bestPartition;
 int CLI::numberOfCommunities;
 bool CLI::hasNumberOfCommunities;
+bool CLI::noWriteFiles;
 
 //unique id to identify this run, random number between 1 and 1000000
-int uniqueIdentifier = rand() % (1000000 + 1);
+int uniqueIdentifier;
 
 /**
  * -----------------------
@@ -48,6 +49,7 @@ int CLI::parseArgs(int argc, char **argv)
     weighted = false;
     hasNumberOfCommunities = false;
     seed = time(NULL);
+    noWriteFiles = false;
 
     for (int i = 1; i < argc; ++i)
     {
@@ -136,6 +138,11 @@ int CLI::parseArgs(int argc, char **argv)
             }
             hasNumberOfCommunities = true;
             numberOfCommunities = stoi(argv[i]);
+        }
+
+        else if (arg == "--no-write-files") 
+        {
+            noWriteFiles = true;
         }
     }
 
@@ -241,6 +248,7 @@ void CLI::writeNetworkToGephiData()
         cout << "Error opening partition file for writing" << endl;
         return;
     }
+    file << "Id" << endl;
     for(int i = 0; i < g->numNodes(); i++){
         file << i+1 << endl;
     }
@@ -281,6 +289,8 @@ void printMotifConstantValues(MotifConstantValues values)
 
 void CLI::start(int argc, char **argv)
 {
+    srand(time(0));
+    uniqueIdentifier = rand() % (1000000 + 1);
     int parseResult = CLI::parseArgs(argc, argv);
     if(parseResult < 0) return;
 
@@ -294,6 +304,7 @@ void CLI::start(int argc, char **argv)
     g = new GraphMatrix();
     GraphUtils::readFileTxt(g, networkFile.c_str(), directed, weighted);
 
+    if (!noWriteFiles)
     writeNetworkToGephiData();
 
     networkPartition.setNumberNodes(g->numNodes());
@@ -306,10 +317,12 @@ void CLI::start(int argc, char **argv)
     {
         networkPartition.readPartition(partitionFile.c_str());
         cout << "Partition read: " << networkPartition.toStringPartitionByNode() << endl;
+            if (!noWriteFiles)
         networkPartition.writePartitionFile(networkFileName, "real-partition", uniqueIdentifier);
     }
     else {
         networkPartition.randomPartition(numberOfCommunities);
+            if (!noWriteFiles)
         networkPartition.writePartitionFile(networkFileName, "random-partition", uniqueIdentifier);
         cout << "Partition created: " << networkPartition.toStringPartitionByNode() << endl;
     }
@@ -330,9 +343,12 @@ void CLI::start(int argc, char **argv)
     // printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
 
     total = 0;
-    double optimizedMotifModularity = CLI::optimizedMotifModularity();
-    printf("Optimized Motif modularity: %f\nTotal: %ld\n", optimizedMotifModularity, total);
+    // double optimizedMotifModularity = CLI::optimizedMotifModularity();
+    // printf("Optimized Motif modularity: %f\nTotal: %ld\n", optimizedMotifModularity, total);
 
+    MotifValues values = CLI::optimizedMotifModularityValues();
+    cout << "Optimized motif Modularity values: " << CLI::motifModularityFromValues(values) << endl << "Total: " << total << endl;
+    printMotifValues(values);
     // for(int i = 0; i < 5; ++i)
     // {
     //     total = 0;
@@ -1008,8 +1024,9 @@ double CLI::singleNodeGreedyAlgorithm()
 
     // currentModularity = CLI::optimizedMotifModularity();
     
-    cout << "Current Modularity " << currentModularity << endl;
-    writeLineToFile("Current Modularity: "+to_string(currentModularity)+"\n");
+    cout << "Initial Modularity " << currentModularity << endl;
+    writeLineToFile("Initial Modularity: "+to_string(currentModularity)+"\n");
+    if (!noWriteFiles)
     networkPartition.writePartitionFile(networkFileName, "g-initial-partition", uniqueIdentifier);
 
     FailObject failObject;
@@ -1070,13 +1087,14 @@ double CLI::singleNodeGreedyAlgorithm()
     }
 
     stringstream ss;
-    ss << "Successfuly incremented modularity " << failObject.getTimesSuccess() << " times" << endl;
+    ss << "Successfully incremented modularity " << failObject.getTimesSuccess() << " times" << endl;
     ss << "Best modularity: " << currentModularity << endl;
     ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
     ss << "Number of unique communities: " + to_string(networkPartition.getNumberOfDifferentPartitions()) << endl;
     cout << ss.str();
     
     writeLineToFile(ss.str());
+    if (!noWriteFiles)
     networkPartition.writePartitionFile(networkFileName, "g-computed-partition", uniqueIdentifier);
 
     return currentModularity;

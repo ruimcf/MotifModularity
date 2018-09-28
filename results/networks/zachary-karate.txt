@@ -70,3 +70,11 @@ Partition: 9 9 9 9 9 9 9 9 4 3 9 6 9 9 4 4 9 9 4 9 4 9 4 4 5 0 4 4 4 4 4 4 4 4
 Number of unique communities: 6
 Elapsed seconds: 0.042866
 
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 18
+-Single Node Greedy Algorithm-
+Successfuly incremented modularity 19 times
+Best modularity: 0.797327
+Partition: 1 1 1 1 1 1 1 1 0 1 1 1 1 1 0 0 1 1 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 
+Number of unique communities: 2
+Elapsed seconds: 0.018179
+
