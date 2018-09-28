@@ -174,7 +174,7 @@ int CLI::parseArgs(int argc, char **argv)
 
 void CLI::openResultsFile()
 {
-    string resultPath = "resultsCall/results_"  + to_string(uniqueIdentifier) + "_" + networkFileName;
+    string resultPath = "resultsCall/results_" + networkFileName;
     resultsFile.open(resultPath, ios::out | ios::app);
     if (resultsFile.is_open())
     {
@@ -359,13 +359,13 @@ void CLI::start(int argc, char **argv)
     double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
     cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
     cout << "Optimized motif Modularity: " << modularity << endl << "Total: " << total << endl;
-    writeLineToFile("\nElapsed seconds: " + to_string(elapsedSecs) +"\n");
+    writeLineToFile("Elapsed seconds: " + to_string(elapsedSecs) +"\n");
     if(notOptimized)
     {
         writeLineToFile("NOT Optimized motif Modularity: " + to_string(modularity) + "\n");
     }
     else {
-        writeLineToFile("Optimized motif Modularity: " + to_string(modularity) + "\n");
+        writeLineToFile("Optimized motif Modularity: " + to_string(modularity) + "\n\n");
     } 
 
     
