@@ -3,7 +3,7 @@ from subprocess import call
 
 
 def parseArgs():
-    if len(sys.argv) <= 2:
+    if len(sys.argv) <= 1:
         print "usage: pyhton rangeModularity <network-file>"
         return
 
@@ -14,15 +14,15 @@ def parseArgs():
     # motifFile = "motifs/tripartite_4_nodes.motif"
     directedOrUndirected = "-ud"
     weightedOrUnweighted = "-uw"
-    numberCommunities = 2
+    numberCommunities = "2"
 
-    for i in seedList:
-        call(["/Users/rui.fonseca/Workspace/Tese/MotifModularity/motifModularity", "-n", networkFile,
-              weightedOrUnweighted, directedOrUndirected, "-s", seed, "-m", motifFile, "-nc", numberCommunities])
+    for seed in seedList:
+        call(["/net/areas/homes/up201602879/Tese/MotifModularity/motifModularity", "-n", networkFile,
+              weightedOrUnweighted, directedOrUndirected, "-s", str(seed), "-m", motifFile, "-nc", numberCommunities])
 
-    for i in seedList:
-        call(["/Users/rui.fonseca/Workspace/Tese/MotifModularity/motifModularity", "-n", networkFile,
-              weightedOrUnweighted, directedOrUndirected, "-s", seed, "-m", motifFile, "-nc", numberCommunities, "--not-optimized"])
+    for seed in seedList:
+        call(["/net/areas/homes/up201602879/Tese/MotifModularity/motifModularity", "-n", networkFile,
+              weightedOrUnweighted, directedOrUndirected, "-s", str(seed), "-m", motifFile, "-nc", numberCommunities, "--not-optimized"])
 
 
 parseArgs()
