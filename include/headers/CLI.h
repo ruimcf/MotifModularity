@@ -111,6 +111,7 @@ private:
    * Greedy algorithms to maximize modularity
    */
   static double singleNodeGreedyAlgorithm();
+  static double singleNodeGreedyAlgorithmNotOptimized();
   static double singleNodeTestAllGreedyAlgorithm();
 
   /**
