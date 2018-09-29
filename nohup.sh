@@ -1,3 +1,3 @@
 #!/bin/bash
 
-nohup python call-script.py networks/dolphins.txt > /dev/null 2>&1 &
+nohup python call-script.py networks/email.txt > /dev/null 2>&1 &

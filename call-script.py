@@ -1,4 +1,5 @@
 import sys
+import os
 from subprocess import call
 
 
@@ -17,11 +18,11 @@ def parseArgs():
     numberCommunities = "2"
 
     for seed in seedList:
-        call(["/net/areas/homes/up201602879/Tese/MotifModularity/motifModularity", "-n", networkFile,
+        call([os.getcwd() + "/motifModularity", "-n", networkFile,
               weightedOrUnweighted, directedOrUndirected, "-s", str(seed), "-m", motifFile, "-nc", numberCommunities])
 
     for seed in seedList:
-        call(["/net/areas/homes/up201602879/Tese/MotifModularity/motifModularity", "-n", networkFile,
+        call([os.getcwd() + "/motifModularity", "-n", networkFile,
               weightedOrUnweighted, directedOrUndirected, "-s", str(seed), "-m", motifFile, "-nc", numberCommunities, "--not-optimized"])
 
 

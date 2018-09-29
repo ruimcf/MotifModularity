@@ -1,0 +1,140 @@
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 3915
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.129103
+Successfully incremented modularity 35 times
+Best modularity: 0.689524
+OPTIMIZED Elapsed seconds: 
+0.097168
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6058
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.034291
+Successfully incremented modularity 30 times
+Best modularity: 0.689851
+OPTIMIZED Elapsed seconds: 
+0.116672
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 7494
+-Single Node Greedy Algorithm-
+Initial Modularity: -0.007920
+Successfully incremented modularity 41 times
+Best modularity: 0.699487
+OPTIMIZED Elapsed seconds: 
+0.120338
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 8024
+-Single Node Greedy Algorithm-
+Initial Modularity: -0.031397
+Successfully incremented modularity 40 times
+Best modularity: 0.484941
+OPTIMIZED Elapsed seconds: 
+0.133453
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6453
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.005166
+Successfully incremented modularity 56 times
+Best modularity: 0.689522
+OPTIMIZED Elapsed seconds: 
+0.170410
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 9705
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.078994
+Successfully incremented modularity 34 times
+Best modularity: 0.64351
+OPTIMIZED Elapsed seconds: 
+0.092602
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 9597
+-Single Node Greedy Algorithm-
+Initial Modularity: -0.069864
+Successfully incremented modularity 60 times
+Best modularity: 0.637315
+OPTIMIZED Elapsed seconds: 
+0.146351
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 4777
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.057586
+Successfully incremented modularity 42 times
+Best modularity: 0.699487
+OPTIMIZED Elapsed seconds: 
+0.151757
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 1277
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.026681
+Successfully incremented modularity 50 times
+Best modularity: 0.668469
+OPTIMIZED Elapsed seconds: 
+0.145881
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 5521
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.007384
+Successfully incremented modularity 39 times
+Best modularity: 0.64351
+OPTIMIZED Elapsed seconds: 
+0.115461
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 3915
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.129103
+Successfully incremented modularity 35 times
+Best modularity: 0.689524
+NOT OPTIMIZED Elapsed seconds: 
+0.881577
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6058
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.034291
+Successfully incremented modularity 30 times
+Best modularity: 0.689851
+NOT OPTIMIZED Elapsed seconds: 
+0.978039
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 7494
+-Single Node Greedy Algorithm-
+Initial Modularity: -0.007920
+Successfully incremented modularity 41 times
+Best modularity: 0.699487
+NOT OPTIMIZED Elapsed seconds: 
+1.152595
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 8024
+-Single Node Greedy Algorithm-
+Initial Modularity: -0.031397
+Successfully incremented modularity 40 times
+Best modularity: 0.484941
+NOT OPTIMIZED Elapsed seconds: 
+1.281942
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6453
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.005166
+Successfully incremented modularity 56 times
+Best modularity: 0.689522
+NOT OPTIMIZED Elapsed seconds: 
+1.596406
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 9705
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.078994
+Successfully incremented modularity 34 times
+Best modularity: 0.64351
+NOT OPTIMIZED Elapsed seconds: 
+0.858124
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 9597
+-Single Node Greedy Algorithm-
+Initial Modularity: -0.069864
+Successfully incremented modularity 60 times
+Best modularity: 0.637315
+NOT OPTIMIZED Elapsed seconds: 
+1.433060
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 4777
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.057586
+Successfully incremented modularity 42 times
+Best modularity: 0.699487
+NOT OPTIMIZED Elapsed seconds: 
+1.319457
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 1277
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.026681
+Successfully incremented modularity 50 times
+Best modularity: 0.668469
+NOT OPTIMIZED Elapsed seconds: 
+1.394117
+Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 5521
+-Single Node Greedy Algorithm-
+Initial Modularity: 0.007384
+Successfully incremented modularity 39 times
+Best modularity: 0.64351
+NOT OPTIMIZED Elapsed seconds: 
+1.165275
