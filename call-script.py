@@ -10,18 +10,18 @@ def parseArgs():
     seedList = [3915, 6058, 7494, 8024, 6453, 9705, 9597, 4777, 1277, 5521]
     networkFile = sys.argv[1]
     # networkFile = "networks/tripartite-demo.txt"
-    motifFile = "motifs/triangle.motif"
-    # motifFile = "motifs/tripartite_4_nodes.motif"
+    # motifFile = "motifs/triangle.motif"
+    motifFile = "motifs/tripartite_3_nodes.motif"
     directedOrUndirected = "-ud"
     weightedOrUnweighted = "-uw"
-    numberCommunities = "2"
+    numberCommunities = "3"
 
     for seed in seedList:
-        call(["/net/areas/homes/up201602879/Tese/MotifModularity/motifModularity", "-n", networkFile,
+        call(["/Users/rui.fonseca/Workspace/Tese/MotifModularity/motifModularity", "-n", networkFile,
               weightedOrUnweighted, directedOrUndirected, "-s", str(seed), "-m", motifFile, "-nc", numberCommunities])
 
     for seed in seedList:
-        call(["/net/areas/homes/up201602879/Tese/MotifModularity/motifModularity", "-n", networkFile,
+        call(["/Users/rui.fonseca/Workspace/Tese/MotifModularity/motifModularity", "-n", networkFile,
               weightedOrUnweighted, directedOrUndirected, "-s", str(seed), "-m", motifFile, "-nc", numberCommunities, "--not-optimized"])
 
 
