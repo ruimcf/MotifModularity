@@ -46,6 +46,7 @@ private:
   static bool readMotif;
   static bool readPartition;
   static bool notOptimized;
+  static bool noMotifOrder;
   static int seed;
   static Motif motif;
   static void setNodes();

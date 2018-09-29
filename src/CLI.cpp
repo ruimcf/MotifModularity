@@ -26,6 +26,7 @@ int *bestPartition;
 int CLI::numberOfCommunities;
 bool CLI::hasNumberOfCommunities;
 bool CLI::notOptimized;
+bool CLI::noMotifOrder;
 
 //unique id to identify this run, random number between 1 and 1000000
 int uniqueIdentifier;
@@ -50,6 +51,7 @@ int CLI::parseArgs(int argc, char **argv)
     hasNumberOfCommunities = false;
     seed = time(NULL);
     notOptimized = false;
+    noMotifOrder = false;
 
     for (int i = 1; i < argc; ++i)
     {
@@ -144,6 +146,11 @@ int CLI::parseArgs(int argc, char **argv)
         {
             notOptimized = true;
         }
+
+        else if (arg == "--no-motif-order") 
+        {
+            noMotifOrder = true;
+        }
     }
 
     if(!hasNumberOfCommunities)
@@ -174,7 +181,7 @@ int CLI::parseArgs(int argc, char **argv)
 
 void CLI::openResultsFile()
 {
-    string resultPath = "resultsCompareChangingNode/results_" + networkFileName;
+    string resultPath = "resultsCompareMotifOrder/results_" + networkFileName;
     resultsFile.open(resultPath, ios::out | ios::app);
     if (resultsFile.is_open())
     {
@@ -347,22 +354,16 @@ void CLI::start(int argc, char **argv)
     // printf("Optimized Motif modularity: %f\nTotal: %ld\n", optimizedMotifModularity, total);
 
     clock_t begin = clock();
-    if (notOptimized) {
-        CLI::singleNodeGreedyAlgorithmNotOptimized();
-    }
-    else {
     CLI::singleNodeGreedyAlgorithm();
-    }
-    
     clock_t end = clock();
     double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
     cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
     if(notOptimized)
     {
-        writeLineToFile("NOT OPTIMIZED Elapsed seconds: \n" + to_string(elapsedSecs) +"\n");
+        writeLineToFile("NOT OPTIMIZED Elapsed seconds: " + to_string(elapsedSecs) +"\n");
     }
     else {
-        writeLineToFile("OPTIMIZED Elapsed seconds: \n" + to_string(elapsedSecs) +"\n");
+        writeLineToFile("OPTIMIZED Elapsed seconds: " + to_string(elapsedSecs) +"\n");
     } 
 
     
@@ -544,7 +545,7 @@ void CLI::countCombinationMotifs(MotifValues *values)
 
 bool CLI::combinationObeysOrbitRules()
 {
-    const vector<vector<int> > & orbitRules = motif.getOrbitRulesWithOrder();
+    const vector<vector<int> > & orbitRules = noMotifOrder ? motif.getOrbitRules() :  motif.getOrbitRulesWithOrder();
     for(int i = 0; i < orbitRules.size(); i++)
     {
         if(combination.at(orbitRules[i][0]) >= combination.at(orbitRules[i][1])){
@@ -563,7 +564,7 @@ bool CLI::combinationHasMotifEdges()
         for(int j = i+1; j < combination.size(); ++j)
         {
             // if has edge in motif, it needs to have edge on the graph
-            if(motif.hasEdgeWithOrder(i, j))
+            if(noMotifOrder ? motif.hasEdge(i, j) : motif.hasEdgeWithOrder(i, j))
             {
                 if(!g->hasEdge(combination[i], combination[j]))
                     return false;
@@ -576,7 +577,7 @@ bool CLI::combinationHasMotifEdges()
             // also check the opposite orientation if the motif is directed
             if(motif.isDirected())
             {
-                if(motif.hasEdgeWithOrder(j, i))
+                if(noMotifOrder ? motif.hasEdge(j, i) : motif.hasEdgeWithOrder(j, i))
                 {
                     if(!g->hasEdge(combination[j], combination[i]))
                         return false;
@@ -598,12 +599,12 @@ bool CLI::combinationHasMotifCommunities()
         for(int nodeB = nodeA + 1; nodeB < combination.size(); ++nodeB)
         {
             // If one of the nodes can be in any community we continue
-            if(motif.getCommunityWithOrder(nodeA) == -1 || motif.getCommunityWithOrder(nodeB) == -1)
+            if((noMotifOrder ? motif.getCommunity(nodeA) : motif.getCommunityWithOrder(nodeA)) == -1 || (noMotifOrder ? motif.getCommunity(nodeB) : motif.getCommunityWithOrder(nodeB)) == -1)
                 continue;
 
             // If the communities are different in the motif, they have
             // to be different in the partition
-            else if (motif.getCommunityWithOrder(nodeA) != motif.getCommunityWithOrder(nodeB))
+            else if ((noMotifOrder ? motif.getCommunity(nodeA) : motif.getCommunityWithOrder(nodeA)) != (noMotifOrder ? motif.getCommunity(nodeB) : motif.getCommunityWithOrder(nodeB)))
             {
                 if(CLI::kronecker(combination[nodeA], combination[nodeB]))
                     return false;
@@ -622,7 +623,7 @@ bool CLI::combinationHasMotifCommunities()
 // For each motif edges, calculate the nullcaseWeight and return the product of them
 int CLI::combinationNullcaseWeights()
 {
-    const vector< vector<int> > & adjacencyList = motif.getAdjacencyListWithOrder();
+    const vector< vector<int> > & adjacencyList = noMotifOrder ? motif.getAdjacencyList() : motif.getAdjacencyListWithOrder();
     int product = 1;
     for(int i = 0; i < adjacencyList.size(); ++i)
     {
@@ -705,7 +706,7 @@ void CLI::optimizedMotifModularityValuesIteration(int offset, bool edgesCheck, b
 
 bool CLI::optimizedCombinationOrbitRules()
 {
-    const vector< vector<int> >& orbitRules = motif.getOrbitRulesSizeWithOrder(combination.size()-1);
+    const vector< vector<int> >& orbitRules = noMotifOrder ? motif.getOrbitRulesSize(combination.size()-1) : motif.getOrbitRulesSizeWithOrder(combination.size()-1);
     for(int i = 0; i < orbitRules.size(); i++)
     {
         if(combination.at(orbitRules[i][0]) >= combination.at(orbitRules[i][1])){
@@ -718,7 +719,7 @@ bool CLI::optimizedCombinationOrbitRules()
 // The next node that we can add to the combination needs to agree to the most strict orbit rule
 int CLI::getOrbitRulesNextValidNode()
 {
-    const vector< vector<int> >& orbitRules = motif.getOrbitRulesSizeWithOrder(combination.size());
+    const vector< vector<int> >& orbitRules = noMotifOrder ? motif.getOrbitRulesSize(combination.size()) : motif.getOrbitRulesSizeWithOrder(combination.size());
     int maxNode = -1;
     for(int i = 0; i < orbitRules.size(); i++)
     {
@@ -740,7 +741,7 @@ bool CLI::optimizedCombinationHasMotifEdges()
     for(int i = 0; i < addedNodePos; ++i)
     {
         //if has edge in motif, it needs to have edge on the graph
-        if(motif.hasEdgeWithOrder(addedNodePos, i)) {
+        if(noMotifOrder ? motif.hasEdge(addedNodePos, i) : motif.hasEdgeWithOrder(addedNodePos, i)) {
             if(!g->hasEdge(combination[addedNodePos], combination[i]))
                 return false;
         }
@@ -752,7 +753,7 @@ bool CLI::optimizedCombinationHasMotifEdges()
         // also check the opposite orientation if the motif is directed
         if(motif.isDirected())
         {
-            if(motif.hasEdgeWithOrder(i, addedNodePos)) 
+            if(noMotifOrder ? motif.hasEdge(i, addedNodePos) : motif.hasEdgeWithOrder(i, addedNodePos)) 
             {
                 if(!g->hasEdge(combination[i], combination[addedNodePos]))
                     return false;
@@ -771,17 +772,17 @@ bool CLI::optimizedCombinationHasMotifCommunities()
     int addedNodePos = combination.size()-1;
     
     // If the added node can be in any community, its all good
-    if(motif.getCommunityWithOrder(addedNodePos) == -1)
+    if((noMotifOrder ? motif.getCommunity(addedNodePos) : motif.getCommunityWithOrder(addedNodePos)) == -1)
         return true;
     
     for(int i = 0; i < addedNodePos; ++i)
     {
         // If the node can be in any community we continue
-        if (motif.getCommunityWithOrder(i) == -1) continue;
+        if ((noMotifOrder ? motif.getCommunity(i) : motif.getCommunityWithOrder(i)) == -1) continue;
 
         // If the communities are different in the motif, they have
         // to be different in the partition
-        if (motif.getCommunityWithOrder(i) != motif.getCommunityWithOrder(addedNodePos))
+        if ((noMotifOrder ? motif.getCommunity(i) : motif.getCommunityWithOrder(i)) != (noMotifOrder ? motif.getCommunity(addedNodePos) : motif.getCommunityWithOrder(addedNodePos)))
         {
             if(CLI::kronecker(combination[i], combination[addedNodePos]))
                 return false;
@@ -799,7 +800,7 @@ bool CLI::optimizedCombinationHasMotifCommunities()
 // When a new node is added to the combination, calculate the nullcase weights of that node with the others
 void CLI::nextCombinationNullcaseWeights()
 {
-    const vector< vector<int> > & adjacencyList = motif.getAdjacencyListSizeWithOrder(combination.size() - 1);
+    const vector< vector<int> > & adjacencyList = noMotifOrder ? motif.getAdjacencyListSize(combination.size() - 1) : motif.getAdjacencyListSizeWithOrder(combination.size() - 1);
     long product = (combination.size() == 1) ? 1 : combinationWeightsArray[combination.size() - 2];
 
     for(int i = 0; i < adjacencyList.size(); ++i)
