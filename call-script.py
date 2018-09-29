@@ -21,9 +21,9 @@ def parseArgs():
         call([os.getcwd() + "/motifModularity", "-n", networkFile,
               weightedOrUnweighted, directedOrUndirected, "-s", str(seed), "-m", motifFile, "-nc", numberCommunities])
 
-    for seed in seedList:
-        call([os.getcwd() + "/motifModularity", "-n", networkFile,
-              weightedOrUnweighted, directedOrUndirected, "-s", str(seed), "-m", motifFile, "-nc", numberCommunities, "--not-optimized"])
+    # for seed in seedList:
+    #     call([os.getcwd() + "/motifModularity", "-n", networkFile,
+    #           weightedOrUnweighted, directedOrUndirected, "-s", str(seed), "-m", motifFile, "-nc", numberCommunities, "--not-optimized"])
 
 
 parseArgs()

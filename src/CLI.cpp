@@ -1029,6 +1029,7 @@ int numberForEvenTrianglePartitions(int numNodes)
 
 double CLI::singleNodeGreedyAlgorithm()
 {
+    int step = 0;
     cout << "--- Starting greedy ---" << endl;
     writeLineToFile("-- Single Node Greedy Algorithm --\n");
     int chosenNode, chosenIndex, chosenNodePartition, betterPartition;
@@ -1043,7 +1044,7 @@ double CLI::singleNodeGreedyAlgorithm()
     // currentModularity = CLI::optimizedMotifModularity();
     
     cout << "Initial Modularity " << currentModularity << endl;
-    writeLineToFile("Modularity: "+to_string(currentModularity)+"\n");
+    writeLineToFile(to_string(++step)+"	"+to_string(currentModularity)+"\n");
     //if (!noWriteFiles)
     //networkPartition.writePartitionFile(networkFileName, "g-initial-partition", uniqueIdentifier);
 
@@ -1091,7 +1092,7 @@ double CLI::singleNodeGreedyAlgorithm()
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
             currentValues = betterValues;
             stringstream ss;
-            ss << "Modularity: " << currentModularity << endl;
+            ss << ++step << "	" << currentModularity << endl;
             // ss << "Times failed: " << failObject.getConsecutiveTimesFailed() << endl;
             // ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
             // cout << ss.str();
