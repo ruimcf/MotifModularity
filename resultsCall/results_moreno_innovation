@@ -1,0 +1,70 @@
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 3915
+Elapsed seconds: 0.488092
+Optimized motif Modularity: -0.021116
+
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 6058
+Elapsed seconds: 0.410595
+Optimized motif Modularity: 0.016758
+
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 7494
+Elapsed seconds: 0.425366
+Optimized motif Modularity: -0.010672
+
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 8024
+Elapsed seconds: 0.427031
+Optimized motif Modularity: -0.001652
+
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 6453
+Elapsed seconds: 0.408508
+Optimized motif Modularity: -0.006567
+
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 9705
+Elapsed seconds: 0.494271
+Optimized motif Modularity: 0.000865
+
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 9597
+Elapsed seconds: 0.422285
+Optimized motif Modularity: 0.009851
+
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 4777
+Elapsed seconds: 0.424974
+Optimized motif Modularity: -0.037784
+
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 1277
+Elapsed seconds: 0.433325
+Optimized motif Modularity: -0.012065
+
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 5521
+Elapsed seconds: 0.428699
+Optimized motif Modularity: -0.016466
+
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 3915
+Elapsed seconds: 0.719882
+NOT Optimized motif Modularity: -0.021116
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 6058
+Elapsed seconds: 0.697128
+NOT Optimized motif Modularity: 0.016758
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 7494
+Elapsed seconds: 0.736038
+NOT Optimized motif Modularity: -0.010672
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 8024
+Elapsed seconds: 0.651302
+NOT Optimized motif Modularity: -0.001652
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 6453
+Elapsed seconds: 0.641532
+NOT Optimized motif Modularity: -0.006567
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 9705
+Elapsed seconds: 0.676692
+NOT Optimized motif Modularity: 0.000865
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 9597
+Elapsed seconds: 0.654781
+NOT Optimized motif Modularity: 0.009851
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 4777
+Elapsed seconds: 0.637438
+NOT Optimized motif Modularity: -0.037784
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 1277
+Elapsed seconds: 0.639365
+NOT Optimized motif Modularity: -0.012065
+Number of Communities: 3 | Motif: motifs/path_3_nodes_directed.motif | SEED: 5521
+Elapsed seconds: 0.638309
+NOT Optimized motif Modularity: -0.016466

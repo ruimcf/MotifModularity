@@ -1,0 +1,70 @@
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 3915
+Elapsed seconds: 0.172292
+Optimized motif Modularity: -0.107061
+
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 6058
+Elapsed seconds: 0.172807
+Optimized motif Modularity: 0.037416
+
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 7494
+Elapsed seconds: 0.165373
+Optimized motif Modularity: 0.172504
+
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 8024
+Elapsed seconds: 0.165226
+Optimized motif Modularity: 0.171941
+
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 6453
+Elapsed seconds: 0.165436
+Optimized motif Modularity: -0.033428
+
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 9705
+Elapsed seconds: 0.166959
+Optimized motif Modularity: -0.116977
+
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 9597
+Elapsed seconds: 0.165901
+Optimized motif Modularity: -0.115999
+
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 4777
+Elapsed seconds: 0.164422
+Optimized motif Modularity: -0.107477
+
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 1277
+Elapsed seconds: 0.163606
+Optimized motif Modularity: -0.036938
+
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 5521
+Elapsed seconds: 0.165215
+Optimized motif Modularity: 0.100619
+
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 3915
+Elapsed seconds: 0.316415
+NOT Optimized motif Modularity: -0.107061
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 6058
+Elapsed seconds: 0.317893
+NOT Optimized motif Modularity: 0.037416
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 7494
+Elapsed seconds: 0.321226
+NOT Optimized motif Modularity: 0.172504
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 8024
+Elapsed seconds: 0.326414
+NOT Optimized motif Modularity: 0.171941
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 6453
+Elapsed seconds: 0.328905
+NOT Optimized motif Modularity: -0.033428
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 9705
+Elapsed seconds: 0.321486
+NOT Optimized motif Modularity: -0.116977
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 9597
+Elapsed seconds: 0.340209
+NOT Optimized motif Modularity: -0.115999
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 4777
+Elapsed seconds: 0.325392
+NOT Optimized motif Modularity: -0.107477
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 1277
+Elapsed seconds: 0.318916
+NOT Optimized motif Modularity: -0.036938
+Number of Communities: 3 | Motif: motifs/triangle_cycle_directed.motif | SEED: 5521
+Elapsed seconds: 0.336398
+NOT Optimized motif Modularity: 0.100619

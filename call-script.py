@@ -11,8 +11,9 @@ def parseArgs():
     networkFile = sys.argv[1]
     # networkFile = "networks/tripartite-demo.txt"
     # motifFile = "motifs/triangle.motif"
-    motifFile = "motifs/tripartite_3_nodes.motif"
-    directedOrUndirected = "-ud"
+    # motifFile = "motifs/tripartite_3_nodes.motif"
+    motifFile = "motifs/path_3_nodes_directed.motif"
+    directedOrUndirected = "-d"
     weightedOrUnweighted = "-uw"
     numberCommunities = "3"
 
