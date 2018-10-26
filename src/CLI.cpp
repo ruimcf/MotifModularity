@@ -181,7 +181,7 @@ int CLI::parseArgs(int argc, char **argv)
 
 void CLI::openResultsFile()
 {
-    string resultPath = "resultsGreedyEvolution/results_" + networkFileName;
+    string resultPath = "resultsCompareGreedy/results_" + networkFileName;
     resultsFile.open(resultPath, ios::out | ios::app);
     if (resultsFile.is_open())
     {
@@ -303,7 +303,7 @@ void CLI::start(int argc, char **argv)
 
     CLI::openResultsFile();
     string argsInfo = "INFO Number of Communities: " + to_string(numberOfCommunities) + " | Motif: " + motifFile + " | SEED: " + to_string(seed) + "\n";
-    //CLI::writeLineToFile(argsInfo);
+    CLI::writeLineToFile(argsInfo);
 
     Random::seed(seed);
 
@@ -341,68 +341,19 @@ void CLI::start(int argc, char **argv)
         nodes.push_back(i);
     }
 
-    // total = 0;
-    // double modularity = CLI::triangleModularity();
-    // printf("Triangle modularity: %f\nTotal: %ld\n", modularity, total);
-
-    // total = 0;
-    // double motifModularity = CLI::motifModularity();
-    // printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
-
-    total = 0;
-    // double optimizedMotifModularity = CLI::optimizedMotifModularity();
-    // printf("Optimized Motif modularity: %f\nTotal: %ld\n", optimizedMotifModularity, total);
-
     clock_t begin = clock();
     CLI::singleNodeGreedyAlgorithm();
     clock_t end = clock();
     double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
     cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
-    // if(notOptimized)
-    // {
-    //     writeLineToFile("NOT OPTIMIZED Elapsed seconds: " + to_string(elapsedSecs) +"\n");
-    // }
-    // else {
-    //     writeLineToFile("OPTIMIZED Elapsed seconds: " + to_string(elapsedSecs) +"\n");
-    // } 
+    writeLineToFile("Greedy Choose first - Elapsed seconds: " + to_string(elapsedSecs) +"\n");
 
-    
-    // for(int i = 0; i < 5; ++i)
-    // {
-    //     total = 0;
-    //     clock_t begin_ = clock();
-    //     MotifValues values = CLI::optimizedMotifModularityValues();
-    //     cout << "Optimized motif Modularity values: " << CLI::motifModularityFromValues(values) << endl << "Total: " << total << endl;
-    //     printMotifValues(values);
-    //     clock_t end_ = clock();
-    //     double elapsedSecs_ = double(end_ - begin_) / CLOCKS_PER_SEC;
-    //     cout << "Elapsed seconds: " << elapsedSecs_ << endl << endl;
-    // }
-
-    // total = 0;
-    // MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
-    // MotifVariableValues motifVariableValues = CLI::getMotifVariableValues();
-    // double constantValuesMotifModularity = CLI::motifModularityFromValues(motifConstantValues, motifVariableValues);
-    // printf("Optimized Motif modularity with constant values: %f\n", constantValuesMotifModularity);
-
-    // int changingNode = 1;
-
-    // MotifVariableValues toChangeNodeValues = CLI::nodeVariableValues(changingNode);
-    // networkPartition.setNodeCommunity(changingNode, 1);
-    // cout << "CHANGED" << endl;
-    // total = 0;
-    // MotifValues newValues = CLI::optimizedMotifModularityValues();
-    // cout << "Modularity: " << motifModularityFromValues(newValues) << endl << " Total: " << total << endl;
-    // MotifVariableValues changedNodeValues = CLI::nodeVariableValues(changingNode);
-    // MotifValues changingNodeMotifValuesValues = changingNodeMotifValues(values, toChangeNodeValues, changedNodeValues);
-    // cout << "Calculated Changing Node modularity: " << CLI::motifModularityFromValues(changingNodeMotifValuesValues) << endl;
-
-    // clock_t begin = clock();
-    // CLI::singleNodeGreedyAlgorithm();
-    // clock_t end = clock();
-    // double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
-    // cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
-    // CLI::writeLineToFile("Elapsed seconds: " + to_string(elapsedSecs) + "\n\n");
+    begin = clock();
+    CLI::singleNodeTestAllGreedyAlgorithm();
+    end = clock();
+    elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
+    cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
+    writeLineToFile("Greedy Choose best - Elapsed seconds: " + to_string(elapsedSecs) +"\n");
     CLI::closeResultsFile();
 }
 
@@ -1119,104 +1070,26 @@ double CLI::singleNodeGreedyAlgorithm()
     return currentModularity;
 }
 
-double CLI::singleNodeGreedyAlgorithmNotOptimized()
-{
-    cout << "--- Starting greedy ---" << endl;
-    writeLineToFile("-Single Node Greedy Algorithm-\n");
-    int chosenNode, chosenIndex, chosenNodePartition, betterPartition;
-    double  currentModularity;
-    vector<int> allNodes;
-
-    networkPartition.randomPartition(numberOfCommunities);
-
-
-    currentModularity = CLI::optimizedMotifModularity();
-    
-    cout << "Initial Modularity " << currentModularity << endl;
-    writeLineToFile("Initial Modularity: "+to_string(currentModularity)+"\n");
-    //if (!noWriteFiles)
-    // networkPartition.writePartitionFile(networkFileName, "g-initial-partition", uniqueIdentifier);
-
-    FailObject failObject;
-    allNodes.reserve(g->numNodes());
-    for (int i = 0; i < g->numNodes(); ++i)
-    {
-        allNodes.push_back(i);
-    }
-    vector<int> availableNodes(allNodes);
-
-    while (!availableNodes.empty())
-    {
-        chosenIndex = Random::getInteger(0, availableNodes.size() - 1);
-        chosenNode = availableNodes[chosenIndex];
-
-        chosenNodePartition = networkPartition.getNodeCommunity(chosenNode);
-        betterPartition = -1;
-        for (int i = 0; i < numberOfCommunities; i++)
-        {
-            if (i != chosenNodePartition)
-            {
-                networkPartition.setNodeCommunity(chosenNode, i);
-                double currentPartitionModularity = CLI::optimizedMotifModularity();
-                if (currentPartitionModularity > currentModularity)
-                {
-                    currentModularity = currentPartitionModularity;
-                    betterPartition = i;
-                }
-            }
-        }
-        if (betterPartition == -1)
-        {
-            failObject.recordFail();
-            networkPartition.setNodeCommunity(chosenNode, chosenNodePartition);
-            availableNodes.erase(availableNodes.begin() + chosenIndex);
-        }
-        else
-        {
-            networkPartition.setNodeCommunity(chosenNode, betterPartition);
-            // stringstream ss;
-            // ss << "Current modularity: " << currentModularity << endl;
-            // ss << "Times failed: " << failObject.getConsecutiveTimesFailed() << endl;
-            // ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
-            // cout << ss.str();
-            // printMotifValues(betterValues);
-            // cout << "-----------" << endl;
-            // writeLineToFile(ss.str());
-
-            failObject.recordSuccess();
-            availableNodes = allNodes;
-        }
-    }
-
-    stringstream ss;
-    ss << "Successfully incremented modularity " << failObject.getTimesSuccess() << " times" << endl;
-    ss << "Best modularity: " << currentModularity << endl;
-    // ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
-    // ss << "Number of unique communities: " + to_string(networkPartition.getNumberOfDifferentPartitions()) << endl;
-    cout << ss.str();
-    
-    writeLineToFile(ss.str());
-    //if (!noWriteFiles)
-    // networkPartition.writePartitionFile(networkFileName, "g-computed-partition", uniqueIdentifier);
-
-    return currentModularity;
-}
 /**
  * Greedy algorithm that tests the all the possible one node community changes and choses the one
  * that increases the modularity the greatest
  */
 double CLI::singleNodeTestAllGreedyAlgorithm()
 {
+    int step = 0;
     cout << "--- Starting greedy test all ---" << endl;
+    writeLineToFile("-- Test All Greedy Algorithm --\n");
     int chosenNode, chosenIndex, chosenNodePartition;
-    double bestModularity, currentModularity;
     vector<int> allNodes;
-    MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
+    double bestModularity, currentModularity;
+    MotifValues betterValues;
 
     networkPartition.randomPartition(numberOfCommunities);
 
-    currentModularity = CLI::optimizedMotifModularity();
+    MotifValues currentValues = CLI::optimizedMotifModularityValues();
+    currentModularity = CLI::motifModularityFromValues(currentValues);
     cout << "Current Modularity " << currentModularity << endl;
+    writeLineToFile(to_string(++step)+"	"+to_string(currentModularity)+"\n");
 
     allNodes.reserve(g->numNodes());
     for (int i = 0; i < g->numNodes(); ++i)
@@ -1235,15 +1108,19 @@ double CLI::singleNodeTestAllGreedyAlgorithm()
         {
             chosenNode = availableNodes[chosenIndex];
             chosenNodePartition = networkPartition.getNodeCommunity(chosenNode);
+            MotifVariableValues beforeChangeNodeValues = CLI::nodeVariableValues(chosenNode); 
             for (int i = 0; i < numberOfCommunities; i++)
             {
                 if (i != chosenNodePartition)
                 {
                     networkPartition.setNodeCommunity(chosenNode, i);
-                    double currentPartitionModularity = CLI::optimizedMotifModularity();
+                    MotifVariableValues afterChangeNodeValues = CLI::nodeVariableValues(chosenNode);
+                    MotifValues currentPartitionModularityValues = CLI::changingNodeMotifValues(currentValues, beforeChangeNodeValues, afterChangeNodeValues);
+                    double currentPartitionModularity = CLI::motifModularityFromValues(currentPartitionModularityValues);
                     if (currentPartitionModularity > currentModularity)
                     {
                         currentModularity = currentPartitionModularity;
+                        betterValues = currentPartitionModularityValues;
                         bestCommunity = i;
                         bestNodeToChange = chosenNode;
                     }
@@ -1258,12 +1135,14 @@ double CLI::singleNodeTestAllGreedyAlgorithm()
         else
         {
             networkPartition.setNodeCommunity(bestNodeToChange, bestCommunity);
+            currentValues = betterValues;
 
-            // stringstream ss;
+            stringstream ss;
+            ss << ++step << "	" << currentModularity << endl;
+            writeLineToFile(ss.str());
             // ss << "Current modularity: " << currentModularity << endl;
             // ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
             // cout << ss.str();
-            // writeLineToFile(ss.str());
         }
     }
 
