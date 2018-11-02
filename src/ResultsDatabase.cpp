@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
+#include <iterator>
 
 using namespace std;
 
@@ -13,22 +14,17 @@ ResultsDatabase::ResultsDatabase()
 
 }
 
-void ResultsDatabase::addColumn (string columnName)
+void ResultsDatabase::addColumn(string columnName)
 {
+    map<string, vector<double> >::iterator findResult = table.find(columnName);  
+    if (findResult != table.end()) {   
+        cout << "Column " << columnName << " already exists." << endl;
+        return;
+    }
     vector<double> newTableColumn;
     table.insert(make_pair(columnName, newTableColumn));
     cout << "Added a new column: " << columnName << endl;
 }
-
-template <typename C, class T> void findit(const C& c, T val) {  
-    cout << "Trying find() on value " << val << endl;  
-    auto result = c.find(val);  
-    if (result != c.end()) {  
-        cout << "Element found: "; print_elem(*result); cout << endl;  
-    } else {  
-        cout << "Element not found." << endl;  
-    }  
-} 
 
 void ResultsDatabase::addEntryToColumn(string columnName, double result)
 {
@@ -36,7 +32,6 @@ void ResultsDatabase::addEntryToColumn(string columnName, double result)
     if (findResult != table.end()) {  
         vector<double> &column = (findResult->second);
         column.push_back(result);
-        cout << "Added result " << result << " to column " << columnName << endl;
     } else {  
         cout << "Column "<< columnName << " not found." << endl;  
     }   
@@ -143,4 +138,46 @@ void ResultsDatabase::printToCSVFile()
         cout << "Failed to open File " << resultPath << endl;
     }
 
+}
+
+
+template<typename Out>
+void split(const std::string &s, char delim, Out result) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        *(result++) = item;
+    }
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, std::back_inserter(elems));
+    return elems;
+}
+
+void ResultsDatabase::readFromCSVFile()
+{
+    string filename = "results/results-table.csv";
+    ifstream resultsFile(filename);
+     if (!resultsFile.is_open())
+    {
+        cout << "Error opening results file for read" << endl;
+        return;
+    }
+    table.clear();
+    string line;
+    getline(resultsFile, line);
+    vector<string> headers = split(line, ',');
+    for(int i = 1; i < headers.size(); ++i)
+        addColumn(headers[i]);
+
+    while(getline(resultsFile, line))
+    {
+        vector<string> rowValues = split(line, ','); 
+        for(int i = 1; i < rowValues.size(); ++i)
+            if (!rowValues[i].empty())
+                addEntryToColumn(headers[i], stod(rowValues[i]));
+    }
+    resultsFile.close();
 }

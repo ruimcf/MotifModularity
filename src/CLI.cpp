@@ -27,6 +27,7 @@ int CLI::numberOfCommunities;
 bool CLI::hasNumberOfCommunities;
 bool CLI::notOptimized;
 bool CLI::noMotifOrder;
+ResultsDatabase CLI::resultsTable;
 
 //unique id to identify this run, random number between 1 and 1000000
 int uniqueIdentifier;
@@ -304,6 +305,7 @@ void CLI::start(int argc, char **argv)
     CLI::openResultsFile();
     string argsInfo = "INFO Number of Communities: " + to_string(numberOfCommunities) + " | Motif: " + motifFile + " | SEED: " + to_string(seed) + "\n";
     CLI::writeLineToFile(argsInfo);
+    resultsTable.readFromCSVFile();
 
     Random::seed(seed);
 
@@ -346,7 +348,10 @@ void CLI::start(int argc, char **argv)
     clock_t end = clock();
     double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
     cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
-    writeLineToFile("Greedy Choose first - Elapsed seconds: " + to_string(elapsedSecs) +"\n");
+    // writeLineToFile("Greedy Choose first - Elapsed seconds: " + to_string(elapsedSecs) +"\n");
+    string columnName = "time-"+to_string(seed)+"-choose-first";
+    resultsTable.addColumn(columnName);
+    resultsTable.addEntryToColumn(columnName, elapsedSecs);
 
     begin = clock();
     CLI::singleNodeTestAllGreedyAlgorithm();
@@ -354,7 +359,12 @@ void CLI::start(int argc, char **argv)
     elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
     cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
     writeLineToFile("Greedy Choose best - Elapsed seconds: " + to_string(elapsedSecs) +"\n");
+    columnName = "time-"+to_string(seed)+"-choose-best";
+    resultsTable.addColumn(columnName);
+    resultsTable.addEntryToColumn(columnName, elapsedSecs);
+
     CLI::closeResultsFile();
+    resultsTable.printToCSVFile();
 }
 
 /**
@@ -980,9 +990,9 @@ int numberForEvenTrianglePartitions(int numNodes)
 
 double CLI::singleNodeGreedyAlgorithm()
 {
-    int step = 0;
     cout << "--- Starting greedy ---" << endl;
-    writeLineToFile("-- Single Node Greedy Algorithm --\n");
+    string columnName = to_string(seed) + "-choose-first";
+    resultsTable.addColumn(columnName);
     int chosenNode, chosenIndex, chosenNodePartition, betterPartition;
     MotifValues betterValues;
     double bestModularity, currentModularity;
@@ -992,12 +1002,9 @@ double CLI::singleNodeGreedyAlgorithm()
     MotifValues currentValues = CLI::optimizedMotifModularityValues();
     currentModularity = CLI::motifModularityFromValues(currentValues);
 
-    // currentModularity = CLI::optimizedMotifModularity();
     
     cout << "Initial Modularity " << currentModularity << endl;
-    writeLineToFile(to_string(++step)+"	"+to_string(currentModularity)+"\n");
-    //if (!noWriteFiles)
-    //networkPartition.writePartitionFile(networkFileName, "g-initial-partition", uniqueIdentifier);
+    resultsTable.addEntryToColumn(columnName, currentModularity);
 
     FailObject failObject;
     allNodes.reserve(g->numNodes());
@@ -1042,14 +1049,7 @@ double CLI::singleNodeGreedyAlgorithm()
         {
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
             currentValues = betterValues;
-            stringstream ss;
-            ss << ++step << "	" << currentModularity << endl;
-            // ss << "Times failed: " << failObject.getConsecutiveTimesFailed() << endl;
-            // ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
-            // cout << ss.str();
-            // printMotifValues(betterValues);
-            // cout << "-----------" << endl;
-            writeLineToFile(ss.str());
+            resultsTable.addEntryToColumn(columnName, currentModularity);
 
             failObject.recordSuccess();
             availableNodes = allNodes;
@@ -1063,10 +1063,6 @@ double CLI::singleNodeGreedyAlgorithm()
     // ss << "Number of unique communities: " + to_string(networkPartition.getNumberOfDifferentPartitions()) << endl;
     cout << ss.str();
     
-    //writeLineToFile(ss.str());
-    //if (!noWriteFiles)
-    // networkPartition.writePartitionFile(networkFileName, "g-computed-partition", uniqueIdentifier);
-
     return currentModularity;
 }
 
@@ -1076,20 +1072,21 @@ double CLI::singleNodeGreedyAlgorithm()
  */
 double CLI::singleNodeTestAllGreedyAlgorithm()
 {
-    int step = 0;
     cout << "--- Starting greedy test all ---" << endl;
-    writeLineToFile("-- Test All Greedy Algorithm --\n");
+    string columnName = to_string(seed) + "-choose-best";
     int chosenNode, chosenIndex, chosenNodePartition;
     vector<int> allNodes;
     double bestModularity, currentModularity;
     MotifValues betterValues;
+    resultsTable.addColumn(columnName);
 
     networkPartition.randomPartition(numberOfCommunities);
 
     MotifValues currentValues = CLI::optimizedMotifModularityValues();
     currentModularity = CLI::motifModularityFromValues(currentValues);
     cout << "Current Modularity " << currentModularity << endl;
-    writeLineToFile(to_string(++step)+"	"+to_string(currentModularity)+"\n");
+
+    resultsTable.addEntryToColumn(columnName, currentModularity);
 
     allNodes.reserve(g->numNodes());
     for (int i = 0; i < g->numNodes(); ++i)
@@ -1136,13 +1133,7 @@ double CLI::singleNodeTestAllGreedyAlgorithm()
         {
             networkPartition.setNodeCommunity(bestNodeToChange, bestCommunity);
             currentValues = betterValues;
-
-            stringstream ss;
-            ss << ++step << "	" << currentModularity << endl;
-            writeLineToFile(ss.str());
-            // ss << "Current modularity: " << currentModularity << endl;
-            // ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
-            // cout << ss.str();
+            resultsTable.addEntryToColumn(columnName, currentModularity);
         }
     }
 
@@ -1150,7 +1141,6 @@ double CLI::singleNodeTestAllGreedyAlgorithm()
     ss << "Best modularity: " << currentModularity << endl;
     ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
     cout << ss.str();
-    // writeLineToFile(ss.str());
 
     return currentModularity;
 }

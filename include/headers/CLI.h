@@ -6,6 +6,7 @@
 #include "FailObject.h"
 #include "ArrayPartition.h"
 #include "Motif.h"
+#include "ResultsDatabase.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -53,6 +54,7 @@ private:
   static int parseArgs(int argc, char **argv);
   static int numberOfCommunities;
   static bool hasNumberOfCommunities;
+  static ResultsDatabase resultsTable;
 
   /**
    * Classic triangleModularity

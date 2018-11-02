@@ -14,6 +14,7 @@ class ResultsDatabase
         void addEntryToColumn(std::string columnName, double result);
         void printTable();
         void printToCSVFile();
+        void readFromCSVFile();
     private:
         std::map< std::string, std::vector< double > > table;
         void printHeaders();
