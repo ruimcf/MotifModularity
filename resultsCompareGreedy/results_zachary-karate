@@ -1,0 +1,592 @@
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 3915
+-- Single Node Greedy Algorithm --
+1	-0.055033
+2	-0.0315861
+3	-0.03046
+4	0.0396827
+5	0.0409674
+6	0.0828125
+7	0.0854118
+8	0.105035
+9	0.128922
+10	0.150461
+11	0.171901
+12	0.195736
+13	0.196852
+14	0.237082
+15	0.240236
+16	0.240791
+17	0.262458
+18	0.323588
+19	0.394262
+20	0.464063
+21	0.484681
+22	0.722477
+23	0.725074
+24	0.725333
+25	0.752774
+26	0.75288
+27	0.774712
+28	0.79717
+29	0.797214
+30	0.797327
+Greedy Choose first - Elapsed seconds: 0.016227
+-- Test All Greedy Algorithm --
+1	-0.130957
+2	0.0352157
+3	0.172555
+4	0.302308
+5	0.427015
+6	0.521887
+7	0.572555
+8	0.597226
+9	0.619555
+10	0.66297
+11	0.685962
+12	0.708458
+13	0.730641
+14	0.752902
+15	0.775086
+16	0.79717
+17	0.797308
+18	0.797327
+Greedy Choose best - Elapsed seconds: 0.042128
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6058
+-- Single Node Greedy Algorithm --
+1	0.111002
+2	0.136755
+3	0.144303
+4	0.156506
+5	0.161634
+6	0.178728
+7	0.196775
+8	0.289297
+9	0.362904
+10	0.381386
+11	0.548693
+12	0.56995
+13	0.594195
+14	0.730508
+15	0.775119
+16	0.775125
+17	0.797308
+18	0.797327
+Greedy Choose first - Elapsed seconds: 0.010787
+-- Test All Greedy Algorithm --
+1	-0.005829
+2	0.0788784
+3	0.218955
+4	0.352509
+5	0.397231
+6	0.483496
+7	0.507114
+8	0.5298
+9	0.552387
+10	0.574876
+11	0.596832
+12	0.618689
+13	0.640448
+14	0.659872
+15	0.696924
+16	0.70006
+17	0.724922
+18	0.72837
+19	0.774712
+20	0.79717
+21	0.797308
+22	0.797327
+Greedy Choose best - Elapsed seconds: 0.054720
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 7494
+-- Single Node Greedy Algorithm --
+1	-0.043910
+2	-0.0267969
+3	-0.0261712
+4	0.00505078
+5	0.00709088
+6	0.0141499
+7	0.0156999
+8	0.0343234
+9	0.187167
+10	0.190396
+11	0.199255
+12	0.202777
+13	0.203644
+14	0.207042
+15	0.326014
+16	0.333971
+17	0.351529
+18	0.356193
+19	0.395907
+20	0.635853
+21	0.659105
+22	0.66329
+23	0.684424
+24	0.752683
+25	0.774651
+26	0.797308
+27	0.797327
+Greedy Choose first - Elapsed seconds: 0.013716
+-- Test All Greedy Algorithm --
+1	-0.070923
+2	0.0101765
+3	0.131098
+4	0.262868
+5	0.393548
+6	0.48509
+7	0.549103
+8	0.597012
+9	0.640631
+10	0.663282
+11	0.685834
+12	0.708287
+13	0.730642
+14	0.752732
+15	0.774723
+16	0.775106
+17	0.797214
+18	0.797327
+Greedy Choose best - Elapsed seconds: 0.047693
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 8024
+-- Single Node Greedy Algorithm --
+1	-0.048512
+2	-0.0481253
+3	-0.0263423
+4	0.0376166
+5	0.0384471
+6	0.0399489
+7	0.0409546
+8	0.0414642
+9	0.105556
+10	0.121478
+11	0.124211
+12	0.285618
+13	0.304808
+14	0.319881
+15	0.323134
+16	0.331903
+17	0.350481
+18	0.551309
+19	0.619054
+20	0.640911
+21	0.64159
+22	0.662282
+23	0.685563
+24	0.686216
+25	0.728997
+26	0.729526
+27	0.729644
+28	0.797327
+Greedy Choose first - Elapsed seconds: 0.011023
+-- Test All Greedy Algorithm --
+1	-0.132607
+2	0.106568
+3	0.236737
+4	0.362088
+5	0.436737
+6	0.485438
+7	0.508423
+8	0.530601
+9	0.552867
+10	0.575045
+11	0.597311
+12	0.619479
+13	0.641684
+14	0.663394
+15	0.684846
+16	0.705642
+17	0.725941
+18	0.728997
+19	0.774948
+20	0.797308
+21	0.797327
+Greedy Choose best - Elapsed seconds: 0.052581
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6453
+-- Single Node Greedy Algorithm --
+1	-0.047447
+2	-0.0453962
+3	-0.0318727
+4	-0.0295291
+5	-0.0232495
+6	-0.00164495
+7	0.000340947
+8	0.00723239
+9	0.0148521
+10	0.0157411
+11	0.0627336
+12	0.0824078
+13	0.0831979
+14	0.0833805
+15	0.146439
+16	0.150766
+17	0.154609
+18	0.172988
+19	0.176832
+20	0.243894
+21	0.245413
+22	0.251406
+23	0.257301
+24	0.263097
+25	0.530211
+26	0.552844
+27	0.574923
+28	0.638567
+29	0.640108
+30	0.660789
+31	0.679078
+32	0.679374
+33	0.70038
+34	0.725187
+35	0.728536
+36	0.77478
+37	0.797214
+38	0.797327
+Greedy Choose first - Elapsed seconds: 0.016810
+-- Test All Greedy Algorithm --
+1	-0.098630
+2	0.0598954
+3	0.188901
+4	0.312451
+5	0.391959
+6	0.440874
+7	0.508441
+8	0.530643
+9	0.552885
+10	0.575087
+11	0.59733
+12	0.619532
+13	0.641659
+14	0.663984
+15	0.685651
+16	0.726182
+17	0.729139
+18	0.774992
+19	0.797327
+Greedy Choose best - Elapsed seconds: 0.046577
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 9705
+-- Single Node Greedy Algorithm --
+1	0.086234
+2	0.151239
+3	0.15273
+4	0.15286
+5	0.241299
+6	0.241561
+7	0.263522
+8	0.304216
+9	0.305085
+10	0.374212
+11	0.374317
+12	0.596226
+13	0.617937
+14	0.640671
+15	0.640783
+16	0.641171
+17	0.662384
+18	0.685117
+19	0.685421
+20	0.686238
+21	0.72995
+22	0.751745
+23	0.77479
+24	0.775117
+25	0.79717
+26	0.797214
+27	0.797327
+Greedy Choose first - Elapsed seconds: 0.015949
+-- Test All Greedy Algorithm --
+1	-0.060199
+2	0.132818
+3	0.236426
+4	0.374968
+5	0.508184
+6	0.596605
+7	0.641659
+8	0.663994
+9	0.686226
+10	0.708439
+11	0.730671
+12	0.752883
+13	0.774997
+14	0.797327
+Greedy Choose best - Elapsed seconds: 0.034607
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 9597
+-- Single Node Greedy Algorithm --
+1	0.148429
+2	0.164921
+3	0.236584
+4	0.345536
+5	0.387034
+6	0.410632
+7	0.434131
+8	0.441143
+9	0.441707
+10	0.572292
+11	0.572989
+12	0.59581
+13	0.616552
+14	0.639495
+15	0.66234
+16	0.66248
+17	0.684105
+18	0.752568
+19	0.775117
+20	0.79717
+21	0.797214
+22	0.797327
+Greedy Choose first - Elapsed seconds: 0.012946
+-- Test All Greedy Algorithm --
+1	-0.123118
+2	-0.0487566
+3	0.074459
+4	0.204624
+5	0.395959
+6	0.463978
+7	0.486238
+8	0.508422
+9	0.53059
+10	0.552897
+11	0.575105
+12	0.597219
+13	0.640255
+14	0.663886
+15	0.686217
+16	0.708449
+17	0.730661
+18	0.75277
+19	0.775106
+20	0.797214
+21	0.797327
+Greedy Choose best - Elapsed seconds: 0.055403
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 4777
+-- Single Node Greedy Algorithm --
+1	0.090981
+2	0.0914597
+3	0.134705
+4	0.158567
+5	0.158689
+6	0.158815
+7	0.201751
+8	0.202231
+9	0.202613
+10	0.202895
+11	0.203087
+12	0.203196
+13	0.245533
+14	0.24615
+15	0.255946
+16	0.273237
+17	0.278168
+18	0.283001
+19	0.287734
+20	0.292369
+21	0.316424
+22	0.320176
+23	0.328497
+24	0.357104
+25	0.440165
+26	0.574977
+27	0.707529
+28	0.707906
+29	0.775105
+30	0.775119
+31	0.775125
+32	0.797308
+33	0.797327
+Greedy Choose first - Elapsed seconds: 0.020406
+-- Test All Greedy Algorithm --
+1	0.004892
+2	0.165015
+3	0.247378
+4	0.30597
+5	0.366138
+6	0.482083
+7	0.611069
+8	0.652371
+9	0.679817
+10	0.703111
+11	0.724261
+12	0.743721
+13	0.751745
+14	0.77479
+15	0.775117
+16	0.79717
+17	0.797308
+18	0.797327
+Greedy Choose best - Elapsed seconds: 0.047044
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 1277
+-- Single Node Greedy Algorithm --
+1	-0.158414
+2	-0.00019513
+3	0.037195
+4	0.081598
+5	0.102229
+6	0.113236
+7	0.151213
+8	0.164368
+9	0.477899
+10	0.61554
+11	0.617295
+12	0.640775
+13	0.641781
+14	0.641792
+15	0.664003
+16	0.686115
+17	0.708128
+18	0.729526
+19	0.729644
+20	0.797327
+Greedy Choose first - Elapsed seconds: 0.009793
+-- Test All Greedy Algorithm --
+1	0.146743
+2	0.274943
+3	0.397242
+4	0.43409
+5	0.472876
+6	0.500757
+7	0.527088
+8	0.574851
+9	0.597349
+10	0.619533
+11	0.641794
+12	0.663978
+13	0.686146
+14	0.730039
+15	0.752812
+16	0.775119
+17	0.797327
+Greedy Choose best - Elapsed seconds: 0.045552
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 5521
+-- Single Node Greedy Algorithm --
+1	0.081146
+2	0.0820722
+3	0.216436
+4	0.240875
+5	0.284862
+6	0.308864
+7	0.360358
+8	0.36434
+9	0.368223
+10	0.369182
+11	0.390661
+12	0.548153
+13	0.572663
+14	0.775119
+15	0.775125
+16	0.797308
+17	0.797327
+Greedy Choose first - Elapsed seconds: 0.010928
+-- Test All Greedy Algorithm --
+1	-0.146065
+2	0.0554173
+3	0.129712
+4	0.264023
+5	0.395797
+6	0.463889
+7	0.486228
+8	0.50846
+9	0.530672
+10	0.552786
+11	0.575112
+12	0.597348
+13	0.619485
+14	0.641759
+15	0.664019
+16	0.686179
+17	0.707197
+18	0.708402
+19	0.752501
+20	0.774393
+21	0.774997
+22	0.797327
+Greedy Choose best - Elapsed seconds: 0.054712
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6058
+Greedy Choose first - Elapsed seconds: 0.015414
+Greedy Choose best - Elapsed seconds: 0.062775
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6058
+Greedy Choose first - Elapsed seconds: 0.011028
+Greedy Choose best - Elapsed seconds: 0.062282
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6058
+Greedy Choose first - Elapsed seconds: 0.012093
+Greedy Choose best - Elapsed seconds: 0.070039
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6058
+Greedy Choose first - Elapsed seconds: 0.015657
+Greedy Choose best - Elapsed seconds: 0.065072
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 3915
+Greedy Choose first - Elapsed seconds: 0.016305
+Greedy Choose best - Elapsed seconds: 0.052740
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6058
+Greedy Choose first - Elapsed seconds: 0.010775
+Greedy Choose best - Elapsed seconds: 0.066276
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 7494
+Greedy Choose first - Elapsed seconds: 0.015937
+Greedy Choose best - Elapsed seconds: 0.048523
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 8024
+Greedy Choose first - Elapsed seconds: 0.012019
+Greedy Choose best - Elapsed seconds: 0.056950
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6453
+Greedy Choose first - Elapsed seconds: 0.016731
+Greedy Choose best - Elapsed seconds: 0.046916
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 9705
+Greedy Choose first - Elapsed seconds: 0.016930
+Greedy Choose best - Elapsed seconds: 0.034611
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 9597
+Greedy Choose first - Elapsed seconds: 0.010670
+Greedy Choose best - Elapsed seconds: 0.056900
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 4777
+Greedy Choose first - Elapsed seconds: 0.021176
+Greedy Choose best - Elapsed seconds: 0.047891
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 1277
+Greedy Choose first - Elapsed seconds: 0.009247
+Greedy Choose best - Elapsed seconds: 0.046048
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 5521
+Greedy Choose first - Elapsed seconds: 0.011708
+Greedy Choose best - Elapsed seconds: 0.057859
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 3915
+Greedy Choose first - Elapsed seconds: 0.015033
+Greedy Choose best - Elapsed seconds: 0.040860
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6058
+Greedy Choose first - Elapsed seconds: 0.010209
+Greedy Choose best - Elapsed seconds: 0.050804
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 7494
+Greedy Choose first - Elapsed seconds: 0.014668
+Greedy Choose best - Elapsed seconds: 0.048849
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 8024
+Greedy Choose first - Elapsed seconds: 0.012298
+Greedy Choose best - Elapsed seconds: 0.053744
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6453
+Greedy Choose first - Elapsed seconds: 0.015982
+Greedy Choose best - Elapsed seconds: 0.046059
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 9705
+Greedy Choose first - Elapsed seconds: 0.018508
+Greedy Choose best - Elapsed seconds: 0.033946
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 9597
+Greedy Choose first - Elapsed seconds: 0.011283
+Greedy Choose best - Elapsed seconds: 0.050833
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 4777
+Greedy Choose first - Elapsed seconds: 0.020240
+Greedy Choose best - Elapsed seconds: 0.042073
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 1277
+Greedy Choose first - Elapsed seconds: 0.009300
+Greedy Choose best - Elapsed seconds: 0.040964
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 5521
+Greedy Choose first - Elapsed seconds: 0.010167
+Greedy Choose best - Elapsed seconds: 0.053190
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 3915
+Greedy Choose best - Elapsed seconds: 0.044328
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6058
+Greedy Choose best - Elapsed seconds: 0.050706
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 7494
+Greedy Choose best - Elapsed seconds: 0.043700
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 8024
+Greedy Choose best - Elapsed seconds: 0.049764
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 6453
+Greedy Choose best - Elapsed seconds: 0.043802
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 9705
+Greedy Choose best - Elapsed seconds: 0.034170
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 9597
+Greedy Choose best - Elapsed seconds: 0.050785
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 4777
+Greedy Choose best - Elapsed seconds: 0.046909
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 1277
+Greedy Choose best - Elapsed seconds: 0.041262
+INFO Number of Communities: 2 | Motif: motifs/triangle.motif | SEED: 5521
+Greedy Choose best - Elapsed seconds: 0.052018

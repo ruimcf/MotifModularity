@@ -6,6 +6,7 @@
 #include "FailObject.h"
 #include "ArrayPartition.h"
 #include "Motif.h"
+#include "ResultsDatabase.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -45,13 +46,15 @@ private:
   static string motifFile;
   static bool readMotif;
   static bool readPartition;
-  static bool noWriteFiles;
+  static bool notOptimized;
+  static bool noMotifOrder;
   static int seed;
   static Motif motif;
   static void setNodes();
   static int parseArgs(int argc, char **argv);
   static int numberOfCommunities;
   static bool hasNumberOfCommunities;
+  static ResultsDatabase resultsTable;
 
   /**
    * Classic triangleModularity
@@ -111,6 +114,7 @@ private:
    * Greedy algorithms to maximize modularity
    */
   static double singleNodeGreedyAlgorithm();
+  static double singleNodeGreedyAlgorithmNotOptimized();
   static double singleNodeTestAllGreedyAlgorithm();
 
   /**

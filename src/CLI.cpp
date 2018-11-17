@@ -25,7 +25,9 @@ double bestModularity;
 int *bestPartition;
 int CLI::numberOfCommunities;
 bool CLI::hasNumberOfCommunities;
-bool CLI::noWriteFiles;
+bool CLI::notOptimized;
+bool CLI::noMotifOrder;
+ResultsDatabase CLI::resultsTable;
 
 //unique id to identify this run, random number between 1 and 1000000
 int uniqueIdentifier;
@@ -49,7 +51,8 @@ int CLI::parseArgs(int argc, char **argv)
     weighted = false;
     hasNumberOfCommunities = false;
     seed = time(NULL);
-    noWriteFiles = false;
+    notOptimized = false;
+    noMotifOrder = false;
 
     for (int i = 1; i < argc; ++i)
     {
@@ -140,9 +143,14 @@ int CLI::parseArgs(int argc, char **argv)
             numberOfCommunities = stoi(argv[i]);
         }
 
-        else if (arg == "--no-write-files") 
+        else if (arg == "--not-optimized") 
         {
-            noWriteFiles = true;
+            notOptimized = true;
+        }
+
+        else if (arg == "--no-motif-order") 
+        {
+            noMotifOrder = true;
         }
     }
 
@@ -174,7 +182,7 @@ int CLI::parseArgs(int argc, char **argv)
 
 void CLI::openResultsFile()
 {
-    string resultPath = "results/" + networkFileName + "_" + to_string(uniqueIdentifier);
+    string resultPath = "resultsCompareGreedy/results_" + networkFileName;
     resultsFile.open(resultPath, ios::out | ios::app);
     if (resultsFile.is_open())
     {
@@ -295,17 +303,18 @@ void CLI::start(int argc, char **argv)
     if(parseResult < 0) return;
 
     CLI::openResultsFile();
-    string argsInfo = "Number of Communities: " + to_string(numberOfCommunities) + " | Motif: " + motifFile + " | SEED: " + to_string(seed) + "\n";
+    string argsInfo = "INFO Number of Communities: " + to_string(numberOfCommunities) + " | Motif: " + motifFile + " | SEED: " + to_string(seed) + "\n";
     CLI::writeLineToFile(argsInfo);
+    resultsTable.readFromCSVFile();
 
     Random::seed(seed);
 
-    CLI::registerConfigs();
+    //CLI::registerConfigs();
     g = new GraphMatrix();
     GraphUtils::readFileTxt(g, networkFile.c_str(), directed, weighted);
 
-    if (!noWriteFiles)
-    writeNetworkToGephiData();
+    // if (!noWriteFiles)
+    // writeNetworkToGephiData();
 
     networkPartition.setNumberNodes(g->numNodes());
 
@@ -313,19 +322,19 @@ void CLI::start(int argc, char **argv)
     motif.print();
 
     
-    if (readPartition)
-    {
-        networkPartition.readPartition(partitionFile.c_str());
-        cout << "Partition read: " << networkPartition.toStringPartitionByNode() << endl;
-            if (!noWriteFiles)
-        networkPartition.writePartitionFile(networkFileName, "real-partition", uniqueIdentifier);
-    }
-    else {
-        networkPartition.randomPartition(numberOfCommunities);
-            if (!noWriteFiles)
-        networkPartition.writePartitionFile(networkFileName, "random-partition", uniqueIdentifier);
-        cout << "Partition created: " << networkPartition.toStringPartitionByNode() << endl;
-    }
+    // if (readPartition)
+    // {
+    //     networkPartition.readPartition(partitionFile.c_str());
+    //     cout << "Partition read: " << networkPartition.toStringPartitionByNode() << endl;
+    //     //     if (!noWriteFiles)
+    //     // networkPartition.writePartitionFile(networkFileName, "real-partition", uniqueIdentifier);
+    // }
+    // else {
+    //     networkPartition.randomPartition(numberOfCommunities);
+    //     //     if (!noWriteFiles)
+    //     // networkPartition.writePartitionFile(networkFileName, "random-partition", uniqueIdentifier);
+    //     cout << "Partition created: " << networkPartition.toStringPartitionByNode() << endl;
+    // }
  
     nodes.clear();
     nodes.reserve(g->numNodes());
@@ -334,58 +343,28 @@ void CLI::start(int argc, char **argv)
         nodes.push_back(i);
     }
 
-    // total = 0;
-    // double modularity = CLI::triangleModularity();
-    // printf("Triangle modularity: %f\nTotal: %ld\n", modularity, total);
-
-    // total = 0;
-    // double motifModularity = CLI::motifModularity();
-    // printf("Motif modularity: %f\nTotal: %d\n", motifModularity, total);
-
-    total = 0;
-    // double optimizedMotifModularity = CLI::optimizedMotifModularity();
-    // printf("Optimized Motif modularity: %f\nTotal: %ld\n", optimizedMotifModularity, total);
-
-    MotifValues values = CLI::optimizedMotifModularityValues();
-    cout << "Optimized motif Modularity values: " << CLI::motifModularityFromValues(values) << endl << "Total: " << total << endl;
-    printMotifValues(values);
-    // for(int i = 0; i < 5; ++i)
-    // {
-    //     total = 0;
-    //     clock_t begin_ = clock();
-    //     MotifValues values = CLI::optimizedMotifModularityValues();
-    //     cout << "Optimized motif Modularity values: " << CLI::motifModularityFromValues(values) << endl << "Total: " << total << endl;
-    //     printMotifValues(values);
-    //     clock_t end_ = clock();
-    //     double elapsedSecs_ = double(end_ - begin_) / CLOCKS_PER_SEC;
-    //     cout << "Elapsed seconds: " << elapsedSecs_ << endl << endl;
-    // }
-
-    // total = 0;
-    // MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
-    // MotifVariableValues motifVariableValues = CLI::getMotifVariableValues();
-    // double constantValuesMotifModularity = CLI::motifModularityFromValues(motifConstantValues, motifVariableValues);
-    // printf("Optimized Motif modularity with constant values: %f\n", constantValuesMotifModularity);
-
-    // int changingNode = 1;
-
-    // MotifVariableValues toChangeNodeValues = CLI::nodeVariableValues(changingNode);
-    // networkPartition.setNodeCommunity(changingNode, 1);
-    // cout << "CHANGED" << endl;
-    // total = 0;
-    // MotifValues newValues = CLI::optimizedMotifModularityValues();
-    // cout << "Modularity: " << motifModularityFromValues(newValues) << endl << " Total: " << total << endl;
-    // MotifVariableValues changedNodeValues = CLI::nodeVariableValues(changingNode);
-    // MotifValues changingNodeMotifValuesValues = changingNodeMotifValues(values, toChangeNodeValues, changedNodeValues);
-    // cout << "Calculated Changing Node modularity: " << CLI::motifModularityFromValues(changingNodeMotifValuesValues) << endl;
-
     clock_t begin = clock();
     CLI::singleNodeGreedyAlgorithm();
     clock_t end = clock();
     double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
     cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
-    CLI::writeLineToFile("Elapsed seconds: " + to_string(elapsedSecs) + "\n\n");
+    // writeLineToFile("Greedy Choose first - Elapsed seconds: " + to_string(elapsedSecs) +"\n");
+    string columnName = "time-"+to_string(seed)+"-choose-first";
+    resultsTable.addColumn(columnName);
+    resultsTable.addEntryToColumn(columnName, elapsedSecs);
+
+    begin = clock();
+    CLI::singleNodeTestAllGreedyAlgorithm();
+    end = clock();
+    elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
+    cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
+    writeLineToFile("Greedy Choose best - Elapsed seconds: " + to_string(elapsedSecs) +"\n");
+    columnName = "time-"+to_string(seed)+"-choose-best";
+    resultsTable.addColumn(columnName);
+    resultsTable.addEntryToColumn(columnName, elapsedSecs);
+
     CLI::closeResultsFile();
+    resultsTable.printToCSVFile();
 }
 
 /**
@@ -527,7 +506,7 @@ void CLI::countCombinationMotifs(MotifValues *values)
 
 bool CLI::combinationObeysOrbitRules()
 {
-    const vector<vector<int> > & orbitRules = motif.getOrbitRulesWithOrder();
+    const vector<vector<int> > & orbitRules = noMotifOrder ? motif.getOrbitRules() :  motif.getOrbitRulesWithOrder();
     for(int i = 0; i < orbitRules.size(); i++)
     {
         if(combination.at(orbitRules[i][0]) >= combination.at(orbitRules[i][1])){
@@ -546,7 +525,7 @@ bool CLI::combinationHasMotifEdges()
         for(int j = i+1; j < combination.size(); ++j)
         {
             // if has edge in motif, it needs to have edge on the graph
-            if(motif.hasEdgeWithOrder(i, j))
+            if(noMotifOrder ? motif.hasEdge(i, j) : motif.hasEdgeWithOrder(i, j))
             {
                 if(!g->hasEdge(combination[i], combination[j]))
                     return false;
@@ -559,7 +538,7 @@ bool CLI::combinationHasMotifEdges()
             // also check the opposite orientation if the motif is directed
             if(motif.isDirected())
             {
-                if(motif.hasEdgeWithOrder(j, i))
+                if(noMotifOrder ? motif.hasEdge(j, i) : motif.hasEdgeWithOrder(j, i))
                 {
                     if(!g->hasEdge(combination[j], combination[i]))
                         return false;
@@ -581,12 +560,12 @@ bool CLI::combinationHasMotifCommunities()
         for(int nodeB = nodeA + 1; nodeB < combination.size(); ++nodeB)
         {
             // If one of the nodes can be in any community we continue
-            if(motif.getCommunityWithOrder(nodeA) == -1 || motif.getCommunityWithOrder(nodeB) == -1)
+            if((noMotifOrder ? motif.getCommunity(nodeA) : motif.getCommunityWithOrder(nodeA)) == -1 || (noMotifOrder ? motif.getCommunity(nodeB) : motif.getCommunityWithOrder(nodeB)) == -1)
                 continue;
 
             // If the communities are different in the motif, they have
             // to be different in the partition
-            else if (motif.getCommunityWithOrder(nodeA) != motif.getCommunityWithOrder(nodeB))
+            else if ((noMotifOrder ? motif.getCommunity(nodeA) : motif.getCommunityWithOrder(nodeA)) != (noMotifOrder ? motif.getCommunity(nodeB) : motif.getCommunityWithOrder(nodeB)))
             {
                 if(CLI::kronecker(combination[nodeA], combination[nodeB]))
                     return false;
@@ -605,7 +584,7 @@ bool CLI::combinationHasMotifCommunities()
 // For each motif edges, calculate the nullcaseWeight and return the product of them
 int CLI::combinationNullcaseWeights()
 {
-    const vector< vector<int> > & adjacencyList = motif.getAdjacencyListWithOrder();
+    const vector< vector<int> > & adjacencyList = noMotifOrder ? motif.getAdjacencyList() : motif.getAdjacencyListWithOrder();
     int product = 1;
     for(int i = 0; i < adjacencyList.size(); ++i)
     {
@@ -688,7 +667,7 @@ void CLI::optimizedMotifModularityValuesIteration(int offset, bool edgesCheck, b
 
 bool CLI::optimizedCombinationOrbitRules()
 {
-    const vector< vector<int> >& orbitRules = motif.getOrbitRulesSizeWithOrder(combination.size()-1);
+    const vector< vector<int> >& orbitRules = noMotifOrder ? motif.getOrbitRulesSize(combination.size()-1) : motif.getOrbitRulesSizeWithOrder(combination.size()-1);
     for(int i = 0; i < orbitRules.size(); i++)
     {
         if(combination.at(orbitRules[i][0]) >= combination.at(orbitRules[i][1])){
@@ -701,7 +680,7 @@ bool CLI::optimizedCombinationOrbitRules()
 // The next node that we can add to the combination needs to agree to the most strict orbit rule
 int CLI::getOrbitRulesNextValidNode()
 {
-    const vector< vector<int> >& orbitRules = motif.getOrbitRulesSizeWithOrder(combination.size());
+    const vector< vector<int> >& orbitRules = noMotifOrder ? motif.getOrbitRulesSize(combination.size()) : motif.getOrbitRulesSizeWithOrder(combination.size());
     int maxNode = -1;
     for(int i = 0; i < orbitRules.size(); i++)
     {
@@ -723,7 +702,7 @@ bool CLI::optimizedCombinationHasMotifEdges()
     for(int i = 0; i < addedNodePos; ++i)
     {
         //if has edge in motif, it needs to have edge on the graph
-        if(motif.hasEdgeWithOrder(addedNodePos, i)) {
+        if(noMotifOrder ? motif.hasEdge(addedNodePos, i) : motif.hasEdgeWithOrder(addedNodePos, i)) {
             if(!g->hasEdge(combination[addedNodePos], combination[i]))
                 return false;
         }
@@ -735,7 +714,7 @@ bool CLI::optimizedCombinationHasMotifEdges()
         // also check the opposite orientation if the motif is directed
         if(motif.isDirected())
         {
-            if(motif.hasEdgeWithOrder(i, addedNodePos)) 
+            if(noMotifOrder ? motif.hasEdge(i, addedNodePos) : motif.hasEdgeWithOrder(i, addedNodePos)) 
             {
                 if(!g->hasEdge(combination[i], combination[addedNodePos]))
                     return false;
@@ -754,17 +733,17 @@ bool CLI::optimizedCombinationHasMotifCommunities()
     int addedNodePos = combination.size()-1;
     
     // If the added node can be in any community, its all good
-    if(motif.getCommunityWithOrder(addedNodePos) == -1)
+    if((noMotifOrder ? motif.getCommunity(addedNodePos) : motif.getCommunityWithOrder(addedNodePos)) == -1)
         return true;
     
     for(int i = 0; i < addedNodePos; ++i)
     {
         // If the node can be in any community we continue
-        if (motif.getCommunityWithOrder(i) == -1) continue;
+        if ((noMotifOrder ? motif.getCommunity(i) : motif.getCommunityWithOrder(i)) == -1) continue;
 
         // If the communities are different in the motif, they have
         // to be different in the partition
-        if (motif.getCommunityWithOrder(i) != motif.getCommunityWithOrder(addedNodePos))
+        if ((noMotifOrder ? motif.getCommunity(i) : motif.getCommunityWithOrder(i)) != (noMotifOrder ? motif.getCommunity(addedNodePos) : motif.getCommunityWithOrder(addedNodePos)))
         {
             if(CLI::kronecker(combination[i], combination[addedNodePos]))
                 return false;
@@ -782,7 +761,7 @@ bool CLI::optimizedCombinationHasMotifCommunities()
 // When a new node is added to the combination, calculate the nullcase weights of that node with the others
 void CLI::nextCombinationNullcaseWeights()
 {
-    const vector< vector<int> > & adjacencyList = motif.getAdjacencyListSizeWithOrder(combination.size() - 1);
+    const vector< vector<int> > & adjacencyList = noMotifOrder ? motif.getAdjacencyListSize(combination.size() - 1) : motif.getAdjacencyListSizeWithOrder(combination.size() - 1);
     long product = (combination.size() == 1) ? 1 : combinationWeightsArray[combination.size() - 2];
 
     for(int i = 0; i < adjacencyList.size(); ++i)
@@ -1012,7 +991,8 @@ int numberForEvenTrianglePartitions(int numNodes)
 double CLI::singleNodeGreedyAlgorithm()
 {
     cout << "--- Starting greedy ---" << endl;
-    writeLineToFile("-Single Node Greedy Algorithm-\n");
+    string columnName = to_string(seed) + "-choose-first";
+    resultsTable.addColumn(columnName);
     int chosenNode, chosenIndex, chosenNodePartition, betterPartition;
     MotifValues betterValues;
     double bestModularity, currentModularity;
@@ -1022,12 +1002,9 @@ double CLI::singleNodeGreedyAlgorithm()
     MotifValues currentValues = CLI::optimizedMotifModularityValues();
     currentModularity = CLI::motifModularityFromValues(currentValues);
 
-    // currentModularity = CLI::optimizedMotifModularity();
     
     cout << "Initial Modularity " << currentModularity << endl;
-    writeLineToFile("Initial Modularity: "+to_string(currentModularity)+"\n");
-    if (!noWriteFiles)
-    networkPartition.writePartitionFile(networkFileName, "g-initial-partition", uniqueIdentifier);
+    resultsTable.addEntryToColumn(columnName, currentModularity);
 
     FailObject failObject;
     allNodes.reserve(g->numNodes());
@@ -1072,14 +1049,7 @@ double CLI::singleNodeGreedyAlgorithm()
         {
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
             currentValues = betterValues;
-            // stringstream ss;
-            // ss << "Current modularity: " << currentModularity << endl;
-            // ss << "Times failed: " << failObject.getConsecutiveTimesFailed() << endl;
-            // ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
-            // cout << ss.str();
-            // printMotifValues(betterValues);
-            // cout << "-----------" << endl;
-            // writeLineToFile(ss.str());
+            resultsTable.addEntryToColumn(columnName, currentModularity);
 
             failObject.recordSuccess();
             availableNodes = allNodes;
@@ -1089,14 +1059,10 @@ double CLI::singleNodeGreedyAlgorithm()
     stringstream ss;
     ss << "Successfully incremented modularity " << failObject.getTimesSuccess() << " times" << endl;
     ss << "Best modularity: " << currentModularity << endl;
-    ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
-    ss << "Number of unique communities: " + to_string(networkPartition.getNumberOfDifferentPartitions()) << endl;
+    // ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
+    // ss << "Number of unique communities: " + to_string(networkPartition.getNumberOfDifferentPartitions()) << endl;
     cout << ss.str();
     
-    writeLineToFile(ss.str());
-    if (!noWriteFiles)
-    networkPartition.writePartitionFile(networkFileName, "g-computed-partition", uniqueIdentifier);
-
     return currentModularity;
 }
 
@@ -1107,15 +1073,20 @@ double CLI::singleNodeGreedyAlgorithm()
 double CLI::singleNodeTestAllGreedyAlgorithm()
 {
     cout << "--- Starting greedy test all ---" << endl;
+    string columnName = to_string(seed) + "-choose-best";
     int chosenNode, chosenIndex, chosenNodePartition;
-    double bestModularity, currentModularity;
     vector<int> allNodes;
-    MotifConstantValues motifConstantValues = CLI::getMotifConstantValues();
+    double bestModularity, currentModularity;
+    MotifValues betterValues;
+    resultsTable.addColumn(columnName);
 
     networkPartition.randomPartition(numberOfCommunities);
 
-    currentModularity = CLI::optimizedMotifModularity();
+    MotifValues currentValues = CLI::optimizedMotifModularityValues();
+    currentModularity = CLI::motifModularityFromValues(currentValues);
     cout << "Current Modularity " << currentModularity << endl;
+
+    resultsTable.addEntryToColumn(columnName, currentModularity);
 
     allNodes.reserve(g->numNodes());
     for (int i = 0; i < g->numNodes(); ++i)
@@ -1134,15 +1105,19 @@ double CLI::singleNodeTestAllGreedyAlgorithm()
         {
             chosenNode = availableNodes[chosenIndex];
             chosenNodePartition = networkPartition.getNodeCommunity(chosenNode);
+            MotifVariableValues beforeChangeNodeValues = CLI::nodeVariableValues(chosenNode); 
             for (int i = 0; i < numberOfCommunities; i++)
             {
                 if (i != chosenNodePartition)
                 {
                     networkPartition.setNodeCommunity(chosenNode, i);
-                    double currentPartitionModularity = CLI::optimizedMotifModularity();
+                    MotifVariableValues afterChangeNodeValues = CLI::nodeVariableValues(chosenNode);
+                    MotifValues currentPartitionModularityValues = CLI::changingNodeMotifValues(currentValues, beforeChangeNodeValues, afterChangeNodeValues);
+                    double currentPartitionModularity = CLI::motifModularityFromValues(currentPartitionModularityValues);
                     if (currentPartitionModularity > currentModularity)
                     {
                         currentModularity = currentPartitionModularity;
+                        betterValues = currentPartitionModularityValues;
                         bestCommunity = i;
                         bestNodeToChange = chosenNode;
                     }
@@ -1157,12 +1132,8 @@ double CLI::singleNodeTestAllGreedyAlgorithm()
         else
         {
             networkPartition.setNodeCommunity(bestNodeToChange, bestCommunity);
-
-            // stringstream ss;
-            // ss << "Current modularity: " << currentModularity << endl;
-            // ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
-            // cout << ss.str();
-            // writeLineToFile(ss.str());
+            currentValues = betterValues;
+            resultsTable.addEntryToColumn(columnName, currentModularity);
         }
     }
 
@@ -1170,7 +1141,6 @@ double CLI::singleNodeTestAllGreedyAlgorithm()
     ss << "Best modularity: " << currentModularity << endl;
     ss << "Partition: " << networkPartition.toStringPartitionByNode() << endl;
     cout << ss.str();
-    writeLineToFile(ss.str());
 
     return currentModularity;
 }
