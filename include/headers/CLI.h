@@ -55,7 +55,13 @@ private:
   static int numberOfCommunities;
   static bool hasNumberOfCommunities;
   static ResultsDatabase resultsTable;
+  static vector< vector<int> > nullcaseWeights;
+  static bool noWriteFiles;
 
+  /**
+   * helpers
+   */
+  static void memoizeNullcaseWeights();
   /**
    * Classic triangleModularity
    */

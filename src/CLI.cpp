@@ -11,6 +11,7 @@ vector<int> CLI::nodes;
 vector<int> CLI::combination;
 vector<long> CLI::combinationWeightsArray;
 vector<bool> CLI::used;
+vector< vector<int> > CLI::nullcaseWeights;
 bool CLI::directed, CLI::weighted, CLI::readPartition, CLI::readMotif;
 string CLI::networkFile;
 string CLI::networkFileName;
@@ -246,6 +247,21 @@ void CLI::setNodes()
     // }
 }
 
+void CLI::memoizeNullcaseWeights()
+{
+    int numNodes = g->numNodes();
+    nullcaseWeights.clear();
+    nullcaseWeights.reserve(numNodes);
+    for (int i = 0; i < numNodes; ++i)
+    {
+        vector<int> v;
+        v.reserve(numNodes);
+        nullcaseWeights.push_back(v);
+        for(int j = 0; j < numNodes; ++j)
+            nullcaseWeights[i].push_back(g->nodeOutEdges(i) * g->nodeInEdges(j));
+    }
+}
+
 
 void CLI::writeNetworkToGephiData() 
 {
@@ -313,6 +329,8 @@ void CLI::start(int argc, char **argv)
     g = new GraphMatrix();
     GraphUtils::readFileTxt(g, networkFile.c_str(), directed, weighted);
 
+    memoizeNullcaseWeights();
+
     // if (!noWriteFiles)
     // writeNetworkToGephiData();
 
@@ -349,19 +367,19 @@ void CLI::start(int argc, char **argv)
     double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
     cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
     // writeLineToFile("Greedy Choose first - Elapsed seconds: " + to_string(elapsedSecs) +"\n");
-    string columnName = "time-"+to_string(seed)+"-choose-first";
+    string columnName = "time-"+to_string(seed)+"-no-memoize";
     resultsTable.addColumn(columnName);
     resultsTable.addEntryToColumn(columnName, elapsedSecs);
 
-    begin = clock();
-    CLI::singleNodeTestAllGreedyAlgorithm();
-    end = clock();
-    elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
-    cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
-    writeLineToFile("Greedy Choose best - Elapsed seconds: " + to_string(elapsedSecs) +"\n");
-    columnName = "time-"+to_string(seed)+"-choose-best";
-    resultsTable.addColumn(columnName);
-    resultsTable.addEntryToColumn(columnName, elapsedSecs);
+    // begin = clock();
+    // CLI::singleNodeTestAllGreedyAlgorithm();
+    // end = clock();
+    // elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
+    // cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
+    // writeLineToFile("Greedy Choose best - Elapsed seconds: " + to_string(elapsedSecs) +"\n");
+    // columnName = "time-"+to_string(seed)+"-choose-best";
+    // resultsTable.addColumn(columnName);
+    // resultsTable.addEntryToColumn(columnName, elapsedSecs);
 
     CLI::closeResultsFile();
     resultsTable.printToCSVFile();
@@ -992,7 +1010,7 @@ double CLI::singleNodeGreedyAlgorithm()
 {
     cout << "--- Starting greedy ---" << endl;
     string columnName = to_string(seed) + "-choose-first";
-    resultsTable.addColumn(columnName);
+    //resultsTable.addColumn(columnName);
     int chosenNode, chosenIndex, chosenNodePartition, betterPartition;
     MotifValues betterValues;
     double bestModularity, currentModularity;
@@ -1004,7 +1022,7 @@ double CLI::singleNodeGreedyAlgorithm()
 
     
     cout << "Initial Modularity " << currentModularity << endl;
-    resultsTable.addEntryToColumn(columnName, currentModularity);
+    // resultsTable.addEntryToColumn(columnName, currentModularity);
 
     FailObject failObject;
     allNodes.reserve(g->numNodes());
@@ -1049,7 +1067,7 @@ double CLI::singleNodeGreedyAlgorithm()
         {
             networkPartition.setNodeCommunity(chosenNode, betterPartition);
             currentValues = betterValues;
-            resultsTable.addEntryToColumn(columnName, currentModularity);
+            // resultsTable.addEntryToColumn(columnName, currentModularity);
 
             failObject.recordSuccess();
             availableNodes = allNodes;
