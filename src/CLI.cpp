@@ -329,7 +329,6 @@ void CLI::start(int argc, char **argv)
     g = new GraphMatrix();
     GraphUtils::readFileTxt(g, networkFile.c_str(), directed, weighted);
 
-    memoizeNullcaseWeights();
 
     // if (!noWriteFiles)
     // writeNetworkToGephiData();
@@ -362,12 +361,13 @@ void CLI::start(int argc, char **argv)
     }
 
     clock_t begin = clock();
+    memoizeNullcaseWeights();
     CLI::singleNodeGreedyAlgorithm();
     clock_t end = clock();
     double elapsedSecs = double(end - begin) / CLOCKS_PER_SEC;
     cout << "Elapsed seconds: " << elapsedSecs << endl << endl;
     // writeLineToFile("Greedy Choose first - Elapsed seconds: " + to_string(elapsedSecs) +"\n");
-    string columnName = "time-"+to_string(seed)+"-no-memoize";
+    string columnName = "time-"+to_string(seed)+"-with-memoize";
     resultsTable.addColumn(columnName);
     resultsTable.addEntryToColumn(columnName, elapsedSecs);
 
@@ -1191,7 +1191,8 @@ double CLI::motifModularityFromValues(long long v1, long long v2, long long v3, 
 
 int CLI::nullcaseWeight(int a, int b)
 {
-    return g->nodeOutEdges(a) * g->nodeInEdges(b);
+    // return g->nodeOutEdges(a) * g->nodeInEdges(b);
+    return nullcaseWeights[a][b];
 }
 
 int CLI::maskedNullcaseWeight(int a, int b)
